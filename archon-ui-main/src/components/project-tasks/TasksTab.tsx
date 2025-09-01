@@ -73,7 +73,6 @@ export const TasksTab = ({
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
   const [isSavingTask, setIsSavingTask] = useState<boolean>(false);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
-  const [highlightedTaskId, setHighlightedTaskId] = useState<string | undefined>(selectedTaskId);
   
   // Initialize tasks
   useEffect(() => {
@@ -84,18 +83,6 @@ export const TasksTab = ({
   useEffect(() => {
     loadProjectFeatures();
   }, [projectId]);
-
-  // Handle selectedTaskId from URL - open task for editing
-  useEffect(() => {
-    if (selectedTaskId && tasks.length > 0) {
-      const targetTask = tasks.find(task => task.id === selectedTaskId);
-      if (targetTask && targetTask !== editingTask) {
-        console.log(`🔗 URL specified task: ${targetTask.title}`);
-        setEditingTask(targetTask);
-        setIsModalOpen(true);
-      }
-    }
-  }, [selectedTaskId, tasks, editingTask]);
 
   // Optimized socket handlers with conflict resolution
   const handleTaskUpdated = useCallback((message: any) => {
@@ -228,19 +215,11 @@ export const TasksTab = ({
   const openEditModal = async (task: Task) => {
     setEditingTask(task);
     setIsModalOpen(true);
-    // Update URL when task is selected
-    if (onTaskSelect) {
-      onTaskSelect(task.id);
-    }
   };
 
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingTask(null);
-    // Clear task ID from URL when modal closes
-    if (onTaskSelect) {
-      onTaskSelect(''); // Empty string will remove the task ID from URL
-    }
   };
 
   const saveTask = async (task: Task) => {
