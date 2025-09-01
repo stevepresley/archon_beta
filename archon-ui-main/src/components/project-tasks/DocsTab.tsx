@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, X, Search, Upload, Link as LinkIcon, Check, Brain, Save, History, Eye, Edit3, Sparkles } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { knowledgeBaseService, KnowledgeItem } from '../../services/knowledgeBaseService';
@@ -501,7 +501,9 @@ Add your content here...
 /* ——————————————————————————————————————————— */
 export const DocsTab = ({
   tasks,
-  project
+  project,
+  selectedDocumentId,
+  onDocumentSelect
 }: {
   tasks: Task[];
   project?: {
@@ -510,6 +512,8 @@ export const DocsTab = ({
     created_at?: string;
     updated_at?: string;
   } | null;
+  selectedDocumentId?: string;
+  onDocumentSelect?: (documentId: string) => void;
 }) => {
   // Document state
   const [documents, setDocuments] = useState<ProjectDoc[]>([]);
@@ -712,6 +716,26 @@ export const DocsTab = ({
   useEffect(() => {
     setSelectedDocument(null);
   }, [project?.id]);
+
+  // Handle selectedDocumentId from URL
+  useEffect(() => {
+    if (selectedDocumentId && documents.length > 0) {
+      const targetDoc = documents.find(doc => doc.id === selectedDocumentId);
+      if (targetDoc && targetDoc !== selectedDocument) {
+        console.log(`🔗 URL specified document: ${targetDoc.title}`);
+        setSelectedDocument(targetDoc);
+        setIsEditing(false);
+      }
+    }
+  }, [selectedDocumentId, documents, selectedDocument]);
+
+  // Handle document selection with URL callback
+  const handleDocumentSelect = useCallback((document: ProjectDoc) => {
+    setSelectedDocument(document);
+    if (onDocumentSelect) {
+      onDocumentSelect(document.id);
+    }
+  }, [onDocumentSelect]);
 
   // Existing knowledge loading function
   const loadKnowledgeItems = async (knowledgeType?: 'technical' | 'business') => {
@@ -941,7 +965,7 @@ export const DocsTab = ({
                 key={doc.id}
                 document={doc}
                 isActive={selectedDocument?.id === doc.id}
-                onSelect={setSelectedDocument}
+                onSelect={handleDocumentSelect}
                 onDelete={async (docId) => {
                   try {
                     // Call API to delete from database first

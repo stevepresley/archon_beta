@@ -55,11 +55,15 @@ const mapDatabaseTaskToUITask = (dbTask: any): Task => {
 export const TasksTab = ({
   initialTasks,
   onTasksChange,
-  projectId
+  projectId,
+  selectedTaskId,
+  onTaskSelect
 }: {
   initialTasks: Task[];
   onTasksChange: (tasks: Task[]) => void;
   projectId: string;
+  selectedTaskId?: string;
+  onTaskSelect?: (taskId: string) => void;
 }) => {
   const [viewMode, setViewMode] = useState<'table' | 'board'>('board');
   const [tasks, setTasks] = useState<Task[]>([]);

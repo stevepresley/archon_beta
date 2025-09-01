@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStaggeredEntrance } from '../hooks/useStaggeredEntrance';
@@ -41,6 +42,11 @@ export function ProjectPage({
   className = '',
   'data-id': dataId
 }: ProjectPageProps) {
+  // URL parameters and navigation
+  const { projectId, documentId, taskId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   // State management for real data
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -51,10 +57,18 @@ export function ProjectPage({
   const [projectsError, setProjectsError] = useState<string | null>(null);
   const [tasksError, setTasksError] = useState<string | null>(null);
   
-  // UI state
-  const [activeTab, setActiveTab] = useState('tasks');
-  const [showProjectDetails, setShowProjectDetails] = useState(false);
+  // UI state - determine initial tab based on URL
+  const getInitialTab = useCallback(() => {
+    if (location.pathname.includes('/docs')) return 'docs';
+    if (location.pathname.includes('/tasks')) return 'tasks';
+    return 'tasks'; // default
+  }, [location.pathname]);
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [showProjectDetails, setShowProjectDetails] = useState(!!projectId);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | undefined>(documentId);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(taskId);
   
   // New project form state
   const [newProjectForm, setNewProjectForm] = useState({
@@ -117,27 +131,45 @@ export function ProjectPage({
           console.log(`   - ${p.title}: pinned=${p.pinned} (type: ${typeof p.pinned})`);
         });
         
-        // On page load, ALWAYS select pinned project if it exists
-        if (pinnedProject) {
-          console.log(`✅ Selecting pinned project: ${pinnedProject.title}`);
-          setSelectedProject(pinnedProject);
-          setShowProjectDetails(true);
-          setActiveTab('tasks');
-          // Small delay to let Socket.IO connections establish
-          setTimeout(() => {
-            loadTasksForProject(pinnedProject.id);
-          }, 100);
-        } else if (sortedProjects.length > 0) {
-          // No pinned project, select first one
-          const firstProject = sortedProjects[0];
-          console.log(`📋 No pinned project, selecting first: ${firstProject.title}`);
-          setSelectedProject(firstProject);
-          setShowProjectDetails(true);
-          setActiveTab('tasks');
-          // Small delay to let Socket.IO connections establish
-          setTimeout(() => {
-            loadTasksForProject(firstProject.id);
-          }, 100);
+        // Handle URL-based project selection first
+        if (projectId) {
+          const targetProject = sortedProjects.find(p => p.id === projectId);
+          if (targetProject) {
+            console.log(`🔗 URL specified project: ${targetProject.title}`);
+            setSelectedProject(targetProject);
+            setShowProjectDetails(true);
+            setActiveTab(getInitialTab());
+            // Small delay to let Socket.IO connections establish
+            setTimeout(() => {
+              loadTasksForProject(targetProject.id);
+            }, 100);
+          } else {
+            console.warn(`⚠️ Project ${projectId} not found, falling back to default selection`);
+          }
+        } else {
+          // No URL project specified, use default behavior
+          // On page load, ALWAYS select pinned project if it exists
+          if (pinnedProject) {
+            console.log(`✅ Selecting pinned project: ${pinnedProject.title}`);
+            setSelectedProject(pinnedProject);
+            setShowProjectDetails(true);
+            setActiveTab('tasks');
+            // Small delay to let Socket.IO connections establish
+            setTimeout(() => {
+              loadTasksForProject(pinnedProject.id);
+            }, 100);
+          } else if (sortedProjects.length > 0) {
+            // No pinned project, select first one
+            const firstProject = sortedProjects[0];
+            console.log(`📋 No pinned project, selecting first: ${firstProject.title}`);
+            setSelectedProject(firstProject);
+            setShowProjectDetails(true);
+            setActiveTab('tasks');
+            // Small delay to let Socket.IO connections establish
+            setTimeout(() => {
+              loadTasksForProject(firstProject.id);
+            }, 100);
+          }
         }
         
         setIsLoadingProjects(false);
@@ -234,6 +266,26 @@ export function ProjectPage({
       loadTasksForProject(selectedProject.id);
     }
   }, [selectedProject]);
+
+  // Handle URL parameter changes (browser navigation)
+  useEffect(() => {
+    if (projectId && projects.length > 0) {
+      const targetProject = projects.find(p => p.id === projectId);
+      if (targetProject && (!selectedProject || selectedProject.id !== projectId)) {
+        console.log(`🔄 URL changed to project: ${targetProject.title}`);
+        setSelectedProject(targetProject);
+        setShowProjectDetails(true);
+        setActiveTab(getInitialTab());
+        loadTasksForProject(targetProject.id);
+      }
+    }
+  }, [projectId, projects, selectedProject, getInitialTab]);
+
+  // Handle document/task ID changes
+  useEffect(() => {
+    setSelectedDocumentId(documentId);
+    setSelectedTaskId(taskId);
+  }, [documentId, taskId]);
 
   // Removed localStorage persistence for selected project
   // We always want to load the pinned project on page refresh
@@ -394,6 +446,9 @@ export function ProjectPage({
     setShowProjectDetails(true);
     setActiveTab('tasks'); // Default to tasks tab when a new project is selected
     loadTasksForProject(project.id); // Load tasks for the selected project
+    
+    // Update URL to reflect selection
+    navigate(`/projects/${project.id}/tasks`, { replace: true });
   };
 
   const handleDeleteProject = useCallback(async (e: React.MouseEvent, projectId: string, projectTitle: string) => {
@@ -494,6 +549,23 @@ export function ProjectPage({
       showToast('Failed to update project. Please try again.', 'error');
     }
   }, [projectService, setProjects, selectedProject, setSelectedProject, showToast]);
+
+  // Handle tab changes and update URL accordingly
+  const handleTabChange = useCallback((newTab: string) => {
+    setActiveTab(newTab);
+    if (selectedProject) {
+      const basePath = `/projects/${selectedProject.id}`;
+      let newPath = basePath;
+      
+      if (newTab === 'docs') {
+        newPath = selectedDocumentId ? `${basePath}/docs/${selectedDocumentId}` : `${basePath}/docs`;
+      } else if (newTab === 'tasks') {
+        newPath = selectedTaskId ? `${basePath}/tasks/${selectedTaskId}` : `${basePath}/tasks`;
+      }
+      
+      navigate(newPath, { replace: true });
+    }
+  }, [selectedProject, selectedDocumentId, selectedTaskId, navigate]);
 
   const handleCreateProject = async () => {
     if (!newProjectForm.title.trim()) {
@@ -885,7 +957,7 @@ export function ProjectPage({
       {/* Project Details Section */}
       {showProjectDetails && selectedProject && (
         <motion.div variants={itemVariants}>
-          <Tabs defaultValue="tasks" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue="tasks" value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList>
               <TabsTrigger value="docs" className="py-3 font-mono transition-all duration-300" color="blue">
                 Docs
@@ -905,7 +977,17 @@ export function ProjectPage({
             <div>
               {activeTab === 'docs' && (
                 <TabsContent value="docs" className="mt-0">
-                  <DocsTab tasks={tasks} project={selectedProject} />
+                  <DocsTab 
+                    tasks={tasks} 
+                    project={selectedProject} 
+                    selectedDocumentId={selectedDocumentId}
+                    onDocumentSelect={(docId) => {
+                      setSelectedDocumentId(docId);
+                      if (selectedProject) {
+                        navigate(`/projects/${selectedProject.id}/docs/${docId}`, { replace: true });
+                      }
+                    }}
+                  />
                 </TabsContent>
               )}
               {/* {activeTab === 'features' && (
@@ -951,6 +1033,13 @@ export function ProjectPage({
                         loadTaskCountsForAllProjects(projectIds);
                       }} 
                       projectId={selectedProject.id} 
+                      selectedTaskId={selectedTaskId}
+                      onTaskSelect={(taskId) => {
+                        setSelectedTaskId(taskId);
+                        if (selectedProject) {
+                          navigate(`/projects/${selectedProject.id}/tasks/${taskId}`, { replace: true });
+                        }
+                      }}
                     />
                   )}
                 </TabsContent>

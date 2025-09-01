@@ -1,0 +1,172 @@
+# Deep URL Linking
+
+Archon supports deep URL linking that allows you to link directly to specific projects, documents, and tasks within the application.
+
+## Overview
+
+With deep URL linking, you can:
+
+- Share direct links to specific projects
+- Navigate directly to project documents
+- Link to specific tasks within projects
+- Maintain navigation state across browser refreshes
+
+## URL Structure
+
+The deep URL linking follows a hierarchical structure:
+
+### Project URLs
+
+- `/projects` - Projects page (shows all projects)
+- `/projects/{projectId}` - Specific project (defaults to tasks tab)
+- `/projects/{projectId}/docs` - Project documents tab
+- `/projects/{projectId}/tasks` - Project tasks tab
+
+### Document URLs
+
+- `/projects/{projectId}/docs/{documentId}` - Specific document within a project
+
+### Task URLs
+
+- `/projects/{projectId}/tasks/{taskId}` - Specific task within a project
+
+## Examples
+
+Here are some example URLs you might use:
+
+```
+# View all projects
+https://your-archon-instance.com/projects
+
+# View specific project (defaults to tasks)
+https://your-archon-instance.com/projects/452536cf-1fd2-45dc-82cb-064c79f487f8
+
+# View project's documents tab
+https://your-archon-instance.com/projects/452536cf-1fd2-45dc-82cb-064c79f487f8/docs
+
+# View specific document
+https://your-archon-instance.com/projects/452536cf-1fd2-45dc-82cb-064c79f487f8/docs/abc123-def456
+
+# View project's tasks tab
+https://your-archon-instance.com/projects/452536cf-1fd2-45dc-82cb-064c79f487f8/tasks
+
+# View specific task
+https://your-archon-instance.com/projects/452536cf-1fd2-45dc-82cb-064c79f487f8/tasks/task789-xyz012
+```
+
+## How It Works
+
+### Frontend Routing
+
+The application uses React Router v6 with the following route definitions:
+
+- `Route path="/projects" element={<ProjectPage />}`
+- `Route path="/projects/:projectId" element={<ProjectPage />}`
+- `Route path="/projects/:projectId/docs" element={<ProjectPage />}`
+- `Route path="/projects/:projectId/docs/:documentId" element={<ProjectPage />}`
+- `Route path="/projects/:projectId/tasks" element={<ProjectPage />}`
+- `Route path="/projects/:projectId/tasks/:taskId" element={<ProjectPage />}`
+
+### URL Parameter Handling
+
+The `ProjectPage` component:
+
+1. Extracts URL parameters using `useParams()` from React Router
+2. Automatically selects the appropriate project based on the `projectId` parameter
+3. Switches to the correct tab based on the URL path (`/docs` or `/tasks`)
+4. Pre-selects documents or tasks when their IDs are in the URL
+
+### Navigation Updates
+
+When users interact with the interface:
+
+- Selecting a project updates the URL to `/projects/{projectId}/tasks`
+- Switching tabs updates the URL path appropriately
+- Selecting documents/tasks appends their IDs to the URL
+- All navigation preserves the current state and is shareable
+
+## Browser Navigation
+
+The deep URL linking system fully supports:
+
+- **Forward/Back buttons**: Navigate through your project history
+- **Bookmarks**: Save direct links to specific projects, documents, or tasks
+- **Page refresh**: Maintains your current location and selections
+- **Copy/Paste URLs**: Share exact locations with team members
+
+## Implementation Details
+
+### Component Updates
+
+The following components were enhanced for deep URL linking:
+
+#### ProjectPage
+- Added URL parameter extraction with `useParams()`
+- Added navigation handling with `useNavigate()`
+- Enhanced project selection logic to handle URL-based selection
+- Added tab switching based on URL paths
+
+#### DocsTab
+- Added `selectedDocumentId` prop for URL-based document selection
+- Added `onDocumentSelect` callback for URL updates
+- Implemented automatic document selection from URL parameters
+
+#### TasksTab
+- Added `selectedTaskId` prop for URL-based task selection
+- Added `onTaskSelect` callback for URL updates
+- Enhanced to support direct task linking (implementation varies by view mode)
+
+### URL State Management
+
+The system maintains URL state through:
+
+1. **Route Parameters**: Project, document, and task IDs
+2. **Path-based Tabs**: `/docs` and `/tasks` determine active tab
+3. **Navigation Replacement**: Uses `replace: true` to avoid cluttering browser history during normal navigation
+
+## Benefits
+
+### For Users
+- **Bookmarking**: Save direct links to frequently accessed projects
+- **Sharing**: Send colleagues direct links to specific documents or tasks
+- **Navigation**: Use browser back/forward buttons intuitively
+- **Context Preservation**: Page refreshes don't lose your place
+
+### For Teams
+- **Collaboration**: Share exact locations in project discussions
+- **Documentation**: Include direct links in external documentation
+- **Issue Tracking**: Reference specific tasks or documents in bug reports
+- **Onboarding**: Provide new team members with direct links to relevant resources
+
+## Technical Considerations
+
+### Projects Feature Toggle
+
+Deep URL linking respects the projects feature toggle:
+
+- When projects are disabled, `/projects/*` routes redirect to the home page
+- This ensures the feature doesn't break when projects are turned off
+
+### Error Handling
+
+The system gracefully handles:
+
+- **Invalid Project IDs**: Falls back to default project selection
+- **Missing Documents/Tasks**: Continues to load the project without pre-selection
+- **Disabled Features**: Redirects appropriately when projects are disabled
+
+### Performance
+
+- URL parameter changes trigger minimal re-renders
+- Project loading is optimized to avoid unnecessary API calls
+- Navigation updates use `replace: true` to maintain clean browser history
+
+## Migration Notes
+
+This feature is backward compatible:
+
+- Existing `/projects` URLs continue to work as before
+- Users without specific URL parameters get the default behavior
+- No database migrations or API changes were required
+
+The implementation leverages existing React Router v6 infrastructure and adds enhanced parameter handling to existing components.
