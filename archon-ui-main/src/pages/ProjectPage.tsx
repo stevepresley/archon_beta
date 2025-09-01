@@ -1037,7 +1037,11 @@ export function ProjectPage({
                       onTaskSelect={(taskId) => {
                         setSelectedTaskId(taskId);
                         if (selectedProject) {
-                          navigate(`/projects/${selectedProject.id}/tasks/${taskId}`, { replace: true });
+                          if (taskId) {
+                            navigate(`/projects/${selectedProject.id}/tasks/${taskId}`, { replace: true });
+                          } else {
+                            navigate(`/projects/${selectedProject.id}/tasks`, { replace: true });
+                          }
                         }
                       }}
                     />
