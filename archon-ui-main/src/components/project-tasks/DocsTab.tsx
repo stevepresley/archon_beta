@@ -746,13 +746,13 @@ export const DocsTab = ({
     setSelectedDocument(null);
   }, [project?.id]);
 
-  // Handle selectedDocumentId from URL
+  // Handle selectedDocumentId from URL - load full content for deep linking
   useEffect(() => {
     if (selectedDocumentId && documents.length > 0) {
       const targetDoc = documents.find(doc => doc.id === selectedDocumentId);
       if (targetDoc && targetDoc !== selectedDocument) {
-        console.log(`🔗 URL specified document: ${targetDoc.title}`);
-        setSelectedDocument(targetDoc);
+        console.log(`🔗 URL specified document: ${targetDoc.title} - loading full content`);
+        loadFullDocument(selectedDocumentId);
         setIsEditing(false);
       }
     }
