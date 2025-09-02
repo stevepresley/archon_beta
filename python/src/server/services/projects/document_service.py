@@ -126,7 +126,7 @@ class DocumentService:
                     documents.append(doc)
                 else:
                     # Return metadata only
-                    documents.append({
+                    doc_metadata = {
                         "id": doc.get("id"),
                         "document_type": doc.get("document_type"),
                         "title": doc.get("title"),
@@ -139,7 +139,9 @@ class DocumentService:
                         "stats": {
                             "content_size": len(str(doc.get("content", {})))
                         }
-                    })
+                    }
+                    # Only include project_id if needed for frontend compatibility
+                    documents.append(doc_metadata)
 
             return True, {
                 "project_id": project_id,
