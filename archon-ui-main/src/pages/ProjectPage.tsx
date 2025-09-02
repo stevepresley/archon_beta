@@ -429,6 +429,23 @@ export function ProjectPage({
     };
   }, [selectedProject?.id]);
 
+  // Auto-scroll selected project into view
+  useEffect(() => {
+    if (selectedProject && !isLoadingProjects) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
+        if (projectCard) {
+          projectCard.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'nearest', 
+            inline: 'center' 
+          });
+        }
+      }, 100);
+    }
+  }, [selectedProject?.id, isLoadingProjects]);
+
   const loadProjects = async () => {
     try {
       console.log(`[LOAD PROJECTS] Starting loadProjects...`);
