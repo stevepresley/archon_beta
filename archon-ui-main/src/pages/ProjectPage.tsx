@@ -894,6 +894,7 @@ export function ProjectPage({
                 <motion.div 
                   key={project.id} 
                   variants={itemVariants} 
+                  data-project-id={project.id}
                   onClick={() => handleProjectSelect(project)} 
                   className={`
                     relative p-4 rounded-xl backdrop-blur-md w-72 cursor-pointer overflow-hidden
