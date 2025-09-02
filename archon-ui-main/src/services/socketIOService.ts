@@ -149,7 +149,7 @@ export class WebSocketService {
     const isDevelopment = window.location.port === frontendPort;
     const backendPort = import.meta.env.VITE_ARCHON_SERVER_PORT || '8181';
     const connectionUrl = isDevelopment 
-      ? `http://localhost:${backendPort}`  // Connect directly to backend using env variable
+      ? `${window.location.protocol}//${window.location.hostname}:${backendPort}`  // Use current hostname, not hardcoded localhost
       : window.location.origin;  // Use proxy in production
     
     try {
