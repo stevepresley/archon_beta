@@ -1010,7 +1010,11 @@ export const DocsTab = ({
           viewMode === 'beautiful' ? (
             <div className="mb-8">
               <PRPViewer 
-                content={selectedDocument.content || {}} 
+                content={{
+                  title: selectedDocument.title,
+                  document_type: selectedDocument.document_type,
+                  ...selectedDocument.content
+                }}
                 isDarkMode={isDarkMode}
               />
             </div>
