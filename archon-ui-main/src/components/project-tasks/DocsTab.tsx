@@ -758,9 +758,10 @@ export const DocsTab = ({
     }
   }, [selectedDocumentId, documents, selectedDocument]);
 
-  // Handle document selection with URL callback
+  // Handle document selection with URL callback - load full content
   const handleDocumentSelect = useCallback((document: ProjectDoc) => {
-    setSelectedDocument(document);
+    // Load full document content when selected
+    loadFullDocument(document.id);
     if (onDocumentSelect) {
       onDocumentSelect(document.id);
     }
