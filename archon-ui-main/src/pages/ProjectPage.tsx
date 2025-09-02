@@ -438,20 +438,24 @@ export function ProjectPage({
         const scrollContainer = document.querySelector('.overflow-x-auto');
         
         if (projectCard && scrollContainer) {
-          const cardRect = projectCard.getBoundingClientRect();
-          const containerRect = scrollContainer.getBoundingClientRect();
+          // Get the position of the card relative to the container
+          const containerScrollLeft = scrollContainer.scrollLeft;
+          const containerWidth = scrollContainer.clientWidth;
+          const cardOffsetLeft = projectCard.offsetLeft;
+          const cardWidth = projectCard.clientWidth;
           
-          // Calculate how much to scroll to center the card
-          const cardCenter = cardRect.left + cardRect.width / 2;
-          const containerCenter = containerRect.left + containerRect.width / 2;
-          const scrollAmount = cardCenter - containerCenter;
+          // Calculate the scroll position to center the card
+          const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
           
-          scrollContainer.scrollBy({
-            left: scrollAmount,
+          // Smooth scroll to center the selected card
+          scrollContainer.scrollTo({
+            left: targetScrollLeft,
             behavior: 'smooth'
           });
+          
+          console.log(`Scrolling to center project: ${selectedProject.title}`);
         }
-      }, 100);
+      }, 200);
     }
   }, [selectedProject?.id, isLoadingProjects]);
 
