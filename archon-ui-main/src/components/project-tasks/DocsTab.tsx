@@ -562,15 +562,24 @@ export const DocsTab = ({
   const [progressItems, setProgressItems] = useState<CrawlProgressData[]>([]);
   const { showToast } = useToast();
 
-  // Load project documents from the project data
+  // Load project documents from the API (since lightweight project loading doesn't include docs)
   const loadProjectDocuments = async () => {
-    if (!project?.id || !project.docs) return;
+    if (!project?.id) return;
     
     try {
       setLoading(true);
       
-      // Use the docs directly from the project data
-      const projectDocuments: ProjectDoc[] = project.docs.map((doc: any) => ({
+      // Fetch the full project data to get docs (since lightweight loading doesn't include them)
+      const fullProject = await projectService.getProject(project.id);
+      
+      if (!fullProject.docs || fullProject.docs.length === 0) {
+        setDocuments([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Use the docs from the full project data
+      const projectDocuments: ProjectDoc[] = fullProject.docs.map((doc: any) => ({
         id: doc.id,
         title: doc.title || 'Untitled Document',
         created_at: doc.created_at,

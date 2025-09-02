@@ -53,7 +53,8 @@ class DocumentService:
 
             current_docs = project_response.data[0].get("docs", [])
 
-            # Create new document entry
+            # Create new document entry with timestamps
+            current_time = datetime.now().isoformat()
             new_doc = {
                 "id": str(uuid.uuid4()),
                 "document_type": document_type,
@@ -62,6 +63,8 @@ class DocumentService:
                 "tags": tags or [],
                 "status": "draft",
                 "version": "1.0",
+                "created_at": current_time,
+                "updated_at": current_time,
             }
 
             if author:

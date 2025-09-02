@@ -1,8 +1,12 @@
 __pycache__
 .env
 .serena
-.claude/
-claude.local.md
 PRPs/local
 PRPs/completed/
 /logs/
+
+# Claude
+.claude/
+claude.local.md
+.mcp.json
+.next-session.md
