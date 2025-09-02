@@ -617,8 +617,8 @@ export const projectService = {
    */
   async getDocument(projectId: string, docId: string): Promise<Document> {
     try {
-      const response = await callAPI<{document: Document}>(`/api/projects/${projectId}/docs/${docId}`);
-      return response.document;
+      const document = await callAPI<Document>(`/api/projects/${projectId}/docs/${docId}`);
+      return document;
     } catch (error) {
       console.error(`Failed to get document ${docId} from project ${projectId}:`, error);
       throw error;
