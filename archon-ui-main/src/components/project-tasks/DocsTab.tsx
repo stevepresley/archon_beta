@@ -991,29 +991,22 @@ export const DocsTab = ({
         <div className="relative mb-6">
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
             {loading ? (
-              // Loading skeleton cards
+              // Single loading card following the same pattern as projects
               <>
-                {[1, 2, 3].map(i => (
-                  <div
-                    key={`loading-${i}`}
-                    className="flex-shrink-0 w-48 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/30"
-                  >
-                    {/* Document type badge skeleton */}
-                    <div className="h-6 w-20 bg-gray-200/50 dark:bg-gray-700/30 rounded-full animate-pulse mb-2"></div>
-                    
-                    {/* Title skeleton */}
-                    <div className="space-y-2 mb-2">
-                      <div className="h-4 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
-                      <div className="h-4 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
-                    </div>
-                    
-                    {/* Date skeleton */}
-                    <div className="h-3 w-24 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse mb-2"></div>
-                    
-                    {/* ID skeleton */}
-                    <div className="h-3 w-16 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                <div className="flex-shrink-0 w-48 p-4 rounded-lg border border-gray-200/50 dark:border-zinc-800/30 bg-gradient-to-b from-white/60 to-white/40 dark:from-white/5 dark:to-black/20 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]">
+                  <div className="flex items-center justify-center mb-4">
+                    <Loader2 className="w-4 h-4 text-blue-500 animate-spin mr-2" />
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Loading documents...
+                    </span>
                   </div>
-                ))}
+                  <div className="space-y-2">
+                    {/* Skeleton placeholders */}
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
+                    <div className="h-6 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                  </div>
+                </div>
                 <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
               </>
             ) : (
