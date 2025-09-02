@@ -172,6 +172,14 @@ uv run pytest tests/test_service_integration.py -v
 - `GET /api/projects/{id}/tasks` - Get project tasks
 - `POST /api/projects/{id}/tasks` - Create task
 
+### Documents
+
+- `GET /api/projects/{id}/docs` - List project documents (light mode)
+- `POST /api/projects/{id}/docs` - Create document (returns full document with created_at/updated_at timestamps)
+- `GET /api/projects/{id}/docs/{doc_id}` - Get specific document (full mode with complete content)
+- `PUT /api/projects/{id}/docs/{doc_id}` - Update document
+- `DELETE /api/projects/{id}/docs/{doc_id}` - Delete document
+
 ## Socket.IO Events
 
 Real-time updates via Socket.IO on port 8181:
