@@ -562,45 +562,65 @@ export const DocsTab = ({
   const [progressItems, setProgressItems] = useState<CrawlProgressData[]>([]);
   const { showToast } = useToast();
 
-  // Load project documents from the API (since lightweight project loading doesn't include docs)
+  // Load project documents using light mode for performance
   const loadProjectDocuments = async () => {
     if (!project?.id) return;
     
     try {
       setLoading(true);
       
-      // Fetch the full project data to get docs (since lightweight loading doesn't include them)
-      const fullProject = await projectService.getProject(project.id);
+      // Use light mode to get document metadata only (for document cards)
+      const documentsResponse = await projectService.listDocuments(project.id, false);
       
-      if (!fullProject.docs || fullProject.docs.length === 0) {
+      if (!documentsResponse || documentsResponse.length === 0) {
         setDocuments([]);
         setLoading(false);
         return;
       }
       
-      // Use the docs from the full project data
-      const projectDocuments: ProjectDoc[] = fullProject.docs.map((doc: any) => ({
+      // Map to ProjectDoc format for document cards
+      const projectDocuments: ProjectDoc[] = documentsResponse.map((doc: any) => ({
         id: doc.id,
         title: doc.title || 'Untitled Document',
         created_at: doc.created_at,
         updated_at: doc.updated_at,
-        content: doc.content,
+        content: doc.content || {}, // May be empty in light mode
         document_type: doc.document_type || 'document'
       }));
       
       setDocuments(projectDocuments);
       
-      // Auto-select first document if available and no document is currently selected
-      if (projectDocuments.length > 0 && !selectedDocument) {
-        setSelectedDocument(projectDocuments[0]);
-      }
-      
-      console.log(`Loaded ${projectDocuments.length} documents from project data`);
+      console.log(`Loaded ${projectDocuments.length} documents in light mode`);
     } catch (error) {
       console.error('Failed to load documents:', error);
       showToast('Failed to load documents', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load full document content when selecting a specific document
+  const loadFullDocument = async (docId: string) => {
+    if (!project?.id || !docId) return;
+    
+    try {
+      const fullDoc = await projectService.getDocument(project.id, docId);
+      
+      // Update the documents array with the full content
+      setDocuments(prev => prev.map(doc => 
+        doc.id === docId ? { ...doc, content: fullDoc.content || {} } : doc
+      ));
+      
+      // Set as selected document with full content
+      const enrichedDoc = documents.find(d => d.id === docId);
+      if (enrichedDoc) {
+        setSelectedDocument({ ...enrichedDoc, content: fullDoc.content || {} });
+      }
+      
+      console.log(`Loaded full content for document: ${fullDoc.title}`);
+    } catch (error) {
+      console.error('Failed to load full document:', error);
+      showToast('Failed to load document content', 'error');
     }
   };
 
