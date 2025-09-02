@@ -435,11 +435,20 @@ export function ProjectPage({
       // Small delay to ensure DOM is updated
       setTimeout(() => {
         const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
-        if (projectCard) {
-          projectCard.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'nearest', 
-            inline: 'center' 
+        const scrollContainer = document.querySelector('.overflow-x-auto');
+        
+        if (projectCard && scrollContainer) {
+          const cardRect = projectCard.getBoundingClientRect();
+          const containerRect = scrollContainer.getBoundingClientRect();
+          
+          // Calculate how much to scroll to center the card
+          const cardCenter = cardRect.left + cardRect.width / 2;
+          const containerCenter = containerRect.left + containerRect.width / 2;
+          const scrollAmount = cardCenter - containerCenter;
+          
+          scrollContainer.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
           });
         }
       }, 100);
