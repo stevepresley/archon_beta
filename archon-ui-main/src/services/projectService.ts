@@ -595,6 +595,24 @@ export const projectService = {
   },
 
   /**
+   * List project documents (light mode by default for performance)
+   */
+  async listDocuments(projectId: string, includeContent: boolean = false): Promise<Document[]> {
+    try {
+      const response = await callAPI<{documents: Document[]}>(`/api/projects/${projectId}/docs`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.documents;
+    } catch (error) {
+      console.error(`Failed to list documents for project ${projectId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
    * Get a specific document with full content
    */
   async getDocument(projectId: string, docId: string): Promise<Document> {
