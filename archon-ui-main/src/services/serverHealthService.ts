@@ -54,6 +54,7 @@ class ServerHealthService {
   }
 
   startMonitoring(callbacks: HealthCheckCallback) {
+    console.log('🏥 [Health] startMonitoring called, current interval:', this.healthCheckInterval);
     // Guard: Prevent multiple intervals by clearing any existing one
     if (this.healthCheckInterval) {
       console.warn('🏥 [Health] Health monitoring already active, stopping previous monitor');
@@ -70,22 +71,24 @@ class ServerHealthService {
     // Start HTTP health polling
     this.healthCheckInterval = window.setInterval(async () => {
       const isHealthy = await this.checkHealth();
+      console.log('🏥 [Health] Check result:', isHealthy, 'Missed checks:', this.missedChecks, 'isConnected:', this.isConnected);
       
       if (isHealthy) {
-        // Server is healthy
-        if (this.missedChecks > 0) {
-          // Was disconnected, now reconnected
-          this.missedChecks = 0;
-          this.handleConnectionRestored();
+        // Server is healthy - always try to restore connection
+        if (this.missedChecks > 0 || !this.isConnected) {
+          console.log('🏥 [Health] Reconnected after', this.missedChecks, 'missed checks, isConnected:', this.isConnected);
         }
+        this.missedChecks = 0;
+        this.handleConnectionRestored(); // Always call this when healthy
       } else {
         // Server is not responding
         this.missedChecks++;
-        // Health check failed
+        console.log('🏥 [Health] Health check failed, missed checks:', this.missedChecks);
         
         // After maxMissedChecks failures, trigger disconnect screen
         if (this.missedChecks >= this.maxMissedChecks && this.isConnected) {
           this.isConnected = false;
+          console.log('🏥 [Health] Triggering disconnect screen');
           if (this.disconnectScreenEnabled && this.callbacks) {
             // Triggering disconnect screen after multiple health check failures
             this.callbacks.onDisconnected();
@@ -103,9 +106,17 @@ class ServerHealthService {
   }
 
   private handleConnectionRestored() {
+    console.log('🏥 [Health] handleConnectionRestored called, isConnected:', this.isConnected, 'callbacks exist:', !!this.callbacks);
     if (!this.isConnected) {
       this.isConnected = true;
+      console.log('🏥 [Health] Setting isConnected to true and calling onReconnected');
       // Connection to server restored
+      if (this.callbacks) {
+        this.callbacks.onReconnected();
+      }
+    } else {
+      console.log('🏥 [Health] Already connected, but calling onReconnected anyway to clear any stuck disconnect screen');
+      // Force call onReconnected even if we think we're connected (to clear stuck screens)
       if (this.callbacks) {
         this.callbacks.onReconnected();
       }

@@ -86,21 +86,20 @@ async def broadcast_task_batch_update(project_id: str, batch_data: dict):
 
 
 async def broadcast_project_update():
-    """Broadcast project list to subscribers."""
+    """Broadcast project list to subscribers (lightweight - no full content)."""
     try:
         project_service = ProjectService()
-        success, result = project_service.list_projects()
+        success, result = project_service.list_projects(include_content=False)
 
         if not success:
             logger.error(f"Failed to get projects for broadcast: {result}")
             return
 
-        # Use SourceLinkingService to format projects with sources
-        source_service = SourceLinkingService()
-        formatted_projects = source_service.format_projects_with_sources(result["projects"])
+        # PERFORMANCE: Skip source linking for broadcasts to prevent 31 individual database calls
+        formatted_projects = result["projects"]  # Use projects directly without source linking
 
         await sio.emit("projects_update", {"projects": formatted_projects}, room="project_list")
-        logger.info(f"Broadcasted project list update with {len(formatted_projects)} projects")
+        logger.info(f"Broadcasted project list update with {len(formatted_projects)} projects (lightweight)")
 
     except Exception as e:
         logger.error(f"Failed to broadcast project update: {e}")
@@ -296,10 +295,10 @@ async def subscribe_projects(sid, data=None):
     logger.info(f"📥 [SOCKETIO] Client {sid} joined project_list room")
     logger.info(f"Client {sid} subscribed to project list")
 
-    # Send current project list using ProjectService
+    # Send current project list using ProjectService (lightweight - no full content)
     try:
         project_service = ProjectService()
-        success, result = project_service.list_projects()
+        success, result = project_service.list_projects(include_content=False)
 
         if not success:
             await sio.emit(
@@ -307,9 +306,10 @@ async def subscribe_projects(sid, data=None):
             )
             return
 
-        # Use SourceLinkingService to format projects with sources
+        # Use SourceLinkingService to format projects with sources (but skip expensive source linking for Socket.IO)
         source_service = SourceLinkingService()
-        formatted_projects = source_service.format_projects_with_sources(result["projects"])
+        # PERFORMANCE: Skip source linking for Socket.IO to prevent 31 individual database calls
+        formatted_projects = result["projects"]  # Use projects directly without source linking
 
         await sio.emit("projects_update", {"projects": formatted_projects}, to=sid)
         logger.info(f"Sent {len(formatted_projects)} projects to client {sid}")

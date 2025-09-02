@@ -143,8 +143,14 @@ export class WebSocketService {
     // Use relative URL to go through Vite's proxy
     const socketPath = '/socket.io/';  // Use default Socket.IO path
     
-    // Use window.location.origin to ensure we go through the proxy
-    const connectionUrl = window.location.origin;
+    // In development, connect directly to backend since Vite proxy has WebSocket issues
+    // In production, use the same origin
+    const frontendPort = import.meta.env.VITE_UI_PORT || import.meta.env.VITE_ARCHON_UI_PORT || '3737';
+    const isDevelopment = window.location.port === frontendPort;
+    const backendPort = import.meta.env.VITE_ARCHON_SERVER_PORT || '8181';
+    const connectionUrl = isDevelopment 
+      ? `http://localhost:${backendPort}`  // Connect directly to backend using env variable
+      : window.location.origin;  // Use proxy in production
     
     try {
       console.log('🔗 Attempting Socket.IO connection to:', connectionUrl);
@@ -157,7 +163,7 @@ export class WebSocketService {
         reconnectionAttempts: this.config.maxReconnectAttempts,
         reconnectionDelay: this.config.reconnectInterval,
         reconnectionDelayMax: 30000,
-        timeout: 10000,
+        timeout: 30000, // Increased from 10s to 30s to handle backend initialization
         transports: ['websocket', 'polling'],
         path: socketPath,
         query: {

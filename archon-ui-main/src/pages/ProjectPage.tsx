@@ -57,6 +57,10 @@ export function ProjectPage({
   const [projectsError, setProjectsError] = useState<string | null>(null);
   const [tasksError, setTasksError] = useState<string | null>(null);
   
+  // Background loading state
+  const [isLoadingBackgroundProjects, setIsLoadingBackgroundProjects] = useState(false);
+  const [totalProjectCount, setTotalProjectCount] = useState(0);
+  
   // UI state - determine initial tab based on URL
   const getInitialTab = useCallback(() => {
     if (location.pathname.includes('/docs')) return 'docs';
@@ -92,7 +96,7 @@ export function ProjectPage({
 
   const { showToast } = useToast();
 
-  // Load projects on mount - simplified approach
+  // Load projects based on URL - optimize to load only specific project when URL contains projectId
   useEffect(() => {
     const loadProjectsData = async () => {
       try {
@@ -100,79 +104,135 @@ export function ProjectPage({
         setIsLoadingProjects(true);
         setProjectsError(null);
         
-        const projectsData = await projectService.listProjects();
-        console.log(`📦 Received ${projectsData.length} projects from API`);
-        
-        // Log each project's pinned status
-        projectsData.forEach(p => {
-          console.log(`  - ${p.title}: pinned=${p.pinned} (type: ${typeof p.pinned})`);
-        });
-        
-        // Sort projects - pinned first, then alphabetically
-        const sortedProjects = [...projectsData].sort((a, b) => {
-          if (a.pinned && !b.pinned) return -1;
-          if (!a.pinned && b.pinned) return 1;
-          return a.title.localeCompare(b.title);
-        });
-        
-        setProjects(sortedProjects);
-        
-        // Load task counts for all projects
-        const projectIds = sortedProjects.map(p => p.id);
-        loadTaskCountsForAllProjects(projectIds);
-        
-        // Find pinned project - this is ALWAYS the default on page load
-        const pinnedProject = sortedProjects.find(p => p.pinned === true);
-        console.log(`📌 Pinned project:`, pinnedProject ? `${pinnedProject.title} (pinned=${pinnedProject.pinned})` : 'None found');
-        
-        // Debug: Log all projects and their pinned status
-        console.log('📋 All projects with pinned status:');
-        sortedProjects.forEach(p => {
-          console.log(`   - ${p.title}: pinned=${p.pinned} (type: ${typeof p.pinned})`);
-        });
-        
-        // Handle URL-based project selection first
         if (projectId) {
-          const targetProject = sortedProjects.find(p => p.id === projectId);
-          if (targetProject) {
-            console.log(`🔗 URL specified project: ${targetProject.title}`);
+          // URL contains specific project ID - only load that project
+          console.log(`🎯 URL contains project ID: ${projectId}, loading specific project only`);
+          
+          try {
+            // Load ONLY the specific project
+            const targetProject = await projectService.getProject(projectId);
+            console.log(`🔗 Loaded specific project: ${targetProject.title}`);
+            
+            // Set minimal project list - just the target project for now
+            setProjects([targetProject]);
+            
+            // Only load task counts for the target project
+            loadTaskCountsForAllProjects([projectId]);
+            
+            // Set the target project as selected
             setSelectedProject(targetProject);
             setShowProjectDetails(true);
             setActiveTab(getInitialTab());
-            // Small delay to let Socket.IO connections establish
+            
+            // Load tasks for the target project
             setTimeout(() => {
               loadTasksForProject(targetProject.id);
             }, 100);
-          } else {
-            console.warn(`⚠️ Project ${projectId} not found, falling back to default selection`);
+            
+            // Set loading to false immediately since we have the target project
+            setIsLoadingProjects(false);
+            
+            // Show loading indicator immediately and get project count
+            console.log(`🔄 Setting up background loading indicator`);
+            setIsLoadingBackgroundProjects(true);
+            
+            // Get total project count and show loading
+            setTimeout(async () => {
+              try {
+                console.log(`🔄 Getting project count for background loading indicator`);
+                const allProjectsForCount = await projectService.listProjects(false);
+                console.log(`📊 Total project count: ${allProjectsForCount.length}`);
+                setTotalProjectCount(allProjectsForCount.length);
+                
+                // If there are more projects than just this one, continue showing loading
+                if (allProjectsForCount.length > 1) {
+                  console.log(`🔄 Background loading ${allProjectsForCount.length - 1} other projects in background for navigation only (lightweight)`);
+                  
+                  // Add a delay to actually show the loading indicator
+                  setTimeout(() => {
+                    const sortedProjects = [...allProjectsForCount].sort((a, b) => {
+                      if (a.pinned && !b.pinned) return -1;
+                      if (!a.pinned && b.pinned) return 1;
+                      return a.title.localeCompare(b.title);
+                    });
+                    setProjects(sortedProjects);
+                    console.log(`🔄 Setting isLoadingBackgroundProjects to false`);
+                    setIsLoadingBackgroundProjects(false);
+                    
+                    // Don't load task counts for other projects - only load them when user actually selects a project
+                    console.log(`🎯 Background project loading complete - task counts only loaded for current project`);
+                  }, 1500); // Give users time to see the loading indicator
+                } else {
+                  // Only 1 project, no need to show loading
+                  console.log(`🔄 Only 1 project total, hiding loading indicator`);
+                  setIsLoadingBackgroundProjects(false);
+                }
+              } catch (bgError) {
+                console.warn('Failed to load other projects in background:', bgError);
+                setIsLoadingBackgroundProjects(false);
+              }
+            }, 50); // Very quick delay
+            
+          } catch (projectError) {
+            console.warn(`⚠️ Project ${projectId} not found, loading all projects as fallback`);
+            // Fall back to loading all projects if specific project not found (lightweight for initial load)
+            const projectsData = await projectService.listProjects(false);
+            const sortedProjects = [...projectsData].sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return a.title.localeCompare(b.title);
+            });
+            setProjects(sortedProjects);
+            
+            // Load task counts for all projects (fallback behavior)
+            const projectIds = sortedProjects.map(p => p.id);
+            loadTaskCountsForAllProjects(projectIds);
           }
         } else {
-          // No URL project specified, use default behavior
-          // On page load, ALWAYS select pinned project if it exists
-          if (pinnedProject) {
-            console.log(`✅ Selecting pinned project: ${pinnedProject.title}`);
-            setSelectedProject(pinnedProject);
+          // No specific project in URL - load projects list but optimize task counts loading (lightweight for initial load)
+          console.log('📦 No project ID in URL, loading projects list (lightweight)');
+          
+          const projectsData = await projectService.listProjects(false);
+          console.log(`📦 Received ${projectsData.length} projects from API`);
+          
+          // Sort projects - pinned first, then alphabetically
+          const sortedProjects = [...projectsData].sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return a.title.localeCompare(b.title);
+          });
+          
+          setProjects(sortedProjects);
+          
+          // Find pinned project - this is ALWAYS the default on page load
+          const pinnedProject = sortedProjects.find(p => p.pinned === true);
+          console.log(`📌 Pinned project:`, pinnedProject ? `${pinnedProject.title} (pinned=${pinnedProject.pinned})` : 'None found');
+          
+          // Select default project and load its task counts immediately
+          let defaultProject = pinnedProject || (sortedProjects.length > 0 ? sortedProjects[0] : null);
+          
+          if (defaultProject) {
+            console.log(`✅ Selecting default project: ${defaultProject.title}`);
+            setSelectedProject(defaultProject);
             setShowProjectDetails(true);
             setActiveTab('tasks');
-            // Small delay to let Socket.IO connections establish
+            
+            // Load task counts ONLY for the selected project initially
+            loadTaskCountsForAllProjects([defaultProject.id]);
+            
             setTimeout(() => {
-              loadTasksForProject(pinnedProject.id);
+              loadTasksForProject(defaultProject.id);
             }, 100);
-          } else if (sortedProjects.length > 0) {
-            // No pinned project, select first one
-            const firstProject = sortedProjects[0];
-            console.log(`📋 No pinned project, selecting first: ${firstProject.title}`);
-            setSelectedProject(firstProject);
-            setShowProjectDetails(true);
-            setActiveTab('tasks');
-            // Small delay to let Socket.IO connections establish
-            setTimeout(() => {
-              loadTasksForProject(firstProject.id);
-            }, 100);
+            
+            // Don't load task counts for other projects in background
+            // Task counts will be loaded on-demand when user selects different projects
+            console.log(`🎯 Projects index loaded - task counts only loaded for default project, others will load on-demand`);
           }
+          
+          // Set loading to false after default project is set up
+          setIsLoadingProjects(false);
         }
         
-        setIsLoadingProjects(false);
       } catch (error) {
         console.error('Failed to load projects:', error);
         setProjectsError(error instanceof Error ? error.message : 'Failed to load projects');
@@ -193,7 +253,7 @@ export function ProjectPage({
         projectListSocketIO.send({ type: 'subscribe_projects' });
         
         const handleProjectUpdate = (message: any) => {
-          console.log('📨 Received project list update via Socket.IO');
+          console.log('📨 Received lightweight project list update via Socket.IO');
           if (message.data && message.data.projects) {
             const projectsData = message.data.projects;
             
@@ -210,9 +270,11 @@ export function ProjectPage({
               return [...tempProjects, ...sortedProjects];
             });
             
-            // Refresh task counts
-            const projectIds = sortedProjects.map(p => p.id);
-            loadTaskCountsForAllProjects(projectIds);
+            // Refresh task counts only for currently selected project
+            // Don't spam the backend with task count requests for all projects
+            if (selectedProject) {
+              loadTaskCountsForAllProjects([selectedProject.id]);
+            }
           }
         };
         
@@ -235,21 +297,22 @@ export function ProjectPage({
     };
   }, []); // Only run once on mount
 
-  // Load task counts for all projects
+  // Load task counts for specified projects using optimized stats API
   const loadTaskCountsForAllProjects = useCallback(async (projectIds: string[]) => {
+    console.log(`📊 Loading task counts for ${projectIds.length} projects using optimized stats API:`, projectIds);
     try {
       const counts: Record<string, { todo: number; doing: number; done: number }> = {};
       
       for (const projectId of projectIds) {
         try {
-          const tasksData = await projectService.getTasksByProject(projectId);
-          const todos = tasksData.filter(t => t.uiStatus === 'backlog').length;
-          const doing = tasksData.filter(t => t.uiStatus === 'in-progress' || t.uiStatus === 'review').length;
-          const done = tasksData.filter(t => t.uiStatus === 'complete').length;
+          console.log(`📊 Loading stats for project: ${projectId}`);
+          // Use the new optimized stats endpoint that only returns counts
+          const stats = await projectService.getProjectStats(projectId);
           
-          counts[projectId] = { todo: todos, doing, done };
+          counts[projectId] = stats.task_counts;
+          console.log(`📊 Project ${projectId} task counts: ${stats.task_counts.todo} todo, ${stats.task_counts.doing} doing, ${stats.task_counts.done} done`);
         } catch (error) {
-          console.error(`Failed to load tasks for project ${projectId}:`, error);
+          console.error(`Failed to load stats for project ${projectId}:`, error);
           counts[projectId] = { todo: 0, doing: 0, done: 0 };
         }
       }
@@ -301,27 +364,35 @@ export function ProjectPage({
     
     // Define handlers outside so they can be removed in cleanup
     const handleTaskCreated = () => {
-      console.log('✅ Task created - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task created - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskUpdated = () => {
-      console.log('✅ Task updated - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task updated - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskDeleted = () => {
-      console.log('✅ Task deleted - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task deleted - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskArchived = () => {
-      console.log('✅ Task archived - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task archived - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const connectWebSocket = async () => {
@@ -364,7 +435,7 @@ export function ProjectPage({
       setIsLoadingProjects(true);
       setProjectsError(null);
       
-      const projectsData = await projectService.listProjects();
+      const projectsData = await projectService.listProjects(false);
       console.log(`[LOAD PROJECTS] Projects loaded from API:`, projectsData.map(p => ({id: p.id, title: p.title, pinned: p.pinned})));
       
       // Sort projects - pinned first, then alphabetically by title
@@ -446,6 +517,9 @@ export function ProjectPage({
     setShowProjectDetails(true);
     setActiveTab('tasks'); // Default to tasks tab when a new project is selected
     loadTasksForProject(project.id); // Load tasks for the selected project
+    
+    // Load task counts for the newly selected project (on-demand loading)
+    loadTaskCountsForAllProjects([project.id]);
     
     // Update URL to reflect selection
     navigate(`/projects/${project.id}/tasks`, { replace: true });
@@ -859,7 +933,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>ToDo</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-pink-300 dark:border-pink-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.todo || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.todo !== undefined ? projectTaskCounts[project.id].todo : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -877,7 +953,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>Doing</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-blue-300 dark:border-blue-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.doing || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.doing !== undefined ? projectTaskCounts[project.id].doing : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -895,7 +973,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>Done</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-green-300 dark:border-green-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.done || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.done !== undefined ? projectTaskCounts[project.id].done : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -949,6 +1029,33 @@ export function ProjectPage({
                 </motion.div>
                 )
               ))}
+              
+              {/* Background loading indicator */}
+              {(() => {
+                console.log(`🎨 Render check - isLoadingBackgroundProjects: ${isLoadingBackgroundProjects}, totalProjectCount: ${totalProjectCount}, projects.length: ${projects.length}`);
+                return isLoadingBackgroundProjects;
+              })() && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="w-72 p-4 rounded-xl backdrop-blur-md bg-gradient-to-b from-white/60 to-white/40 dark:from-white/5 dark:to-black/20 border border-gray-200/50 dark:border-zinc-800/30 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]"
+                >
+                  <div className="flex items-center justify-center mb-4">
+                    <Loader2 className="w-5 h-5 text-purple-500 animate-spin mr-2" />
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {totalProjectCount > 1 
+                        ? `Loading ${totalProjectCount - 1} more projects...`
+                        : 'Loading other projects...'
+                      }
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {/* Skeleton placeholders */}
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
+                    <div className="h-8 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -1028,9 +1135,10 @@ export function ProjectPage({
                       initialTasks={tasks} 
                       onTasksChange={(updatedTasks) => {
                         setTasks(updatedTasks);
-                        // Refresh task counts for all projects when tasks change
-                        const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-                        loadTaskCountsForAllProjects(projectIds);
+                        // Refresh task counts only for current project when tasks change
+                        if (selectedProject) {
+                          loadTaskCountsForAllProjects([selectedProject.id]);
+                        }
                       }} 
                       projectId={selectedProject.id} 
                       selectedTaskId={selectedTaskId}

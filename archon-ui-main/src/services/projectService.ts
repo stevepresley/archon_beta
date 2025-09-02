@@ -177,11 +177,12 @@ export const projectService = {
 
   /**
    * Get all projects
+   * @param include_content - If false, returns lightweight project data (no tasks/docs content)
    */
-  async listProjects(): Promise<Project[]> {
+  async listProjects(include_content: boolean = true): Promise<Project[]> {
     try {
-      console.log('[PROJECT SERVICE] Fetching projects from API');
-      const projects = await callAPI<Project[]>('/api/projects');
+      console.log(`[PROJECT SERVICE] Fetching projects from API | include_content=${include_content}`);
+      const projects = await callAPI<Project[]>(`/api/projects?include_content=${include_content}`);
       console.log('[PROJECT SERVICE] Raw API response:', projects);
       console.log('[PROJECT SERVICE] Raw API response length:', projects.length);
       
@@ -368,6 +369,27 @@ export const projectService = {
       return response;
     } catch (error) {
       console.error(`Failed to get features for project ${projectId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get project statistics including task counts by status (optimized - no full data transfer)
+   */
+  async getProjectStats(projectId: string): Promise<{ 
+    task_counts: { todo: number; doing: number; done: number }; 
+    doc_count: number; 
+    total_tasks: number 
+  }> {
+    try {
+      const response = await callAPI<{ 
+        task_counts: { todo: number; doing: number; done: number }; 
+        doc_count: number; 
+        total_tasks: number 
+      }>(`/api/projects/${projectId}/stats`);
+      return response;
+    } catch (error) {
+      console.error(`Failed to get stats for project ${projectId}:`, error);
       throw error;
     }
   },

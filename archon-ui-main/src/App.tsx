@@ -69,17 +69,17 @@ const AppContent = () => {
         }
       },
       onReconnected: () => {
+        console.log('🏥 [Health] onReconnected called - clearing disconnect screen');
         setDisconnectScreenActive(false);
         setDisconnectScreenDismissed(false);
-        // Refresh the page to ensure all data is fresh
-        window.location.reload();
+        // Don't auto-reload - let the user stay on the current page
       }
     });
 
     return () => {
       serverHealthService.stopMonitoring();
     };
-  }, [disconnectScreenDismissed]);
+  }, []); // Only run once on mount, not when disconnectScreenDismissed changes
 
   const handleDismissDisconnectScreen = () => {
     setDisconnectScreenActive(false);
