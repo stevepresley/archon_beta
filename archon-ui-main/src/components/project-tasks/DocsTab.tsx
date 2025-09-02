@@ -990,34 +990,64 @@ export const DocsTab = ({
         {/* Document Cards Container */}
         <div className="relative mb-6">
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-            {documents.map(doc => (
-              <DocumentCard
-                key={doc.id}
-                document={doc}
-                isActive={selectedDocument?.id === doc.id}
-                onSelect={handleDocumentSelect}
-                onDelete={async (docId) => {
-                  try {
-                    // Call API to delete from database first
-                    await projectService.deleteDocument(project.id, docId);
+            {loading ? (
+              // Loading skeleton cards
+              <>
+                {[1, 2, 3].map(i => (
+                  <div
+                    key={`loading-${i}`}
+                    className="flex-shrink-0 w-48 p-4 rounded-lg border border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-black/30"
+                  >
+                    {/* Document type badge skeleton */}
+                    <div className="h-6 w-20 bg-gray-200/50 dark:bg-gray-700/30 rounded-full animate-pulse mb-2"></div>
                     
-                    // Then remove from local state
-                    setDocuments(prev => prev.filter(d => d.id !== docId));
-                    if (selectedDocument?.id === docId) {
-                      setSelectedDocument(documents.find(d => d.id !== docId) || null);
-                    }
-                    showToast('Document deleted', 'success');
-                  } catch (error) {
-                    console.error('Failed to delete document:', error);
-                    showToast('Failed to delete document', 'error');
-                  }
-                }}
-                isDarkMode={isDarkMode}
-              />
-            ))}
-            
-            {/* Add New Document Card */}
-            <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+                    {/* Title skeleton */}
+                    <div className="space-y-2 mb-2">
+                      <div className="h-4 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                      <div className="h-4 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
+                    </div>
+                    
+                    {/* Date skeleton */}
+                    <div className="h-3 w-24 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse mb-2"></div>
+                    
+                    {/* ID skeleton */}
+                    <div className="h-3 w-16 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                  </div>
+                ))}
+                <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+              </>
+            ) : (
+              <>
+                {documents.map(doc => (
+                  <DocumentCard
+                    key={doc.id}
+                    document={doc}
+                    isActive={selectedDocument?.id === doc.id}
+                    onSelect={handleDocumentSelect}
+                    onDelete={async (docId) => {
+                      try {
+                        // Call API to delete from database first
+                        await projectService.deleteDocument(project.id, docId);
+                        
+                        // Then remove from local state
+                        setDocuments(prev => prev.filter(d => d.id !== docId));
+                        if (selectedDocument?.id === docId) {
+                          setSelectedDocument(documents.find(d => d.id !== docId) || null);
+                        }
+                        showToast('Document deleted', 'success');
+                      } catch (error) {
+                        console.error('Failed to delete document:', error);
+                        showToast('Failed to delete document', 'error');
+                      }
+                    }}
+                    isDarkMode={isDarkMode}
+                  />
+                ))}
+                
+                {/* Add New Document Card */}
+                <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+              </>
+            )}
           </div>
         </div>
 
