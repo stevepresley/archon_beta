@@ -603,7 +603,16 @@ export const DocsTab = ({
   const loadFullDocument = async (docId: string) => {
     if (!project?.id || !docId) return;
     
+    // Check if document already has content loaded
+    const existingDoc = documents.find(d => d.id === docId);
+    if (existingDoc && existingDoc.content && Object.keys(existingDoc.content).length > 0) {
+      console.log(`Document ${existingDoc.title} already has content loaded - skipping API call`);
+      setSelectedDocument(existingDoc);
+      return;
+    }
+    
     try {
+      console.log(`Loading full content for document: ${docId}`);
       const fullDoc = await projectService.getDocument(project.id, docId);
       
       // Update the documents array with the full content
@@ -617,7 +626,7 @@ export const DocsTab = ({
         setSelectedDocument({ ...enrichedDoc, content: fullDoc.content || {} });
       }
       
-      console.log(`Loaded full content for document: ${fullDoc.title}`);
+      console.log(`✅ Loaded full content for document: ${fullDoc.title}`);
     } catch (error) {
       console.error('Failed to load full document:', error);
       showToast('Failed to load document content', 'error');
