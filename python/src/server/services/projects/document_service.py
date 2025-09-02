@@ -82,16 +82,10 @@ class DocumentService:
             )
 
             if response.data:
-                return True, {
-                    "document": {
-                        "id": new_doc["id"],
-                        "project_id": project_id,
-                        "document_type": new_doc["document_type"],
-                        "title": new_doc["title"],
-                        "status": new_doc["status"],
-                        "version": new_doc["version"],
-                    }
-                }
+                # Return complete document data including project_id for frontend compatibility
+                complete_doc = new_doc.copy()
+                complete_doc["project_id"] = project_id
+                return True, {"document": complete_doc}
             else:
                 return False, {"error": "Failed to add document to project"}
 
