@@ -12,20 +12,14 @@ export function getApiUrl(): string {
     return '';
   }
 
-  // Check if VITE_API_URL is provided (set by docker-compose)
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  // For development, construct from window location
+  // Always construct from current window location for development
+  // This ensures remote access works properly regardless of VITE_API_URL
   const protocol = window.location.protocol;
   const host = window.location.hostname;
   // Use configured port or default to 8181
   const port = import.meta.env.VITE_ARCHON_SERVER_PORT || '8181';
   
-  if (!import.meta.env.VITE_ARCHON_SERVER_PORT) {
-    console.info('[Archon] Using default ARCHON_SERVER_PORT: 8181');
-  }
+  console.log(`[Archon] Constructing API URL: ${protocol}//${host}:${port}`);
   
   return `${protocol}//${host}:${port}`;
 }
