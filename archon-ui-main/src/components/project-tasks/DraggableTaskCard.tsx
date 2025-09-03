@@ -92,6 +92,11 @@ export const DraggableTaskCard = ({
   const cardScale = 'scale-100';
   const cardOpacity = 'opacity-100';
   
+  // Highlight for selected task (blue) and related tasks (cyan)
+  const selectedHighlight = selectedTaskId === task.id
+    ? 'bg-gradient-to-br from-blue-100/90 to-purple-100/90 dark:from-blue-900/50 dark:to-purple-900/50 border-blue-400/70 dark:border-blue-500/60 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+    : '';
+    
   // Subtle highlight effect for related tasks - applied to the card, not parent
   const highlightGlow = isHighlighted 
     ? 'border-cyan-400/50 shadow-[0_0_8px_rgba(34,211,238,0.2)]' 
