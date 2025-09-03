@@ -1043,6 +1043,7 @@ export const DocsTab = ({
                       }
                     }}
                     isDarkMode={isDarkMode}
+                    projectId={project.id}
                   />
                 ))}
                 
