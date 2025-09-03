@@ -437,9 +437,8 @@ export function ProjectPage({
         const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
         const scrollContainer = document.querySelector('.overflow-x-auto');
         
-        console.log(`🔄 Auto-scroll debug for project: ${selectedProject.title}`);
-        console.log(`🔄 Project card found:`, !!projectCard);
-        console.log(`🔄 Scroll container found:`, !!scrollContainer);
+        console.log(`AUTOSCROLL: Starting for ${selectedProject.title}`);
+        console.log(`AUTOSCROLL: Card=${!!projectCard} Container=${!!scrollContainer}`);
         
         if (projectCard && scrollContainer) {
           // Get the position of the card relative to the container
@@ -448,13 +447,10 @@ export function ProjectPage({
           const cardOffsetLeft = projectCard.offsetLeft;
           const cardWidth = projectCard.clientWidth;
           
-          console.log(`🔄 Container width: ${containerWidth}, scroll left: ${containerScrollLeft}`);
-          console.log(`🔄 Card offset left: ${cardOffsetLeft}, card width: ${cardWidth}`);
-          
           // Calculate the scroll position to center the card
           const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
           
-          console.log(`🔄 Target scroll left: ${targetScrollLeft}`);
+          console.log(`AUTOSCROLL: Target=${targetScrollLeft} (Card=${cardOffsetLeft}, Container=${containerWidth})`);
           
           // Smooth scroll to center the selected card
           scrollContainer.scrollTo({
@@ -462,9 +458,9 @@ export function ProjectPage({
             behavior: 'smooth'
           });
           
-          console.log(`✅ Scrolling to center project: ${selectedProject.title}`);
+          console.log(`AUTOSCROLL: SUCCESS - Scrolled to ${selectedProject.title}`);
         } else {
-          console.log(`❌ Auto-scroll failed - missing elements`);
+          console.log(`AUTOSCROLL: FAILED - Card=${!!projectCard} Container=${!!scrollContainer}`);
         }
       }, 200);
     }
