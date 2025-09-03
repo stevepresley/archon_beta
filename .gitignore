@@ -12,3 +12,7 @@ PRPs/completed/
 claude.local.md
 .mcp.json
 .next-session.md
+
+# local build scripts
+/scripts/
+
