@@ -269,12 +269,17 @@ const DraggableTaskRow = ({
     }
   };
 
+  const isHighlighted = task.id === selectedTaskId;
+  if (isHighlighted) {
+    console.log('✨ DraggableTaskRow HIGHLIGHTING task:', task.title, 'taskId:', task.id, 'selectedTaskId:', selectedTaskId);
+  }
+
   return (
     <tr 
       ref={(node) => drag(drop(node))}
       className={`
         group transition-all duration-200 cursor-move
-        ${task.id === selectedTaskId 
+        ${isHighlighted
           ? 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-blue-900/40 dark:to-purple-900/40 ring-2 ring-blue-400/50 dark:ring-blue-500/50' 
           : index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'
         }
