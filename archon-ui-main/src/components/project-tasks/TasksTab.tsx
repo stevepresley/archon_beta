@@ -591,6 +591,7 @@ export const TasksTab = ({
               onTaskReorder={handleTaskReorder}
               onTaskCreate={createTaskInline}
               onTaskUpdate={updateTaskInline}
+              selectedTaskId={selectedTaskId}
             />
           ) : (
             <TaskBoardView
