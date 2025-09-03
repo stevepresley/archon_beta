@@ -1069,26 +1069,65 @@ export function ProjectPage({
                         <Pin className="w-3.5 h-3.5" fill={project.pinned === true ? 'currentColor' : 'none'} />
                       </button>
                       
-                      {/* Copy Project ID Button */}
+                      {/* Enhanced Copy Project ID Button with shift-click support */}
                       <button 
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          navigator.clipboard.writeText(project.id);
-                          showToast('Project ID copied to clipboard', 'success');
-                          // Visual feedback
-                          const button = e.currentTarget;
-                          const originalHTML = button.innerHTML;
-                          button.innerHTML = '<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
-                          setTimeout(() => {
-                            button.innerHTML = originalHTML;
-                          }, 2000);
+                          try {
+                            const result = await handleCopyClick(e, 'project', project.id);
+                            
+                            if (result.success) {
+                              const message = result.copied === 'url' 
+                                ? 'Project URL copied to clipboard' 
+                                : 'Project ID copied to clipboard';
+                              showToast(message, 'success');
+                              
+                              // Visual feedback
+                              const button = e.currentTarget;
+                              const originalHTML = button.innerHTML;
+                              button.innerHTML = '<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
+                              setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                              }, 2000);
+                            } else {
+                              showToast('Failed to copy to clipboard', 'error');
+                            }
+                          } catch (error) {
+                            console.error('Copy failed:', error);
+                            showToast('Failed to copy to clipboard', 'error');
+                          }
                         }}
                         className="flex-1 flex items-center justify-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors py-1"
-                        title="Copy Project ID to clipboard"
+                        title="Copy Project ID • Shift-click for full URL"
                       >
                         <Clipboard className="w-3 h-3" />
                         <span>Copy ID</span>
                       </button>
+                      
+                      {/* Mobile Copy Link Button - shown on iOS/Android */}
+                      {needsCopyLinkButton() && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const result = await copyUrlToClipboard('project', project.id);
+                              
+                              if (result.success) {
+                                showToast('Project URL copied to clipboard', 'success');
+                              } else {
+                                showToast('Failed to copy URL', 'error');
+                              }
+                            } catch (error) {
+                              console.error('Copy URL failed:', error);
+                              showToast('Failed to copy URL', 'error');
+                            }
+                          }}
+                          className="flex items-center justify-center gap-1 px-2 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 transition-colors py-1"
+                          title="Copy project URL"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                        </button>
+                      )}
                       
                       {/* Delete button */}
                       <button
