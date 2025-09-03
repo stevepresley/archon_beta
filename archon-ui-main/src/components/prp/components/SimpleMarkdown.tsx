@@ -112,7 +112,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
   const flushTable = () => {
     if (tableRows.length > 0) {
       elements.push(
-        <div key={elements.length} className="my-6 overflow-x-auto">
+        <div key={`table-${elements.length}-${Date.now()}`} className="my-6 overflow-x-auto">
           <div className="inline-block min-w-full overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
             <table className="min-w-full">
               {tableHeaders.length > 0 && (
