@@ -308,7 +308,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     if (line.trim()) {
       flushList();
       elements.push(
-        <p key={index} className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300">
+        <p key={`p-${index}-${elements.length}`} className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300">
           {processInlineMarkdown(line)}
         </p>
       );
