@@ -1135,6 +1135,7 @@ export function ProjectPage({
                           title="Copy project URL"
                         >
                           <ExternalLink className="w-3 h-3" />
+                          <span>Copy URL</span>
                         </button>
                       )}
                       
