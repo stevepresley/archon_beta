@@ -75,6 +75,11 @@ export const TasksTab = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projectFeatures, setProjectFeatures] = useState<any[]>([]);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
+  
+  // Persist view mode changes to localStorage
+  useEffect(() => {
+    localStorage.setItem('tasksViewMode', viewMode);
+  }, [viewMode]);
   const [isSavingTask, setIsSavingTask] = useState<boolean>(false);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
   
