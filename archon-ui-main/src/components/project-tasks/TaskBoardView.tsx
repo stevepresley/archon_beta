@@ -127,6 +127,8 @@ const ColumnDropZone = ({
             hoveredTaskId={hoveredTaskId}
             onTaskHover={onTaskHover}
             selectedTaskId={selectedTaskId}
+            projectId={projectId}
+            currentView={currentView}
           />
         ))}
       </div>
