@@ -1,9 +1,11 @@
-# Pull Request - Deep URL Linking Final Fixes
+# Pull Request - Deep URL Linking Final Fixes (IN PROGRESS)
 
 ## Summary
 This PR addresses the final two issues in the deep URL linking feature for task management:
 1. **Task highlighting not working** - Tasks accessed via deep URL (`/task/{id}`) were not being highlighted in Board or Table views
 2. **View persistence broken** - Deep URL navigation always switched to Board view regardless of user's current view preference
+
+**⚠️ STATUS: IMPLEMENTATION COMPLETE, VERIFICATION PENDING**
 
 ## Changes Made
 - **Added selectedTaskId prop chain**: Updated TasksTab → TaskTableView/TaskBoardView → DraggableTaskRow/DraggableTaskCard component hierarchy to pass selectedTaskId through all levels
@@ -30,37 +32,33 @@ This PR addresses the final two issues in the deep URL linking feature for task 
 - [ ] Documentation site
 
 ## Testing
-- [x] All existing tests pass
+- [ ] All existing tests pass
 - [ ] Added new tests for new functionality
-- [x] Manually tested affected user flows
+- [ ] Manually tested affected user flows ⚠️ **PENDING USER VERIFICATION**
 - [ ] Docker builds succeed for all services
 
 ### Test Evidence
-**Manual Testing Performed:**
+**⚠️ TESTING STATUS: PENDING USER VERIFICATION**
+
+**Manual Testing Required:**
 1. **Task Highlighting Test**: 
-   - Navigated to `/projects/{projectId}/tasks/{taskId}` via direct URL
-   - Verified task is highlighted in both Board and Table views
-   - Confirmed highlighting visual consistency (blue-purple gradient background, proper contrast)
+   - Navigate to `/projects/{projectId}/tasks/{taskId}` via direct URL
+   - Verify task is highlighted in both Board and Table views
+   - Confirm highlighting visual consistency (blue-purple gradient background, proper contrast)
 
 2. **View Persistence Test**:
-   - Set view to Table mode, navigated away, returned via deep URL → Table view preserved
-   - Set view to Board mode, navigated away, returned via deep URL → Board view preserved
-   - Tested with browser refresh and new tab navigation
-
-3. **Component Integration Test**:
-   - Verified selectedTaskId prop is correctly passed through all component levels:
-     - TasksTab receives selectedTaskId from ProjectPage
-     - TaskTableView and TaskBoardView receive selectedTaskId from TasksTab
-     - DraggableTaskRow and DraggableTaskCard receive and use selectedTaskId for highlighting
+   - Set view to Table mode, navigate away, return via deep URL → Should preserve Table view
+   - Set view to Board mode, navigate away, return via deep URL → Should preserve Board view
+   - Test with browser refresh and new tab navigation
 
 ## Checklist
 - [x] My code follows the service architecture patterns
 - [x] If using an AI coding assistant, I used the CLAUDE.md rules
-- [ ] I have added tests that prove my fix/feature works
-- [x] All new and existing tests pass locally
+- [ ] I have added tests that prove my fix/feature works ⚠️ **PENDING VERIFICATION**
+- [ ] All new and existing tests pass locally ⚠️ **PENDING VERIFICATION**
 - [x] My changes generate no new warnings
 - [x] I have updated relevant documentation
-- [x] I have verified no regressions in existing features
+- [ ] I have verified no regressions in existing features ⚠️ **PENDING VERIFICATION**
 
 ## Breaking Changes
 None - all changes are additive and backward-compatible.
@@ -112,6 +110,18 @@ useEffect(() => {
   localStorage.setItem('tasksViewMode', viewMode);
 }, [viewMode]);
 ```
+
+## ⚠️ VERIFICATION NEEDED
+**The code implementation is complete but requires user testing to verify:**
+1. Task highlighting works correctly in both Board and Table views when accessing via deep URL
+2. View persistence maintains user's preferred view mode across navigation
+3. No regressions in existing functionality
+
+**Next Steps:**
+1. User to test task highlighting functionality
+2. User to test view persistence
+3. Address any issues found during testing
+4. Complete verification checklist items above
 
 ## Additional Notes
 - The highlighting implementation maintains visual consistency with existing project and document highlighting patterns
