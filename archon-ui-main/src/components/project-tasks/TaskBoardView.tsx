@@ -395,6 +395,8 @@ export const TaskBoardView = ({
           onTaskHover={setHoveredTaskId}
           selectedTasks={selectedTasks}
           onTaskSelect={toggleTaskSelection}
+          projectId={projectId}
+          currentView={currentView}
         />
         
         {/* In Progress Column */}
