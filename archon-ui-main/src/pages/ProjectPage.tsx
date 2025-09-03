@@ -452,7 +452,7 @@ export function ProjectPage({
           const cardWidth = projectCard.clientWidth;
           
           // Calculate the scroll position to center the card
-          const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
+          const targetScrollLeft = Math.max(0, cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2));
           
           console.log(`AUTOSCROLL: Target=${targetScrollLeft} (Card=${cardOffsetLeft}, Container=${containerWidth})`);
           
