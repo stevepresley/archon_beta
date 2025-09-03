@@ -128,6 +128,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
             aria-label="Copy Document ID to clipboard"
           >
             <Clipboard className="w-3 h-3" aria-hidden="true" />
+            <span>Doc ID</span>
           </button>
           
           {/* Mobile Copy Link Button - shown on iOS/Android */}
@@ -154,6 +155,7 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
               aria-label="Copy document URL"
             >
               <ExternalLink className="w-3 h-3" aria-hidden="true" />
+              <span>Copy URL</span>
             </button>
           )}
         </div>
