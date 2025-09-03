@@ -32,6 +32,8 @@ interface TaskTableViewProps {
   onTaskCreate?: (task: Omit<Task, 'id'>) => Promise<void>;
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => Promise<void>;
   selectedTaskId?: string;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 const getAssigneeGlassStyle = (assigneeName: 'User' | 'Archon' | 'AI IDE Agent') => {
