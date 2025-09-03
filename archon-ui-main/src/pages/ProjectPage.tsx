@@ -452,13 +452,26 @@ export function ProjectPage({
           
           console.log(`AUTOSCROLL: Target=${targetScrollLeft} (Card=${cardOffsetLeft}, Container=${containerWidth})`);
           
+          // Store initial scroll position to verify movement
+          const initialScrollLeft = scrollContainer.scrollLeft;
+          
           // Smooth scroll to center the selected card
           scrollContainer.scrollTo({
             left: targetScrollLeft,
             behavior: 'smooth'
           });
           
-          console.log(`AUTOSCROLL: SUCCESS - Scrolled to ${selectedProject.title}`);
+          // Verify the scroll actually worked after a delay
+          setTimeout(() => {
+            const finalScrollLeft = scrollContainer.scrollLeft;
+            const scrollDiff = Math.abs(finalScrollLeft - initialScrollLeft);
+            
+            if (scrollDiff > 5) { // Allow for small rounding differences
+              console.log(`AUTOSCROLL: REAL SUCCESS - Moved ${scrollDiff}px to position ${finalScrollLeft}`);
+            } else {
+              console.log(`AUTOSCROLL: REAL FAILURE - No movement detected (${initialScrollLeft} → ${finalScrollLeft})`);
+            }
+          }, 500); // Wait for smooth scroll to complete
         } else {
           console.log(`AUTOSCROLL: FAILED - Card=${!!projectCard} Container=${!!scrollContainer}`);
         }
