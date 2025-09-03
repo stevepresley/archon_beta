@@ -118,15 +118,45 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
         <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[120px]" title={document.id}>
           {document.id.slice(0, 8)}...
         </span>
-        <button 
-          type="button"
-          onClick={handleCopyId}
-          className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-          title="Copy Document ID to clipboard"
-          aria-label="Copy Document ID to clipboard"
-        >
-          <Clipboard className="w-3 h-3" aria-hidden="true" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Enhanced Copy Document ID Button with shift-click support */}
+          <button 
+            type="button"
+            onClick={handleCopyId}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+            title="Copy Document ID • Shift-click for full URL"
+            aria-label="Copy Document ID to clipboard"
+          >
+            <Clipboard className="w-3 h-3" aria-hidden="true" />
+          </button>
+          
+          {/* Mobile Copy Link Button - shown on iOS/Android */}
+          {needsCopyLinkButton() && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const result = await copyUrlToClipboard('document', projectId, document.id);
+                  
+                  if (result.success) {
+                    showToast('Document URL copied to clipboard', 'success');
+                  } else {
+                    showToast('Failed to copy URL', 'error');
+                  }
+                } catch (error) {
+                  console.error('Copy URL failed:', error);
+                  showToast('Failed to copy URL', 'error');
+                }
+              }}
+              className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 transition-colors p-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900"
+              title="Copy document URL"
+              aria-label="Copy document URL"
+            >
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+            </button>
+          )}
+        </div>
       </div>
       
       {/* Delete Button */}
