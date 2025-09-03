@@ -220,7 +220,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
       const colorClasses = ['text-gray-900 dark:text-white', 'text-gray-800 dark:text-gray-100', 'text-gray-700 dark:text-gray-200', 'text-gray-700 dark:text-gray-200', 'text-gray-600 dark:text-gray-300', 'text-gray-600 dark:text-gray-300'];
       
       elements.push(
-        <HeadingTag key={index} className={`font-bold mb-3 mt-6 ${sizeClasses[level - 1] || 'text-base'} ${colorClasses[level - 1] || 'text-gray-700 dark:text-gray-200'} border-b border-gray-200 dark:border-gray-700 pb-1`}>
+        <HeadingTag key={`heading-${index}-${elements.length}`} className={`font-bold mb-3 mt-6 ${sizeClasses[level - 1] || 'text-base'} ${colorClasses[level - 1] || 'text-gray-700 dark:text-gray-200'} border-b border-gray-200 dark:border-gray-700 pb-1`}>
           {processInlineMarkdown(text)}
         </HeadingTag>
       );
