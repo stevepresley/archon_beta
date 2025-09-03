@@ -4,6 +4,9 @@ __pycache__
 PRPs/local
 PRPs/completed/
 /logs/
+.DS_Store
+*.log
+
 
 # Claude
 .claude/
