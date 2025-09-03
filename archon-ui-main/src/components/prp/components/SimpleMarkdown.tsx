@@ -234,7 +234,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
       const isChecked = checkboxMatch[1] === 'x';
       const content = checkboxMatch[2];
       elements.push(
-        <div key={index} className="flex items-start gap-3 my-2">
+        <div key={`checkbox-${index}-${elements.length}`} className="flex items-start gap-3 my-2">
           <div className={`flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center mt-0.5 transition-colors ${
             isChecked 
               ? 'bg-green-500 border-green-500 text-white' 
