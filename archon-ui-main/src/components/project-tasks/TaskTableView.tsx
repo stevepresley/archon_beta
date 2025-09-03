@@ -194,6 +194,7 @@ interface DraggableTaskRowProps {
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => Promise<void>;
   tasksInStatus: Task[];
   style?: React.CSSProperties;
+  selectedTaskId?: string;
 }
 
 const DraggableTaskRow = ({ 
