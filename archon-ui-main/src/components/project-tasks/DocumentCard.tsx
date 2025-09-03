@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Rocket, Code, Briefcase, Users, FileText, X, Plus, Clipboard } from 'lucide-react';
+import { Rocket, Code, Briefcase, Users, FileText, X, Plus, Clipboard, ExternalLink } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { handleCopyClick, copyUrlToClipboard } from '../../utils/copyHelpers';
+import { needsCopyLinkButton } from '../../utils/platformDetection';
 
 export interface ProjectDoc {
   id: string;
