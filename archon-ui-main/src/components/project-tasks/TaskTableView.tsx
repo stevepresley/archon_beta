@@ -864,6 +864,7 @@ export const TaskTableView = ({
                 onTaskReorder={onTaskReorder}
                 onTaskUpdate={onTaskUpdate}
                 tasksInStatus={getTasksByStatus(task.status)}
+                selectedTaskId={selectedTaskId}
                 style={{ 
                   opacity: scrollOpacities.get(`row-${index}`) || 1,
                   transition: 'opacity 0.2s ease-out'
