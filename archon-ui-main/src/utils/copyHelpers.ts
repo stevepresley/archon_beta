@@ -34,20 +34,29 @@ export const constructDeepLinkUrl = (
  * iOS/Android compatible clipboard copy with fallback
  */
 export const copyToClipboardWithFallback = async (text: string): Promise<boolean> => {
+  console.log('[COPY-DEBUG] Starting copy process for:', text.substring(0, 50) + '...');
+  
   // Modern clipboard API (preferred for HTTPS contexts)
   if (navigator.clipboard && window.isSecureContext) {
+    console.log('[COPY-DEBUG] Using modern clipboard API');
     try {
       await navigator.clipboard.writeText(text);
+      console.log('[COPY-DEBUG] Modern clipboard API succeeded');
       return true;
     } catch (err) {
-      console.log('Clipboard API failed, trying fallback:', err);
+      console.log('[COPY-DEBUG] Modern clipboard API failed, trying fallback:', err);
       // Only use fallback if modern API fails
-      return copyTextUsingInput(text);
+      const fallbackResult = copyTextUsingInput(text);
+      console.log('[COPY-DEBUG] Fallback result:', fallbackResult);
+      return fallbackResult;
     }
   }
   
   // Fallback using temporary input element (works on mobile)
-  return copyTextUsingInput(text);
+  console.log('[COPY-DEBUG] No modern clipboard API, using fallback');
+  const fallbackResult = copyTextUsingInput(text);
+  console.log('[COPY-DEBUG] Fallback result:', fallbackResult);
+  return fallbackResult;
 };
 
 /**
