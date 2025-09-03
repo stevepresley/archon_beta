@@ -114,6 +114,7 @@ export const DraggableTaskCard = ({
   return (
     <div 
       ref={(node) => drag(drop(node))}
+      data-task-id={task.id}
       style={{ 
         perspective: '1000px',
         transformStyle: 'preserve-3d'
