@@ -15,6 +15,7 @@ export interface DraggableTaskCardProps {
   allTasks?: Task[];
   hoveredTaskId?: string | null;
   onTaskHover?: (taskId: string | null) => void;
+  selectedTaskId?: string;
 }
 
 export const DraggableTaskCard = ({
