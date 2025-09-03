@@ -431,7 +431,7 @@ export function ProjectPage({
 
   // Auto-scroll selected project into view
   useEffect(() => {
-    if (selectedProject && !isLoadingProjects) {
+    if (selectedProject && !isLoadingProjects && !isLoadingBackgroundProjects) {
       // Small delay to ensure DOM is updated
       setTimeout(() => {
         const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
