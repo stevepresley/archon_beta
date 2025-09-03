@@ -574,13 +574,26 @@ export const TaskTableView = ({
   onTaskUpdate,
   selectedTaskId
 }: TaskTableViewProps) => {
-  const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('backlog');
+  const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('all');
 
   // State for delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const { showToast } = useToast();
+
+  // Auto-select status filter when a task is selected via deep URL
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      const selectedTask = tasks.find(task => task.id === selectedTaskId);
+      if (selectedTask) {
+        // If the selected task is not visible in the current filter, switch to its status or 'all'
+        if (statusFilter !== 'all' && statusFilter !== selectedTask.status) {
+          setStatusFilter(selectedTask.status);
+        }
+      }
+    }
+  }, [selectedTaskId, tasks, statusFilter]);
 
   // Refs for scroll fade effect
   const tableContainerRef = useRef<HTMLDivElement>(null);
