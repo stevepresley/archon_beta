@@ -41,6 +41,8 @@ export const copyToClipboardWithFallback = async (text: string): Promise<boolean
       return true;
     } catch (err) {
       console.log('Clipboard API failed, trying fallback:', err);
+      // Only use fallback if modern API fails
+      return copyTextUsingInput(text);
     }
   }
   
