@@ -270,9 +270,6 @@ const DraggableTaskRow = ({
   };
 
   const isHighlighted = task.id === selectedTaskId;
-  if (isHighlighted) {
-    console.log('[DEEP-LINK-DEBUG] DraggableTaskRow HIGHLIGHTING task:', task.title, 'taskId:', task.id, 'selectedTaskId:', selectedTaskId);
-  }
 
   return (
     <tr 
@@ -628,11 +625,9 @@ export const TaskTableView = ({
           // Store initial scroll position to verify movement
           const initialScrollTop = scrollContainer.scrollTop;
           
-          console.log('[DEEP-LINK-DEBUG] Auto-scroll: initial=', initialScrollTop, 'target=', targetScrollTop, 'diff=', Math.abs(targetScrollTop - initialScrollTop));
           
           // Check if scroll is actually needed
           if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
-            console.log('[DEEP-LINK-DEBUG] Auto-scroll: NO SCROLL NEEDED - already in position');
             return;
           }
           
@@ -642,7 +637,6 @@ export const TaskTableView = ({
             behavior: 'smooth'
           });
           
-          console.log('[DEEP-LINK-DEBUG] Auto-scroll: scrolled from', initialScrollTop, 'to', targetScrollTop);
         }
       }, 300); // Slightly longer delay to ensure status filter changes are applied
     }
