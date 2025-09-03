@@ -579,7 +579,9 @@ export const TaskTableView = ({
   onTaskReorder,
   onTaskCreate,
   onTaskUpdate,
-  selectedTaskId
+  selectedTaskId,
+  projectId,
+  currentView = 'table'
 }: TaskTableViewProps) => {
   const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('all');
 
