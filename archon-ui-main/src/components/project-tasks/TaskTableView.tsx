@@ -271,7 +271,7 @@ const DraggableTaskRow = ({
 
   const isHighlighted = task.id === selectedTaskId;
   if (isHighlighted) {
-    console.log('✨ DraggableTaskRow HIGHLIGHTING task:', task.title, 'taskId:', task.id, 'selectedTaskId:', selectedTaskId);
+    console.log('[DEEP-LINK-DEBUG] DraggableTaskRow HIGHLIGHTING task:', task.title, 'taskId:', task.id, 'selectedTaskId:', selectedTaskId);
   }
 
   return (
@@ -589,14 +589,14 @@ export const TaskTableView = ({
 
   // Auto-select status filter when a task is selected via deep URL
   useEffect(() => {
-    console.log('🔍 TaskTableView selectedTaskId:', selectedTaskId, 'tasks count:', tasks.length);
+    console.log('[DEEP-LINK-DEBUG] TaskTableView selectedTaskId:', selectedTaskId, 'tasks count:', tasks.length);
     if (selectedTaskId && tasks.length > 0) {
       const selectedTask = tasks.find(task => task.id === selectedTaskId);
-      console.log('🎯 Found selected task:', selectedTask ? `${selectedTask.title} (status: ${selectedTask.status})` : 'NOT FOUND');
+      console.log('[DEEP-LINK-DEBUG] Found selected task:', selectedTask ? `${selectedTask.title} (status: ${selectedTask.status})` : 'NOT FOUND');
       if (selectedTask) {
         // If the selected task is not visible in the current filter, switch to its status or 'all'
         if (statusFilter !== 'all' && statusFilter !== selectedTask.status) {
-          console.log('📋 Switching status filter from', statusFilter, 'to', selectedTask.status);
+          console.log('[DEEP-LINK-DEBUG] Switching status filter from', statusFilter, 'to', selectedTask.status);
           setStatusFilter(selectedTask.status);
         }
       }
