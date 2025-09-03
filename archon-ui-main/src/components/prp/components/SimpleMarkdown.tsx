@@ -24,7 +24,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     if (currentList.length > 0 && listType) {
       const ListComponent = listType === 'ul' ? 'ul' : 'ol';
       elements.push(
-        <div key={elements.length} className="my-3">
+        <div key={`list-${elements.length}-${Date.now()}`} className="my-3">
           <ListComponent className={`space-y-2 ${listType === 'ul' ? 'list-disc' : 'list-decimal'} pl-6 text-gray-700 dark:text-gray-300`}>
             {currentList.map((item, idx) => (
               <li key={idx} className="leading-relaxed">{processInlineMarkdown(item)}</li>
