@@ -19,6 +19,8 @@ export interface DraggableTaskCardProps {
   hoveredTaskId?: string | null;
   onTaskHover?: (taskId: string | null) => void;
   selectedTaskId?: string;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 export const DraggableTaskCard = ({
