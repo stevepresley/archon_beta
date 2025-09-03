@@ -998,7 +998,7 @@ export const DocsTab = ({
 
         {/* Document Cards Container */}
         <div className="relative mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-always-visible">
+          <div className="flex gap-3 overflow-x-auto pb-2 force-scrollbar">
             {loading ? (
               // Single loading card following the same pattern as projects
               <>
