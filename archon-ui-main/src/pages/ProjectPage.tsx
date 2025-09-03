@@ -901,7 +901,7 @@ export function ProjectPage({
       {/* Project Cards - Horizontally Scrollable */}
       {!isLoadingProjects && !projectsError && (
         <motion.div className="relative mb-10" variants={itemVariants}>
-          <div className="overflow-x-auto pb-4 force-scrollbar">
+          <div className="overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 dark:scrollbar-thumb-gray-600 scrollbar-track-gray-100 dark:scrollbar-track-gray-800">
             <div className="flex gap-4 min-w-max">
               {projects.map(project => (
                 project.creationProgress ? (
