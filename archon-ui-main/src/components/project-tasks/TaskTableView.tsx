@@ -633,6 +633,8 @@ export const TaskTableView = ({
           // Store initial scroll position to verify movement
           const initialScrollTop = scrollContainer.scrollTop;
           
+          console.log('[DEEP-LINK-DEBUG] Auto-scroll: initial=', initialScrollTop, 'target=', targetScrollTop, 'diff=', Math.abs(targetScrollTop - initialScrollTop));
+          
           // Check if scroll is actually needed
           if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
             console.log('[DEEP-LINK-DEBUG] Auto-scroll: NO SCROLL NEEDED - already in position');
