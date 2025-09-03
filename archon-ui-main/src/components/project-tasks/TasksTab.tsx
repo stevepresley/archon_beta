@@ -601,6 +601,7 @@ export const TasksTab = ({
               onTaskDelete={deleteTask}
               onTaskMove={moveTask}
               onTaskReorder={handleTaskReorder}
+              selectedTaskId={selectedTaskId}
             />
           )}
         </div>
