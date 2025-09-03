@@ -109,7 +109,7 @@ export const copyUrlToClipboard = async (
   currentView?: 'table' | 'board'
 ): Promise<{ success: boolean; text: string }> => {
   const textToCopy = constructDeepLinkUrl(type, projectId, itemId, currentView);
-  const success = await copyToClipboardWithFallboard(textToCopy);
+  const success = await copyToClipboardWithFallback(textToCopy);
   
   return { success, text: textToCopy };
 };
