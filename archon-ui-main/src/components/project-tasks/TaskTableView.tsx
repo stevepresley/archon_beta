@@ -206,7 +206,8 @@ const DraggableTaskRow = ({
   onTaskReorder,
   onTaskUpdate,
   tasksInStatus,
-  style
+  style,
+  selectedTaskId
 }: DraggableTaskRowProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);
