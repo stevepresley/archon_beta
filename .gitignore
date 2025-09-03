@@ -7,7 +7,6 @@ PRPs/completed/
 .DS_Store
 *.log
 
-
 # Claude
 .claude/
 claude.local.md
