@@ -105,11 +105,22 @@ class ServerHealthService {
     });
   }
 
-  private handleConnectionRestored() {
+  private async handleConnectionRestored() {
     console.log('🏥 [Health] handleConnectionRestored called, isConnected:', this.isConnected, 'callbacks exist:', !!this.callbacks);
     if (!this.isConnected) {
       this.isConnected = true;
       console.log('🏥 [Health] Setting isConnected to true and calling onReconnected');
+      
+      // Trigger Socket.IO reconnection for real-time services
+      try {
+        console.log('🏥 [Health] Triggering Socket.IO reconnection...');
+        const { taskSocketService } = await import('./taskSocketService');
+        await taskSocketService.reconnect();
+        console.log('🏥 [Health] Socket.IO reconnection completed');
+      } catch (error) {
+        console.warn('🏥 [Health] Failed to reconnect Socket.IO:', error);
+      }
+      
       // Connection to server restored
       if (this.callbacks) {
         this.callbacks.onReconnected();
