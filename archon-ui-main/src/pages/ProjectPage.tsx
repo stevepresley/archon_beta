@@ -487,7 +487,7 @@ export function ProjectPage({
         }
       }, 200);
     }
-  }, [selectedProject?.id, isLoadingProjects]);
+  }, [selectedProject?.id, isLoadingProjects, isLoadingBackgroundProjects]);
 
   const loadProjects = async () => {
     try {
