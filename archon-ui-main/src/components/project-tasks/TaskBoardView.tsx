@@ -15,6 +15,7 @@ interface TaskBoardViewProps {
   onTaskDelete: (task: Task) => void;
   onTaskMove: (taskId: string, newStatus: Task['status']) => void;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task['status']) => void;
+  selectedTaskId?: string;
 }
 
 interface ColumnDropZoneProps {
