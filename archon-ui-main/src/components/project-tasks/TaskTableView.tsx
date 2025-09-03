@@ -861,7 +861,7 @@ export const TaskTableView = ({
       {/* Scrollable table container */}
       <div 
         ref={tableContainerRef}
-        className="overflow-x-auto overflow-y-auto max-h-[600px] relative"
+        className="overflow-x-auto overflow-y-auto max-h-[600px] relative force-scrollbar"
         style={{
           maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.1) 90%, rgba(0,0,0,0) 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.1) 90%, rgba(0,0,0,0) 100%)'
