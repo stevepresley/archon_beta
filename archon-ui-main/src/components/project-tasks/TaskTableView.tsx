@@ -590,14 +590,11 @@ export const TaskTableView = ({
 
   // Auto-select status filter when a task is selected via deep URL
   useEffect(() => {
-    console.log('[DEEP-LINK-DEBUG] TaskTableView selectedTaskId:', selectedTaskId, 'tasks count:', tasks.length);
     if (selectedTaskId && tasks.length > 0) {
       const selectedTask = tasks.find(task => task.id === selectedTaskId);
-      console.log('[DEEP-LINK-DEBUG] Found selected task:', selectedTask ? `${selectedTask.title} (status: ${selectedTask.status})` : 'NOT FOUND');
       if (selectedTask) {
         // If the selected task is not visible in the current filter, switch to its status or 'all'
         if (statusFilter !== 'all' && statusFilter !== selectedTask.status) {
-          console.log('[DEEP-LINK-DEBUG] Switching status filter from', statusFilter, 'to', selectedTask.status);
           setStatusFilter(selectedTask.status);
         }
       }
@@ -612,7 +609,6 @@ export const TaskTableView = ({
         const taskRow = document.querySelector(`[data-task-id="${selectedTaskId}"]`);
         const scrollContainer = tableContainerRef.current;
         
-        console.log('[DEEP-LINK-DEBUG] Auto-scroll: taskRow=', !!taskRow, 'scrollContainer=', !!scrollContainer);
         
         if (taskRow && scrollContainer) {
           // Get the position of the row relative to the scroll container
@@ -628,7 +624,6 @@ export const TaskTableView = ({
           // Calculate the scroll position to center the row
           const targetScrollTop = Math.max(0, rowOffsetTop - (containerHeight / 2) + (rowHeight / 2));
           
-          console.log('[DEEP-LINK-DEBUG] Auto-scroll: target=', targetScrollTop, 'row=', rowOffsetTop, 'container=', containerHeight);
           
           // Store initial scroll position to verify movement
           const initialScrollTop = scrollContainer.scrollTop;
