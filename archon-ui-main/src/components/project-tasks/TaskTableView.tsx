@@ -277,6 +277,7 @@ const DraggableTaskRow = ({
   return (
     <tr 
       ref={(node) => drag(drop(node))}
+      data-task-id={task.id}
       className={`
         group transition-all duration-200 cursor-move
         ${isHighlighted
