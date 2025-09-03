@@ -164,7 +164,6 @@ export const TaskBoardView = ({
             scrollContainer = scrollContainer.parentElement;
           }
           
-          console.log('[DEEP-LINK-DEBUG] Board auto-scroll: taskCard=', !!taskCard, 'scrollContainer=', !!scrollContainer);
           
           if (scrollContainer) {
             // Get the position of the card relative to the scroll container
@@ -180,14 +179,12 @@ export const TaskBoardView = ({
             // Calculate the scroll position to center the card
             const targetScrollTop = Math.max(0, cardOffsetTop - (containerHeight / 2) + (cardHeight / 2));
             
-            console.log('[DEEP-LINK-DEBUG] Board auto-scroll: target=', targetScrollTop, 'card=', cardOffsetTop, 'container=', containerHeight);
             
             // Store initial scroll position to verify movement
             const initialScrollTop = scrollContainer.scrollTop;
             
             // Check if scroll is actually needed
             if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
-              console.log('[DEEP-LINK-DEBUG] Board auto-scroll: NO SCROLL NEEDED - already in position');
               return;
             }
             
@@ -197,7 +194,6 @@ export const TaskBoardView = ({
               behavior: 'smooth'
             });
             
-            console.log('[DEEP-LINK-DEBUG] Board auto-scroll: scrolled from', initialScrollTop, 'to', targetScrollTop);
           }
         }
       }, 300); // Small delay to ensure DOM is updated
