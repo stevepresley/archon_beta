@@ -46,6 +46,7 @@ const ColumnDropZone = ({
   onTaskReorder,
   allTasks,
   hoveredTaskId,
+  selectedTaskId,
   onTaskHover,
   selectedTasks,
   onTaskSelect
