@@ -901,7 +901,26 @@ export function ProjectPage({
       {/* Project Cards - Horizontally Scrollable */}
       {!isLoadingProjects && !projectsError && (
         <motion.div className="relative mb-10" variants={itemVariants}>
-          <div className="overflow-x-auto pb-4" style={{scrollbarWidth: 'auto'}}>
+          <div 
+            className="overflow-x-auto pb-4" 
+            style={{
+              scrollbarWidth: 'auto',
+              WebkitScrollbarWidth: 'auto'
+            }}
+            css={{
+              '::-webkit-scrollbar': {
+                height: '8px',
+                WebkitAppearance: 'none'
+              },
+              '::-webkit-scrollbar-thumb': {
+                backgroundColor: '#9ca3af',
+                borderRadius: '4px'
+              },
+              '::-webkit-scrollbar-track': {
+                backgroundColor: '#f3f4f6'
+              }
+            }}
+          >
             <div className="flex gap-4 min-w-max">
               {projects.map(project => (
                 project.creationProgress ? (
