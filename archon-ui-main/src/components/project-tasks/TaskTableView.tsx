@@ -937,7 +937,7 @@ export const TaskTableView = ({
                 tasksInStatus={getTasksByStatus(task.status)}
                 selectedTaskId={selectedTaskId}
                 style={{ 
-                  opacity: scrollOpacities.get(`row-${index}`) || 1,
+                  opacity: task.id === selectedTaskId ? 1 : (scrollOpacities.get(`row-${index}`) || 1),
                   transition: 'opacity 0.2s ease-out'
                 }}
               />
