@@ -615,6 +615,8 @@ export const TasksTab = ({
               onTaskCreate={createTaskInline}
               onTaskUpdate={updateTaskInline}
               selectedTaskId={selectedTaskId}
+              projectId={projectId}
+              currentView={viewMode}
             />
           ) : (
             <TaskBoardView
