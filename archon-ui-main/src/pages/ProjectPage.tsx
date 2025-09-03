@@ -441,10 +441,14 @@ export function ProjectPage({
         console.log(`AUTOSCROLL: Card=${!!projectCard} Container=${!!scrollContainer}`);
         
         if (projectCard && scrollContainer) {
-          // Get the position of the card relative to the container
+          // Get the position of the card relative to the scroll container
           const containerScrollLeft = scrollContainer.scrollLeft;
           const containerWidth = scrollContainer.clientWidth;
-          const cardOffsetLeft = projectCard.offsetLeft;
+          
+          // Get card position relative to scroll container using getBoundingClientRect
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const cardRect = projectCard.getBoundingClientRect();
+          const cardOffsetLeft = cardRect.left - containerRect.left + containerScrollLeft;
           const cardWidth = projectCard.clientWidth;
           
           // Calculate the scroll position to center the card
