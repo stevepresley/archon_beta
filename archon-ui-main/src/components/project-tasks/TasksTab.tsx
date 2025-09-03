@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Table, LayoutGrid, Plus, Wifi, WifiOff, List } from 'lucide-react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Toggle } from '../ui/Toggle';
 import { projectService } from '../../services/projectService';
 
@@ -65,10 +66,12 @@ export const TasksTab = ({
   selectedTaskId?: string;
   onTaskSelect?: (taskId: string) => void;
 }) => {
-  // Initialize view mode from localStorage, defaulting to 'board'
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  // Initialize view mode from URL parameters, defaulting to 'board'
   const [viewMode, setViewMode] = useState<'table' | 'board'>(() => {
-    const saved = localStorage.getItem('tasksViewMode');
-    return (saved === 'table' || saved === 'board') ? saved : 'board';
+    const viewParam = searchParams.get('view');
+    return (viewParam === 'table' || viewParam === 'board') ? viewParam : 'board';
   });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
@@ -76,10 +79,21 @@ export const TasksTab = ({
   const [projectFeatures, setProjectFeatures] = useState<any[]>([]);
   const [isLoadingFeatures, setIsLoadingFeatures] = useState(false);
   
-  // Persist view mode changes to localStorage
+  // Update URL parameters when view mode changes
+  const updateViewMode = useCallback((newViewMode: 'table' | 'board') => {
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('view', newViewMode);
+    setSearchParams(newSearchParams, { replace: true });
+    setViewMode(newViewMode);
+  }, [searchParams, setSearchParams]);
+
+  // Update view mode when URL parameters change
   useEffect(() => {
-    localStorage.setItem('tasksViewMode', viewMode);
-  }, [viewMode]);
+    const viewParam = searchParams.get('view');
+    if (viewParam === 'table' || viewParam === 'board') {
+      setViewMode(viewParam);
+    }
+  }, [searchParams]);
   const [isSavingTask, setIsSavingTask] = useState<boolean>(false);
   const [isWebSocketConnected, setIsWebSocketConnected] = useState(false);
   
@@ -659,7 +673,7 @@ export const TasksTab = ({
             {/* View Toggle Controls */}
             <div className="flex items-center bg-white/80 dark:bg-black/90 border border-gray-200 dark:border-gray-800 rounded-lg overflow-hidden shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] backdrop-blur-md pointer-events-auto">
               <button 
-                onClick={() => setViewMode('table')} 
+                onClick={() => updateViewMode('table')} 
                 className={`px-5 py-2.5 flex items-center gap-2 relative transition-all duration-300 ${viewMode === 'table' ? 'text-cyan-600 dark:text-cyan-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300'}`}
               >
                 <Table className="w-4 h-4" />
@@ -667,7 +681,7 @@ export const TasksTab = ({
                 {viewMode === 'table' && <span className="absolute bottom-0 left-[15%] right-[15%] w-[70%] mx-auto h-[2px] bg-cyan-500 shadow-[0_0_10px_2px_rgba(34,211,238,0.4)] dark:shadow-[0_0_20px_5px_rgba(34,211,238,0.7)]"></span>}
               </button>
               <button 
-                onClick={() => setViewMode('board')} 
+                onClick={() => updateViewMode('board')} 
                 className={`px-5 py-2.5 flex items-center gap-2 relative transition-all duration-300 ${viewMode === 'board' ? 'text-purple-600 dark:text-purple-400' : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-300'}`}
               >
                 <LayoutGrid className="w-4 h-4" />
