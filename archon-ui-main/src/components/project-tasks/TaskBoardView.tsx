@@ -110,7 +110,7 @@ const ColumnDropZone = ({
         <div className={`absolute bottom-0 left-[15%] right-[15%] w-[70%] mx-auto h-[1px] ${getColumnGlow()}`}></div>
       </div>
       
-      <div className="px-1 flex-1 overflow-y-auto space-y-3 py-3">
+      <div className="px-1 flex-1 overflow-y-auto space-y-3 py-3 force-scrollbar">
         {organizedTasks.map((task, index) => (
           <DraggableTaskCard
             key={task.id}
