@@ -27,6 +27,7 @@ export const DraggableTaskCard = ({
   allTasks = [],
   hoveredTaskId,
   onTaskHover,
+  selectedTaskId,
 }: DraggableTaskCardProps) => {
   
   const [{ isDragging }, drag] = useDrag({
