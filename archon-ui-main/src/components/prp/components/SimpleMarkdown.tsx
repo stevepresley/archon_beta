@@ -300,7 +300,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     // Handle horizontal rules
     if (line.match(/^(-{3,}|_{3,}|\*{3,})$/)) {
       flushList();
-      elements.push(<hr key={index} className="my-4 border-gray-300 dark:border-gray-700" />);
+      elements.push(<hr key={`hr-${index}-${elements.length}`} className="my-4 border-gray-300 dark:border-gray-700" />);
       return;
     }
     
