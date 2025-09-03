@@ -33,7 +33,10 @@ export const DraggableTaskCard = ({
   hoveredTaskId,
   onTaskHover,
   selectedTaskId,
+  projectId,
+  currentView = 'board'
 }: DraggableTaskCardProps) => {
+  const { showToast } = useToast();
   
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.TASK,
