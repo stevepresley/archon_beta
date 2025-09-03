@@ -29,6 +29,7 @@ interface TaskTableViewProps {
   onTaskReorder: (taskId: string, newOrder: number, status: Task['status']) => void;
   onTaskCreate?: (task: Omit<Task, 'id'>) => Promise<void>;
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => Promise<void>;
+  selectedTaskId?: string;
 }
 
 const getAssigneeGlassStyle = (assigneeName: 'User' | 'Archon' | 'AI IDE Agent') => {
