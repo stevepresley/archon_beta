@@ -459,6 +459,12 @@ export function ProjectPage({
           // Store initial scroll position to verify movement
           const initialScrollLeft = scrollContainer.scrollLeft;
           
+          // Check if scroll is actually needed
+          if (Math.abs(targetScrollLeft - initialScrollLeft) < 5) {
+            console.log(`AUTOSCROLL: NO SCROLL NEEDED - Already in correct position (${initialScrollLeft})`);
+            return;
+          }
+          
           // Smooth scroll to center the selected card
           scrollContainer.scrollTo({
             left: targetScrollLeft,
