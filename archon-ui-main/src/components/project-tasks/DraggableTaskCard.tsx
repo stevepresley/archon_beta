@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Edit, Trash2, RefreshCw, Tag, User, Bot, Clipboard } from 'lucide-react';
+import { Edit, Trash2, RefreshCw, Tag, User, Bot, Clipboard, ExternalLink } from 'lucide-react';
 import { Task } from './TaskTableView';
 import { ItemTypes, getAssigneeIcon, getAssigneeGlow, getOrderColor, getOrderGlow } from '../../lib/task-utils';
+import { handleCopyClick, copyUrlToClipboard } from '../../utils/copyHelpers';
+import { needsCopyLinkButton } from '../../utils/platformDetection';
+import { useToast } from '../../contexts/ToastContext';
 
 export interface DraggableTaskCardProps {
   task: Task;
