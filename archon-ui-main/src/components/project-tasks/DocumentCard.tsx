@@ -27,7 +27,8 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   isActive,
   onSelect,
   onDelete,
-  isDarkMode
+  isDarkMode,
+  projectId
 }) => {
   const [showDelete, setShowDelete] = useState(false);
   const { showToast } = useToast();
