@@ -603,6 +603,53 @@ export const TaskTableView = ({
     }
   }, [selectedTaskId, tasks, statusFilter]);
 
+  // Auto-scroll selected task into view (following projects pattern)
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      // Small delay to ensure DOM is updated and status filter has been applied
+      setTimeout(() => {
+        const taskRow = document.querySelector(`[data-task-id="${selectedTaskId}"]`);
+        const scrollContainer = tableContainerRef.current;
+        
+        console.log('[DEEP-LINK-DEBUG] Auto-scroll: taskRow=', !!taskRow, 'scrollContainer=', !!scrollContainer);
+        
+        if (taskRow && scrollContainer) {
+          // Get the position of the row relative to the scroll container
+          const containerScrollTop = scrollContainer.scrollTop;
+          const containerHeight = scrollContainer.clientHeight;
+          
+          // Get row position relative to scroll container using getBoundingClientRect
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const rowRect = taskRow.getBoundingClientRect();
+          const rowOffsetTop = rowRect.top - containerRect.top + containerScrollTop;
+          const rowHeight = taskRow.clientHeight;
+          
+          // Calculate the scroll position to center the row
+          const targetScrollTop = Math.max(0, rowOffsetTop - (containerHeight / 2) + (rowHeight / 2));
+          
+          console.log('[DEEP-LINK-DEBUG] Auto-scroll: target=', targetScrollTop, 'row=', rowOffsetTop, 'container=', containerHeight);
+          
+          // Store initial scroll position to verify movement
+          const initialScrollTop = scrollContainer.scrollTop;
+          
+          // Check if scroll is actually needed
+          if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
+            console.log('[DEEP-LINK-DEBUG] Auto-scroll: NO SCROLL NEEDED - already in position');
+            return;
+          }
+          
+          // Smooth scroll to center the selected task
+          scrollContainer.scrollTo({
+            top: targetScrollTop,
+            behavior: 'smooth'
+          });
+          
+          console.log('[DEEP-LINK-DEBUG] Auto-scroll: scrolled from', initialScrollTop, 'to', targetScrollTop);
+        }
+      }, 300); // Slightly longer delay to ensure status filter changes are applied
+    }
+  }, [selectedTaskId, tasks, statusFilter]); // Include statusFilter so it re-runs after filter changes
+
   // Refs for scroll fade effect
   const tableContainerRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
