@@ -405,26 +405,71 @@ const DraggableTaskRow = ({
           >
             <Edit className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
-          {/* Copy Task ID Button - Matching Board View */}
+          {/* Enhanced Copy Task ID Button with shift-click support */}
           <button 
             type="button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              navigator.clipboard.writeText(task.id);
-              // Visual feedback like in board view
-              const button = e.currentTarget;
+              
+              // Capture button reference before async call
+              const button = e.currentTarget as HTMLButtonElement;
               const originalHTML = button.innerHTML;
-              button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
-              setTimeout(() => {
-                button.innerHTML = originalHTML;
-              }, 2000);
+              
+              try {
+                const result = await handleCopyClick(e, 'task', projectId, task.id, currentView);
+                
+                if (result.success) {
+                  const message = result.copied === 'url' 
+                    ? 'Task URL copied to clipboard' 
+                    : 'Task ID copied to clipboard';
+                  showToast(message, 'success');
+                  
+                  // Visual feedback
+                  button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
+                  setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                  }, 2000);
+                } else {
+                  showToast('Failed to copy to clipboard', 'error');
+                }
+              } catch (error) {
+                console.error('Exception in copy handler:', error);
+                showToast('Failed to copy to clipboard', 'error');
+              }
             }}
             className="p-1.5 rounded-full bg-gray-500/20 text-gray-500 hover:bg-gray-500/30 hover:shadow-[0_0_10px_rgba(107,114,128,0.3)] transition-all duration-300"
-            title="Copy Task ID to clipboard"
+            title="Copy Task ID • Shift-click for full URL"
             aria-label="Copy Task ID to clipboard"
           >
             <Clipboard className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
+          
+          {/* Mobile Copy Link Button - shown on iOS/Android */}
+          {needsCopyLinkButton() && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const result = await copyUrlToClipboard('task', projectId, task.id, currentView);
+                  
+                  if (result.success) {
+                    showToast('Task URL copied to clipboard', 'success');
+                  } else {
+                    showToast('Failed to copy URL', 'error');
+                  }
+                } catch (error) {
+                  console.error('Copy URL failed:', error);
+                  showToast('Failed to copy URL', 'error');
+                }
+              }}
+              className="p-1.5 rounded-full bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+              title="Copy task URL"
+              aria-label="Copy task URL"
+            >
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+          )}
         </div>
       </td>
     </tr>
