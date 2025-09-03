@@ -19,6 +19,7 @@ interface DocumentCardProps {
   onSelect: (doc: ProjectDoc) => void;
   onDelete: (docId: string) => void;
   isDarkMode: boolean;
+  projectId: string;
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
