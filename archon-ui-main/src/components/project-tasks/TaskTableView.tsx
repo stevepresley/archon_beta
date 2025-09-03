@@ -566,7 +566,8 @@ export const TaskTableView = ({
   onTaskDelete, 
   onTaskReorder,
   onTaskCreate,
-  onTaskUpdate
+  onTaskUpdate,
+  selectedTaskId
 }: TaskTableViewProps) => {
   const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('backlog');
 
