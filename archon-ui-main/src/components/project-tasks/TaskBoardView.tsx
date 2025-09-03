@@ -29,6 +29,7 @@ interface ColumnDropZoneProps {
   onTaskReorder: (taskId: string, targetIndex: number, status: Task['status']) => void;
   allTasks: Task[];
   hoveredTaskId: string | null;
+  selectedTaskId?: string;
   onTaskHover: (taskId: string | null) => void;
   selectedTasks: Set<string>;
   onTaskSelect: (taskId: string) => void;
