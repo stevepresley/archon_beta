@@ -141,7 +141,9 @@ export const TaskBoardView = ({
   onTaskDelete,
   onTaskMove,
   onTaskReorder,
-  selectedTaskId
+  selectedTaskId,
+  projectId,
+  currentView = 'board'
 }: TaskBoardViewProps) => {
   const [hoveredTaskId, setHoveredTaskId] = useState<string | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
