@@ -588,8 +588,11 @@ export function ProjectPage({
     // Load task counts for the newly selected project (on-demand loading)
     loadTaskCountsForAllProjects([project.id]);
     
-    // Update URL to reflect selection
-    navigate(`/projects/${project.id}/tasks`, { replace: true });
+    // Update URL to reflect selection, preserving view parameter
+    const currentSearchParams = new URLSearchParams(window.location.search);
+    const viewParam = currentSearchParams.get('view');
+    const queryString = viewParam ? `?view=${viewParam}` : '';
+    navigate(`/projects/${project.id}/tasks${queryString}`, { replace: true });
   };
 
   const handleDeleteProject = useCallback(async (e: React.MouseEvent, projectId: string, projectTitle: string) => {
