@@ -150,6 +150,60 @@ export const TaskBoardView = ({
 
   const { showToast } = useToast();
 
+  // Auto-scroll selected task into view (following projects pattern)
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        const taskCard = document.querySelector(`[data-task-id="${selectedTaskId}"]`);
+        
+        if (taskCard) {
+          // Find the column scroll container (the parent with overflow-y-auto)
+          let scrollContainer = taskCard.parentElement;
+          while (scrollContainer && !scrollContainer.classList.contains('overflow-y-auto')) {
+            scrollContainer = scrollContainer.parentElement;
+          }
+          
+          console.log('[DEEP-LINK-DEBUG] Board auto-scroll: taskCard=', !!taskCard, 'scrollContainer=', !!scrollContainer);
+          
+          if (scrollContainer) {
+            // Get the position of the card relative to the scroll container
+            const containerScrollTop = scrollContainer.scrollTop;
+            const containerHeight = scrollContainer.clientHeight;
+            
+            // Get card position relative to scroll container using getBoundingClientRect
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const cardRect = taskCard.getBoundingClientRect();
+            const cardOffsetTop = cardRect.top - containerRect.top + containerScrollTop;
+            const cardHeight = taskCard.clientHeight;
+            
+            // Calculate the scroll position to center the card
+            const targetScrollTop = Math.max(0, cardOffsetTop - (containerHeight / 2) + (cardHeight / 2));
+            
+            console.log('[DEEP-LINK-DEBUG] Board auto-scroll: target=', targetScrollTop, 'card=', cardOffsetTop, 'container=', containerHeight);
+            
+            // Store initial scroll position to verify movement
+            const initialScrollTop = scrollContainer.scrollTop;
+            
+            // Check if scroll is actually needed
+            if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
+              console.log('[DEEP-LINK-DEBUG] Board auto-scroll: NO SCROLL NEEDED - already in position');
+              return;
+            }
+            
+            // Smooth scroll to center the selected task
+            scrollContainer.scrollTo({
+              top: targetScrollTop,
+              behavior: 'smooth'
+            });
+            
+            console.log('[DEEP-LINK-DEBUG] Board auto-scroll: scrolled from', initialScrollTop, 'to', targetScrollTop);
+          }
+        }
+      }, 300); // Small delay to ensure DOM is updated
+    }
+  }, [selectedTaskId, tasks]);
+
   // Multi-select handlers
   const toggleTaskSelection = useCallback((taskId: string) => {
     setSelectedTasks(prev => {
