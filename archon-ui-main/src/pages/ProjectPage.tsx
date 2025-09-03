@@ -18,6 +18,10 @@ import type { Task } from '../components/project-tasks/TaskTableView';
 import { ProjectCreationProgressCard } from '../components/ProjectCreationProgressCard';
 import { projectCreationProgressService } from '../services/projectCreationProgressService';
 import type { ProjectCreationProgressData } from '../services/projectCreationProgressService';
+
+// Import copy utilities
+import { handleCopyClick, copyUrlToClipboard } from '../utils/copyHelpers';
+import { needsCopyLinkButton } from '../utils/platformDetection';
 import { projectListSocketIO, taskUpdateSocketIO } from '../services/socketIOService';
 
 interface ProjectPageProps {
