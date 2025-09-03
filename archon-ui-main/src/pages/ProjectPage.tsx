@@ -431,6 +431,13 @@ export function ProjectPage({
 
   // Auto-scroll selected project into view
   useEffect(() => {
+    if (selectedProject) {
+      if (isLoadingProjects || isLoadingBackgroundProjects) {
+        console.log(`AUTOSCROLL: WAITING - Loading projects=${isLoadingProjects}, background=${isLoadingBackgroundProjects}`);
+        return;
+      }
+    }
+    
     if (selectedProject && !isLoadingProjects && !isLoadingBackgroundProjects) {
       // Small delay to ensure DOM is updated
       setTimeout(() => {
