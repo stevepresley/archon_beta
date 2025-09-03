@@ -65,7 +65,11 @@ export const TasksTab = ({
   selectedTaskId?: string;
   onTaskSelect?: (taskId: string) => void;
 }) => {
-  const [viewMode, setViewMode] = useState<'table' | 'board'>('board');
+  // Initialize view mode from localStorage, defaulting to 'board'
+  const [viewMode, setViewMode] = useState<'table' | 'board'>(() => {
+    const saved = localStorage.getItem('tasksViewMode');
+    return (saved === 'table' || saved === 'board') ? saved : 'board';
+  });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
