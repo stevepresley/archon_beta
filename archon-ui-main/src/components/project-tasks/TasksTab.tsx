@@ -627,6 +627,8 @@ export const TasksTab = ({
               onTaskMove={moveTask}
               onTaskReorder={handleTaskReorder}
               selectedTaskId={selectedTaskId}
+              projectId={projectId}
+              currentView={viewMode}
             />
           )}
         </div>
