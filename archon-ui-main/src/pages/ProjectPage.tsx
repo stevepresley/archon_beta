@@ -437,6 +437,10 @@ export function ProjectPage({
         const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
         const scrollContainer = document.querySelector('.overflow-x-auto');
         
+        console.log(`🔄 Auto-scroll debug for project: ${selectedProject.title}`);
+        console.log(`🔄 Project card found:`, !!projectCard);
+        console.log(`🔄 Scroll container found:`, !!scrollContainer);
+        
         if (projectCard && scrollContainer) {
           // Get the position of the card relative to the container
           const containerScrollLeft = scrollContainer.scrollLeft;
@@ -444,8 +448,13 @@ export function ProjectPage({
           const cardOffsetLeft = projectCard.offsetLeft;
           const cardWidth = projectCard.clientWidth;
           
+          console.log(`🔄 Container width: ${containerWidth}, scroll left: ${containerScrollLeft}`);
+          console.log(`🔄 Card offset left: ${cardOffsetLeft}, card width: ${cardWidth}`);
+          
           // Calculate the scroll position to center the card
           const targetScrollLeft = cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2);
+          
+          console.log(`🔄 Target scroll left: ${targetScrollLeft}`);
           
           // Smooth scroll to center the selected card
           scrollContainer.scrollTo({
@@ -453,7 +462,9 @@ export function ProjectPage({
             behavior: 'smooth'
           });
           
-          console.log(`Scrolling to center project: ${selectedProject.title}`);
+          console.log(`✅ Scrolling to center project: ${selectedProject.title}`);
+        } else {
+          console.log(`❌ Auto-scroll failed - missing elements`);
         }
       }, 200);
     }
