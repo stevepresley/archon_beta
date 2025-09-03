@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStaggeredEntrance } from '../hooks/useStaggeredEntrance';
@@ -1213,7 +1213,10 @@ export function ProjectPage({
                       onTaskSelect={(taskId) => {
                         setSelectedTaskId(taskId);
                         if (selectedProject) {
-                          navigate(`/projects/${selectedProject.id}/tasks/${taskId}`, { replace: true });
+                          const currentSearchParams = new URLSearchParams(window.location.search);
+                          const viewParam = currentSearchParams.get('view');
+                          const queryString = viewParam ? `?view=${viewParam}` : '';
+                          navigate(`/projects/${selectedProject.id}/tasks/${taskId}${queryString}`, { replace: true });
                         }
                       }}
                     />
