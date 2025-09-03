@@ -1076,6 +1076,10 @@ export function ProjectPage({
                           e.stopPropagation();
                           e.preventDefault();
                           
+                          // Capture button reference before async call
+                          const button = e.currentTarget as HTMLButtonElement;
+                          const originalHTML = button.innerHTML;
+                          
                           try {
                             const result = await handleCopyClick(e, 'project', project.id);
                             
@@ -1089,8 +1093,6 @@ export function ProjectPage({
                               showToast(message, 'success');
                               
                               // Visual feedback
-                              const button = e.currentTarget;
-                              const originalHTML = button.innerHTML;
                               button.innerHTML = '<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
                               setTimeout(() => {
                                 button.innerHTML = originalHTML;
