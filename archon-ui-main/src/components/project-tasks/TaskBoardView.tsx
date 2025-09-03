@@ -53,7 +53,9 @@ const ColumnDropZone = ({
   selectedTaskId,
   onTaskHover,
   selectedTasks,
-  onTaskSelect
+  onTaskSelect,
+  projectId,
+  currentView
 }: ColumnDropZoneProps) => {
   const ref = useRef<HTMLDivElement>(null);
   
