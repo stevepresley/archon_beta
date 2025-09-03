@@ -35,6 +35,8 @@ interface ColumnDropZoneProps {
   onTaskHover: (taskId: string | null) => void;
   selectedTasks: Set<string>;
   onTaskSelect: (taskId: string) => void;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 const ColumnDropZone = ({
