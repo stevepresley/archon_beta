@@ -281,7 +281,7 @@ const DraggableTaskRow = ({
       className={`
         group transition-all duration-200 cursor-move
         ${isHighlighted
-          ? 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-blue-900/40 dark:to-purple-900/40 ring-2 ring-blue-400/50 dark:ring-blue-500/50' 
+          ? 'bg-gradient-to-r from-cyan-100/90 to-cyan-50/90 dark:from-cyan-900/50 dark:to-cyan-800/50 ring-2 ring-cyan-400 dark:ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]' 
           : index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'
         }
         hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70 dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20
