@@ -274,7 +274,10 @@ const DraggableTaskRow = ({
       ref={(node) => drag(drop(node))}
       className={`
         group transition-all duration-200 cursor-move
-        ${index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'}
+        ${task.id === selectedTaskId 
+          ? 'bg-gradient-to-r from-blue-100/80 to-purple-100/80 dark:from-blue-900/40 dark:to-purple-900/40 ring-2 ring-blue-400/50 dark:ring-blue-500/50' 
+          : index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'
+        }
         hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70 dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20
         border-b border-gray-200 dark:border-gray-800 last:border-b-0
         ${isDragging ? 'opacity-50 scale-105 shadow-lg z-50' : ''}
