@@ -15,7 +15,7 @@ export const constructDeepLinkUrl = (
   itemId?: string,
   currentView?: 'table' | 'board'
 ): string => {
-  const origin = window.location.origin;
+  const origin = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3737';
   
   switch (type) {
     case 'project':
