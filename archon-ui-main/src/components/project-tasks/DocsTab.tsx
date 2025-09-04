@@ -1329,7 +1329,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-purple-500/20',
       buttonHover: 'hover:bg-purple-500/30',
       buttonBorder: 'border-purple-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]',
+      dot: 'bg-purple-400'
     },
     pink: {
       bg: 'bg-pink-500/10',
@@ -1338,7 +1339,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-pink-500/20',
       buttonHover: 'hover:bg-pink-500/30',
       buttonBorder: 'border-pink-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(236,72,153,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(236,72,153,0.3)]',
+      dot: 'bg-pink-400'
     },
     orange: {
       bg: 'bg-orange-500/10',
@@ -1347,7 +1349,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-orange-500/20',
       buttonHover: 'hover:bg-orange-500/30',
       buttonBorder: 'border-orange-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(249,115,22,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(249,115,22,0.3)]',
+      dot: 'bg-orange-400'
     }
   };
   return <section>
