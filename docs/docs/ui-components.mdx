@@ -270,6 +270,47 @@ src/components/
 - Team performance
 - Timeline views
 
+### Navigation & Copy Utilities
+
+#### Deep URL Navigation System
+**Purpose**: Complete URL-based navigation for projects, tasks, and documents
+
+**Key Features**:
+- **React Router v6**: Enhanced parameter handling with `useParams()` and `useNavigate()`
+- **URL State Management**: Route parameters, query parameters, and path-based tabs
+- **Browser Integration**: Forward/back buttons, bookmarks, page refresh support
+- **Progressive Loading**: Target content first, background loading for others
+
+**URL Patterns**:
+- `/projects/{projectId}` - Direct project access
+- `/projects/{projectId}/tasks?view=table/board` - Task view navigation  
+- `/projects/{projectId}/tasks/{taskId}?view=table/board` - Specific task linking
+- `/projects/{projectId}/docs/{docId}` - Document deep linking
+
+#### Cross-Platform Copy System
+**File**: `src/utils/copyHelpers.ts`
+
+**Purpose**: Mobile-compatible clipboard functionality with URL construction
+
+**Key Functions**:
+- `constructDeepLinkUrl()` - Builds URLs for projects, tasks, documents
+- `copyToClipboardWithFallback()` - iOS/Android compatible clipboard with graceful fallbacks
+- `handleCopyClick()` - Shift-click URL vs regular click ID copying
+- `copyUrlToClipboard()` - Dedicated URL copying for mobile "Copy URL" buttons
+
+**Cross-Platform Features**:
+- **Desktop**: Shift-click copies full URL, regular click copies ID
+- **Mobile**: Separate "Copy URL" buttons with proper text labels  
+- **Error Handling**: Toast notifications for copy success/failure
+- **Fallback System**: `document.execCommand('copy')` when modern Clipboard API fails
+
+#### Platform Detection
+**File**: `src/utils/platformDetection.ts`
+
+**Purpose**: Detect mobile devices for adaptive UI behavior
+
+**Usage**: Determines when to show mobile-specific copy buttons vs desktop shift-click behavior
+
 ## ⚙️ Settings Components
 
 ### SettingsPanel.tsx
