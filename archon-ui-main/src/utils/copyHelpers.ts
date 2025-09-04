@@ -54,6 +54,7 @@ export const copyToClipboardWithFallback = async (text: string): Promise<boolean
  * Fallback copy method using temporary input element
  */
 const copyTextUsingInput = (text: string): boolean => {
+  if (typeof document === 'undefined' || !document.body) return false;
   const input = document.createElement('input');
   input.value = text;
   input.style.position = 'fixed';
