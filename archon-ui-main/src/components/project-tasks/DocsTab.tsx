@@ -26,13 +26,15 @@ interface ProjectDoc {
   // Content field stores markdown or structured data
   content?: any;
   document_type?: string;
+  tags?: string[];
+  author?: string;
 }
 
 interface Task {
   id: string;
   title: string;
   feature: string;
-  status: 'backlog' | 'in-progress' | 'review' | 'complete';
+  status: 'todo' | 'doing' | 'review' | 'done';
 }
 
 // Document Templates - Updated for proper MCP database storage
@@ -1317,7 +1319,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-blue-500/20',
       buttonHover: 'hover:bg-blue-500/30',
       buttonBorder: 'border-blue-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+      dot: 'bg-blue-400'
     },
     purple: {
       bg: 'bg-purple-500/10',
@@ -1350,7 +1353,7 @@ const KnowledgeSection: React.FC<{
   return <section>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-          <span className={`w-2 h-2 rounded-full bg-${color}-400 shadow-[0_0_8px_rgba(59,130,246,0.6)] mr-2`} />
+          <span className={`w-2 h-2 rounded-full ${colorMap[color].dot} shadow-[0_0_8px_rgba(59,130,246,0.6)] mr-2`} />
           {title}
         </h3>
         <button onClick={onAddClick} className={`px-3 py-1.5 rounded-md ${colorMap[color].buttonBg} ${colorMap[color].buttonHover} border ${colorMap[color].buttonBorder} ${colorMap[color].text} ${colorMap[color].buttonShadow} transition-all duration-300 flex items-center gap-2`}>
