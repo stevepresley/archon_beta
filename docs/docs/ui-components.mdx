@@ -161,13 +161,17 @@ src/components/
 ## 📊 Project & Task Components
 
 ### TaskBoardView.tsx
-**Purpose**: Kanban board for task management
+**Purpose**: Kanban board for task management with deep URL linking
 
 **Features**:
 - Drag-and-drop between columns
 - Status-based organization
 - Task quick actions
 - Real-time updates
+- **Deep URL Navigation**: Direct linking to specific tasks with highlighting
+- **Cross-Platform Copy**: Shift-click copies URL, regular click copies task ID
+- **Auto-Scroll**: Automatically centers deep-linked tasks in viewport
+- **Task Highlighting**: Vibrant cyan highlighting for URL-linked tasks
 
 **Columns**:
 - Todo
@@ -175,10 +179,17 @@ src/components/
 - Review
 - Done
 
+**URL Features**:
+- `/projects/{projectId}/tasks/{taskId}?view=board` - Direct task linking
+- Maintains view state in URL parameters
+- Browser back/forward button support
+- Shareable and bookmarkable URLs
+
 **Performance Notes**:
 - Uses Socket.IO for real-time task updates from AI agents
 - Implements React DnD for smooth drag operations
 - Optimized with React.memo to prevent unnecessary re-renders
+- Progressive loading with light/full content modes
 
 ### TaskTableView.tsx
 **Purpose**: Table view for task management
