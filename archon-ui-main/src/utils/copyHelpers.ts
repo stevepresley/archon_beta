@@ -84,8 +84,6 @@ export const handleCopyClick = async (
 ): Promise<{ success: boolean; copied: 'id' | 'url'; text: string }> => {
   const isShiftClick = event.shiftKey;
   
-  console.log('[COPY-DEBUG] handleCopyClick called with:', { type, projectId, itemId, isShiftClick });
-  
   let textToCopy: string;
   let copied: 'id' | 'url';
   
@@ -97,11 +95,7 @@ export const handleCopyClick = async (
     copied = 'id';
   }
   
-  console.log('[COPY-DEBUG] About to copy:', textToCopy, 'Type:', copied);
-  
   const success = await copyToClipboardWithFallback(textToCopy);
-  
-  console.log('[COPY-DEBUG] Copy operation result:', success);
   
   return { success, copied, text: textToCopy };
 };
