@@ -1072,7 +1072,6 @@ export function ProjectPage({
                       {/* Enhanced Copy Project ID Button with shift-click support */}
                       <button 
                         onClick={async (e) => {
-                          console.log('[BUTTON-DEBUG] onClick triggered, target:', e.target, 'currentTarget:', e.currentTarget);
                           e.stopPropagation();
                           e.preventDefault();
                           
@@ -1083,13 +1082,10 @@ export function ProjectPage({
                           try {
                             const result = await handleCopyClick(e, 'project', project.id);
                             
-                            console.log('[BUTTON-DEBUG] handleCopyClick returned:', result);
-                            
                             if (result.success) {
                               const message = result.copied === 'url' 
                                 ? 'Project URL copied to clipboard' 
                                 : 'Project ID copied to clipboard';
-                              console.log('[BUTTON-DEBUG] Showing success toast:', message);
                               showToast(message, 'success');
                               
                               // Visual feedback
