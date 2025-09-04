@@ -549,25 +549,25 @@ async def get_project_stats(project_id: str):
         
         # Use server-side count queries for efficiency (O(1) instead of O(n))
         task_counts = {
-            "todo": 0,      # backlog status
-            "doing": 0,     # in-progress and review statuses  
-            "done": 0       # complete status
+            "todo": 0,      # todo status
+            "doing": 0,     # doing and review statuses  
+            "done": 0       # done status
         }
         
-        # Count backlog/todo tasks
+        # Count todo tasks
         todo_response = supabase_client.table("archon_tasks")\
             .select("*", count="exact")\
             .eq("project_id", project_id)\
-            .eq("status", "backlog")\
+            .eq("status", "todo")\
             .or_("archived.is.null,archived.is.false")\
             .execute()
         task_counts["todo"] = todo_response.count if hasattr(todo_response, 'count') else 0
         
-        # Count doing tasks (in-progress and review)
+        # Count doing tasks (doing and review)
         doing_response = supabase_client.table("archon_tasks")\
             .select("*", count="exact")\
             .eq("project_id", project_id)\
-            .in_("status", ["in-progress", "review"])\
+            .in_("status", ["doing", "review"])\
             .or_("archived.is.null,archived.is.false")\
             .execute()
         task_counts["doing"] = doing_response.count if hasattr(doing_response, 'count') else 0
@@ -576,7 +576,7 @@ async def get_project_stats(project_id: str):
         done_response = supabase_client.table("archon_tasks")\
             .select("*", count="exact")\
             .eq("project_id", project_id)\
-            .eq("status", "complete")\
+            .eq("status", "done")\
             .or_("archived.is.null,archived.is.false")\
             .execute()
         task_counts["done"] = done_response.count if hasattr(done_response, 'count') else 0
