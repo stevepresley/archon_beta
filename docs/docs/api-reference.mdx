@@ -907,11 +907,18 @@ Projects in Archon use JSONB fields for flexible document storage:
 
 **GET** `/api/projects`
 
-Retrieve all projects with associated knowledge sources.
+Retrieve all projects with associated knowledge sources and optional content loading modes.
 
 #### Query Parameters
 
-None - returns all projects.
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `include_content` | boolean | ❌ | Include full project content (tasks, docs) - default: true for backward compatibility |
+
+#### Content Loading Modes
+
+- **Light Mode** (`include_content=false`): Returns project metadata only for fast navigation and project lists
+- **Full Mode** (`include_content=true`): Returns complete project data including tasks and documents (default)
 
 #### Example Response
 
