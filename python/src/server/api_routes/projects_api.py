@@ -547,39 +547,29 @@ async def get_project_stats(project_id: str):
         # Use Supabase efficient count queries instead of fetching all data
         supabase_client = get_supabase_client()
         
-        # Use server-side count queries for efficiency (O(1) instead of O(n))
+        # Count tasks by status for this project
         task_counts = {
             "todo": 0,      # backlog status
             "doing": 0,     # in-progress and review statuses  
             "done": 0       # complete status
         }
         
-        # Count backlog/todo tasks
-        todo_response = supabase_client.table("archon_tasks")\
-            .select("*", count="exact")\
+        # Get all non-archived tasks for this project with just status field
+        response = supabase_client.table("archon_tasks")\
+            .select("status")\
             .eq("project_id", project_id)\
-            .eq("status", "backlog")\
             .or_("archived.is.null,archived.is.false")\
             .execute()
-        task_counts["todo"] = todo_response.count if hasattr(todo_response, 'count') else 0
-        
-        # Count doing tasks (in-progress and review)
-        doing_response = supabase_client.table("archon_tasks")\
-            .select("*", count="exact")\
-            .eq("project_id", project_id)\
-            .in_("status", ["in-progress", "review"])\
-            .or_("archived.is.null,archived.is.false")\
-            .execute()
-        task_counts["doing"] = doing_response.count if hasattr(doing_response, 'count') else 0
-        
-        # Count done tasks
-        done_response = supabase_client.table("archon_tasks")\
-            .select("*", count="exact")\
-            .eq("project_id", project_id)\
-            .eq("status", "complete")\
-            .or_("archived.is.null,archived.is.false")\
-            .execute()
-        task_counts["done"] = done_response.count if hasattr(done_response, 'count') else 0
+            
+        if response.data:
+            for task in response.data:
+                status = task.get("status", "backlog")
+                if status == "backlog":
+                    task_counts["todo"] += 1
+                elif status in ["in-progress", "review"]:
+                    task_counts["doing"] += 1
+                elif status == "complete":
+                    task_counts["done"] += 1
         
         # Get document count from docs JSONB field
         doc_response = supabase_client.table("archon_projects")\
