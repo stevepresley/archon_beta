@@ -233,13 +233,24 @@ src/components/
 ### Project Tab Components
 
 #### DocsTab.tsx
-**Purpose**: Project documentation management
+**Purpose**: Project documentation management with deep URL linking and performance optimization
 
 **Features**:
-- Document list
-- Create/edit documents
+- Document list with horizontal scrolling
+- Create/edit documents  
 - Version history
 - Search functionality
+- **Deep URL Navigation**: Direct linking to specific documents (`/projects/{projectId}/docs/{docId}`)
+- **Cross-Platform Copy**: Desktop shift-click for URLs, mobile "Copy URL" buttons
+- **Light/Full Content Modes**: Fast loading with metadata-only mode, full content on demand
+- **Auto-Scroll**: Automatically centers selected documents in viewport
+- **Cross-Platform Scrollbars**: Fixed disappearing scrollbars on Mac with custom CSS
+
+**Performance Optimizations**:
+- Progressive loading: Light mode (metadata) → Full mode (content) on selection
+- Document content caching prevents duplicate API calls
+- Background loading for non-active documents
+- Horizontal scroll optimization for document cards
 
 #### FeaturesTab.tsx
 **Purpose**: Project features organization
