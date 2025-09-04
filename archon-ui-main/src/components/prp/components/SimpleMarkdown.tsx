@@ -34,7 +34,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     if (currentList.length > 0 && listType) {
       const ListComponent = listType === 'ul' ? 'ul' : 'ol';
       elements.push(
-        <div key={`list-${elements.length}-${Date.now()}`} className="my-3">
+        <div key={`list-${listCounter++}`} className="my-3">
           <ListComponent className={`space-y-2 ${listType === 'ul' ? 'list-disc' : 'list-decimal'} pl-6 text-gray-700 dark:text-gray-300`}>
             {currentList.map((item, idx) => (
               <li key={idx} className="leading-relaxed">{processInlineMarkdown(item)}</li>
@@ -122,7 +122,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
   const flushTable = () => {
     if (tableRows.length > 0) {
       elements.push(
-        <div key={`table-${elements.length}-${Date.now()}`} className="my-6 overflow-x-auto">
+        <div key={`table-${tableCounter++}`} className="my-6 overflow-x-auto">
           <div className="inline-block min-w-full overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
             <table className="min-w-full">
               {tableHeaders.length > 0 && (
@@ -170,7 +170,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
         // Ending code block
         inCodeBlock = false;
         elements.push(
-          <div key={`code-${index}-${elements.length}`} className="my-4 rounded-lg overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700 shadow-lg">
+          <div key={`code-${codeCounter++}`} className="my-4 rounded-lg overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700 shadow-lg">
             {codeBlockLanguage && (
               <div className="px-4 py-2 bg-gray-800/50 border-b border-gray-700 text-sm text-gray-300 font-mono">
                 {codeBlockLanguage}
@@ -230,7 +230,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
       const colorClasses = ['text-gray-900 dark:text-white', 'text-gray-800 dark:text-gray-100', 'text-gray-700 dark:text-gray-200', 'text-gray-700 dark:text-gray-200', 'text-gray-600 dark:text-gray-300', 'text-gray-600 dark:text-gray-300'];
       
       elements.push(
-        <HeadingTag key={`heading-${index}-${elements.length}`} className={`font-bold mb-3 mt-6 ${sizeClasses[level - 1] || 'text-base'} ${colorClasses[level - 1] || 'text-gray-700 dark:text-gray-200'} border-b border-gray-200 dark:border-gray-700 pb-1`}>
+        <HeadingTag key={`heading-${headingCounter++}`} className={`font-bold mb-3 mt-6 ${sizeClasses[level - 1] || 'text-base'} ${colorClasses[level - 1] || 'text-gray-700 dark:text-gray-200'} border-b border-gray-200 dark:border-gray-700 pb-1`}>
           {processInlineMarkdown(text)}
         </HeadingTag>
       );
@@ -244,7 +244,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
       const isChecked = checkboxMatch[1] === 'x';
       const content = checkboxMatch[2];
       elements.push(
-        <div key={`checkbox-${index}-${elements.length}`} className="flex items-start gap-3 my-2">
+        <div key={`checkbox-${checkboxCounter++}`} className="flex items-start gap-3 my-2">
           <div className={`flex-shrink-0 w-5 h-5 rounded-md border-2 flex items-center justify-center mt-0.5 transition-colors ${
             isChecked 
               ? 'bg-green-500 border-green-500 text-white' 
@@ -298,7 +298,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
       flushList();
       const content = line.substring(1).trim();
       elements.push(
-        <blockquote key={`quote-${index}-${elements.length}`} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 pl-4 pr-4 py-3 italic my-4 rounded-r-lg backdrop-blur-sm">
+        <blockquote key={`quote-${quoteCounter++}`} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 pl-4 pr-4 py-3 italic my-4 rounded-r-lg backdrop-blur-sm">
           <div className="text-gray-700 dark:text-gray-300">
             {processInlineMarkdown(content)}
           </div>
@@ -310,7 +310,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     // Handle horizontal rules
     if (line.match(/^(-{3,}|_{3,}|\*{3,})$/)) {
       flushList();
-      elements.push(<hr key={`hr-${index}-${elements.length}`} className="my-4 border-gray-300 dark:border-gray-700" />);
+      elements.push(<hr key={`hr-${hrCounter++}`} className="my-4 border-gray-300 dark:border-gray-700" />);
       return;
     }
     
@@ -318,7 +318,7 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
     if (line.trim()) {
       flushList();
       elements.push(
-        <p key={`p-${index}-${elements.length}`} className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300">
+        <p key={`p-${paragraphCounter++}`} className="mb-3 leading-relaxed text-gray-700 dark:text-gray-300">
           {processInlineMarkdown(line)}
         </p>
       );
