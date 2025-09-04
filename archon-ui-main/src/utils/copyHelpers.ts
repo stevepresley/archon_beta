@@ -2,7 +2,7 @@
  * Enhanced copy utilities with deep link URL construction and mobile compatibility
  */
 
-import { useToast } from '../contexts/ToastContext';
+import type React from 'react';
 
 export type CopyButtonType = 'project' | 'task' | 'document';
 
