@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Rocket, Code, Briefcase, Users, FileText, X, Plus, Clipboard } from 'lucide-react';
+import { Rocket, Code, Briefcase, Users, FileText, X, Plus, Clipboard, ExternalLink } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
+import { handleCopyClick, copyUrlToClipboard } from '../../utils/copyHelpers';
+import { needsCopyLinkButton } from '../../utils/platformDetection';
 
 export interface ProjectDoc {
   id: string;
@@ -17,6 +19,7 @@ interface DocumentCardProps {
   onSelect: (doc: ProjectDoc) => void;
   onDelete: (docId: string) => void;
   isDarkMode: boolean;
+  projectId: string;
 }
 
 export const DocumentCard: React.FC<DocumentCardProps> = ({
@@ -24,7 +27,8 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
   isActive,
   onSelect,
   onDelete,
-  isDarkMode
+  isDarkMode,
+  projectId
 }) => {
   const [showDelete, setShowDelete] = useState(false);
   const { showToast } = useToast();
@@ -49,18 +53,34 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
     }
   };
 
-  const handleCopyId = (e: React.MouseEvent) => {
+  const handleCopyId = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    navigator.clipboard.writeText(document.id);
-    showToast('Document ID copied to clipboard', 'success');
     
-    // Visual feedback
-    const button = e.currentTarget;
+    // Capture button reference before async call
+    const button = e.currentTarget as HTMLButtonElement;
     const originalHTML = button.innerHTML;
-    button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
-    setTimeout(() => {
-      button.innerHTML = originalHTML;
-    }, 2000);
+    
+    try {
+      const result = await handleCopyClick(e, 'document', projectId, document.id);
+      
+      if (result.success) {
+        const message = result.copied === 'url' 
+          ? 'Document URL copied to clipboard' 
+          : 'Document ID copied to clipboard';
+        showToast(message, 'success');
+        
+        // Visual feedback
+        button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
+        setTimeout(() => {
+          button.innerHTML = originalHTML;
+        }, 2000);
+      } else {
+        showToast('Failed to copy to clipboard', 'error');
+      }
+    } catch (error) {
+      console.error('Exception in copy handler:', error);
+      showToast('Failed to copy to clipboard', 'error');
+    }
   };
   
   return (
@@ -93,20 +113,52 @@ export const DocumentCard: React.FC<DocumentCardProps> = ({
         {new Date(document.updated_at || document.created_at || Date.now()).toLocaleDateString()}
       </p>
 
-      {/* ID Display Section - Always visible for active, hover for others */}
-      <div className={`flex items-center justify-between mt-2 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200`}>
+      {/* ID Display Section - Always visible for active, hover for others, and always visible on mobile */}
+      <div className={`flex items-center justify-between mt-2 ${isActive ? 'opacity-100' : needsCopyLinkButton() ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity duration-200`}>
         <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[120px]" title={document.id}>
           {document.id.slice(0, 8)}...
         </span>
-        <button 
-          type="button"
-          onClick={handleCopyId}
-          className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
-          title="Copy Document ID to clipboard"
-          aria-label="Copy Document ID to clipboard"
-        >
-          <Clipboard className="w-3 h-3" aria-hidden="true" />
-        </button>
+        <div className="flex items-center gap-1">
+          {/* Enhanced Copy Document ID Button with shift-click support */}
+          <button 
+            type="button"
+            onClick={handleCopyId}
+            className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700"
+            title="Copy Document ID • Shift-click for full URL"
+            aria-label="Copy Document ID to clipboard"
+          >
+            <Clipboard className="w-3 h-3" aria-hidden="true" />
+            <span>Doc ID</span>
+          </button>
+          
+          {/* Mobile Copy Link Button - shown on iOS/Android */}
+          {needsCopyLinkButton() && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const result = await copyUrlToClipboard('document', projectId, document.id);
+                  
+                  if (result.success) {
+                    showToast('Document URL copied to clipboard', 'success');
+                  } else {
+                    showToast('Failed to copy URL', 'error');
+                  }
+                } catch (error) {
+                  console.error('Copy URL failed:', error);
+                  showToast('Failed to copy URL', 'error');
+                }
+              }}
+              className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 transition-colors p-1 rounded hover:bg-blue-100 dark:hover:bg-blue-900"
+              title="Copy document URL"
+              aria-label="Copy document URL"
+            >
+              <ExternalLink className="w-3 h-3" aria-hidden="true" />
+              <span>Copy URL</span>
+            </button>
+          )}
+        </div>
       </div>
       
       {/* Delete Button */}

@@ -24,6 +24,7 @@ module.exports = {
         'projects-overview',
         'knowledge-overview',
         'code-extraction-rules',
+        'deep-url-linking',
       ],
     },
     

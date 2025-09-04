@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, X, Search, Upload, Link as LinkIcon, Check, Brain, Save, History, Eye, Edit3, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, X, Search, Upload, Link as LinkIcon, Check, Brain, Save, History, Eye, Edit3, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { knowledgeBaseService, KnowledgeItem } from '../../services/knowledgeBaseService';
 import { projectService } from '../../services/projectService';
@@ -26,13 +26,15 @@ interface ProjectDoc {
   // Content field stores markdown or structured data
   content?: any;
   document_type?: string;
+  tags?: string[];
+  author?: string;
 }
 
 interface Task {
   id: string;
   title: string;
   feature: string;
-  status: 'backlog' | 'in-progress' | 'review' | 'complete';
+  status: 'todo' | 'doing' | 'review' | 'done';
 }
 
 // Document Templates - Updated for proper MCP database storage
@@ -501,7 +503,9 @@ Add your content here...
 /* ——————————————————————————————————————————— */
 export const DocsTab = ({
   tasks,
-  project
+  project,
+  selectedDocumentId,
+  onDocumentSelect
 }: {
   tasks: Task[];
   project?: {
@@ -510,6 +514,8 @@ export const DocsTab = ({
     created_at?: string;
     updated_at?: string;
   } | null;
+  selectedDocumentId?: string;
+  onDocumentSelect?: (documentId: string) => void;
 }) => {
   // Document state
   const [documents, setDocuments] = useState<ProjectDoc[]>([]);
@@ -558,36 +564,79 @@ export const DocsTab = ({
   const [progressItems, setProgressItems] = useState<CrawlProgressData[]>([]);
   const { showToast } = useToast();
 
-  // Load project documents from the project data
+  // Load project documents using light mode for performance
   const loadProjectDocuments = async () => {
-    if (!project?.id || !project.docs) return;
+    if (!project?.id) return;
     
     try {
       setLoading(true);
       
-      // Use the docs directly from the project data
-      const projectDocuments: ProjectDoc[] = project.docs.map((doc: any) => ({
+      // Use light mode to get document metadata only (for document cards)
+      const documentsResponse = await projectService.listDocuments(project.id, false);
+      
+      if (!documentsResponse || documentsResponse.length === 0) {
+        setDocuments([]);
+        setLoading(false);
+        return;
+      }
+      
+      // Map to ProjectDoc format for document cards
+      const projectDocuments: ProjectDoc[] = documentsResponse.map((doc: any) => ({
         id: doc.id,
         title: doc.title || 'Untitled Document',
         created_at: doc.created_at,
         updated_at: doc.updated_at,
-        content: doc.content,
+        content: doc.content || {}, // May be empty in light mode
         document_type: doc.document_type || 'document'
       }));
       
       setDocuments(projectDocuments);
       
-      // Auto-select first document if available and no document is currently selected
-      if (projectDocuments.length > 0 && !selectedDocument) {
-        setSelectedDocument(projectDocuments[0]);
-      }
-      
-      console.log(`Loaded ${projectDocuments.length} documents from project data`);
+      console.log(`Loaded ${projectDocuments.length} documents in light mode`);
     } catch (error) {
       console.error('Failed to load documents:', error);
       showToast('Failed to load documents', 'error');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Load full document content when selecting a specific document
+  const loadFullDocument = async (docId: string) => {
+    if (!project?.id || !docId) return;
+    
+    // Check if document already has content loaded
+    const existingDoc = documents.find(d => d.id === docId);
+    if (existingDoc && existingDoc.content && Object.keys(existingDoc.content).length > 0) {
+      console.log(`Document ${existingDoc.title} already has content loaded - skipping API call`);
+      setSelectedDocument(existingDoc);
+      return;
+    }
+    
+    try {
+      console.log(`Loading full content for document: ${docId}`);
+      const fullDoc = await projectService.getDocument(project.id, docId);
+      
+      // Build enriched document from existing doc and full content
+      const enrichedDoc: ProjectDoc = existingDoc 
+        ? { ...existingDoc, content: fullDoc.content || {} }
+        : {
+            id: fullDoc.id,
+            title: fullDoc.title || 'Untitled Document',
+            created_at: fullDoc.created_at,
+            updated_at: fullDoc.updated_at,
+            document_type: fullDoc.document_type || 'document',
+            content: fullDoc.content || {}
+          };
+      
+      // Update documents array and selected document with the enriched data
+      setDocuments(prev => prev.map(doc => doc.id === docId ? enrichedDoc : doc));
+      setSelectedDocument(enrichedDoc);
+      
+      console.log(`✅ Loaded full content for document: ${fullDoc.title}`);
+    } catch (error) {
+      console.error('Failed to load full document:', error);
+      showToast('Failed to load document content', 'error');
     }
   };
 
@@ -712,6 +761,27 @@ export const DocsTab = ({
   useEffect(() => {
     setSelectedDocument(null);
   }, [project?.id]);
+
+  // Handle selectedDocumentId from URL - load full content for deep linking
+  useEffect(() => {
+    if (selectedDocumentId && documents.length > 0) {
+      const targetDoc = documents.find(doc => doc.id === selectedDocumentId);
+      if (targetDoc && targetDoc !== selectedDocument) {
+        console.log(`🔗 URL specified document: ${targetDoc.title} - loading full content`);
+        loadFullDocument(selectedDocumentId);
+        setIsEditing(false);
+      }
+    }
+  }, [selectedDocumentId, documents, selectedDocument]);
+
+  // Handle document selection with URL callback - load full content
+  const handleDocumentSelect = useCallback((document: ProjectDoc) => {
+    // Load full document content when selected
+    loadFullDocument(document.id);
+    if (onDocumentSelect) {
+      onDocumentSelect(document.id);
+    }
+  }, [onDocumentSelect]);
 
   // Existing knowledge loading function
   const loadKnowledgeItems = async (knowledgeType?: 'technical' | 'business') => {
@@ -935,35 +1005,63 @@ export const DocsTab = ({
 
         {/* Document Cards Container */}
         <div className="relative mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-            {documents.map(doc => (
-              <DocumentCard
-                key={doc.id}
-                document={doc}
-                isActive={selectedDocument?.id === doc.id}
-                onSelect={setSelectedDocument}
-                onDelete={async (docId) => {
-                  try {
-                    // Call API to delete from database first
-                    await projectService.deleteDocument(project.id, docId);
-                    
-                    // Then remove from local state
-                    setDocuments(prev => prev.filter(d => d.id !== docId));
-                    if (selectedDocument?.id === docId) {
-                      setSelectedDocument(documents.find(d => d.id !== docId) || null);
-                    }
-                    showToast('Document deleted', 'success');
-                  } catch (error) {
-                    console.error('Failed to delete document:', error);
-                    showToast('Failed to delete document', 'error');
-                  }
-                }}
-                isDarkMode={isDarkMode}
-              />
-            ))}
-            
-            {/* Add New Document Card */}
-            <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+          <div className="flex gap-3 overflow-x-auto pb-2 force-scrollbar">
+            {loading ? (
+              // Single loading card following the same pattern as projects
+              <>
+                <div className="flex-shrink-0 w-48 p-4 rounded-lg border border-gray-200/50 dark:border-zinc-800/30 bg-gradient-to-b from-white/60 to-white/40 dark:from-white/5 dark:to-black/20 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]">
+                  <div className="flex items-center justify-center mb-4">
+                    <Loader2 className="w-4 h-4 text-blue-500 animate-spin mr-2" />
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                      Loading documents...
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {/* Skeleton placeholders */}
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
+                    <div className="h-6 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                  </div>
+                </div>
+                <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+              </>
+            ) : (
+              <>
+                {documents.map(doc => (
+                  <DocumentCard
+                    key={doc.id}
+                    document={doc}
+                    isActive={selectedDocument?.id === doc.id}
+                    onSelect={handleDocumentSelect}
+                    onDelete={async (docId) => {
+                      try {
+                        // Call API to delete from database first
+                        await projectService.deleteDocument(project.id, docId);
+                        
+                        // Then remove from local state and handle selection atomically
+                        setDocuments(prev => {
+                          const updatedDocuments = prev.filter(d => d.id !== docId);
+                          // If the deleted document was selected, update selection using the new list
+                          if (selectedDocument?.id === docId) {
+                            setSelectedDocument(updatedDocuments.find(d => d.id !== docId) || null);
+                          }
+                          return updatedDocuments;
+                        });
+                        showToast('Document deleted', 'success');
+                      } catch (error) {
+                        console.error('Failed to delete document:', error);
+                        showToast('Failed to delete document', 'error');
+                      }
+                    }}
+                    isDarkMode={isDarkMode}
+                    projectId={project.id}
+                  />
+                ))}
+                
+                {/* Add New Document Card */}
+                <NewDocumentCard onClick={() => setShowTemplateModal(true)} />
+              </>
+            )}
           </div>
         </div>
 
@@ -977,7 +1075,11 @@ export const DocsTab = ({
           viewMode === 'beautiful' ? (
             <div className="mb-8">
               <PRPViewer 
-                content={selectedDocument.content || {}} 
+                content={{
+                  title: selectedDocument.title,
+                  document_type: selectedDocument.document_type,
+                  ...selectedDocument.content
+                }}
                 isDarkMode={isDarkMode}
               />
             </div>
@@ -1217,7 +1319,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-blue-500/20',
       buttonHover: 'hover:bg-blue-500/30',
       buttonBorder: 'border-blue-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]',
+      dot: 'bg-blue-400'
     },
     purple: {
       bg: 'bg-purple-500/10',
@@ -1226,7 +1329,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-purple-500/20',
       buttonHover: 'hover:bg-purple-500/30',
       buttonBorder: 'border-purple-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(168,85,247,0.3)]',
+      dot: 'bg-purple-400'
     },
     pink: {
       bg: 'bg-pink-500/10',
@@ -1235,7 +1339,8 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-pink-500/20',
       buttonHover: 'hover:bg-pink-500/30',
       buttonBorder: 'border-pink-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(236,72,153,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(236,72,153,0.3)]',
+      dot: 'bg-pink-400'
     },
     orange: {
       bg: 'bg-orange-500/10',
@@ -1244,13 +1349,14 @@ const KnowledgeSection: React.FC<{
       buttonBg: 'bg-orange-500/20',
       buttonHover: 'hover:bg-orange-500/30',
       buttonBorder: 'border-orange-500/40',
-      buttonShadow: 'hover:shadow-[0_0_15px_rgba(249,115,22,0.3)]'
+      buttonShadow: 'hover:shadow-[0_0_15px_rgba(249,115,22,0.3)]',
+      dot: 'bg-orange-400'
     }
   };
   return <section>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-bold text-gray-800 dark:text-white flex items-center">
-          <span className={`w-2 h-2 rounded-full bg-${color}-400 shadow-[0_0_8px_rgba(59,130,246,0.6)] mr-2`} />
+          <span className={`w-2 h-2 rounded-full ${colorMap[color].dot} shadow-[0_0_8px_rgba(59,130,246,0.6)] mr-2`} />
           {title}
         </h3>
         <button onClick={onAddClick} className={`px-3 py-1.5 rounded-md ${colorMap[color].buttonBg} ${colorMap[color].buttonHover} border ${colorMap[color].buttonBorder} ${colorMap[color].text} ${colorMap[color].buttonShadow} transition-all duration-300 flex items-center gap-2`}>

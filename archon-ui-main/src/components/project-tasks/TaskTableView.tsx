@@ -1,9 +1,11 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Check, Trash2, Edit, Tag, User, Bot, Clipboard, Save, Plus } from 'lucide-react';
+import { Check, Trash2, Edit, Tag, User, Bot, Clipboard, Save, Plus, ExternalLink } from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
 import { DeleteConfirmModal } from '../../pages/ProjectPage';
 import { projectService } from '../../services/projectService';
+import { handleCopyClick, copyUrlToClipboard } from '../../utils/copyHelpers';
+import { needsCopyLinkButton } from '../../utils/platformDetection';
 import { ItemTypes, getAssigneeIcon, getAssigneeGlow, getOrderColor, getOrderGlow } from '../../lib/task-utils';
 import { DraggableTaskCard } from './DraggableTaskCard';
 
@@ -29,6 +31,9 @@ interface TaskTableViewProps {
   onTaskReorder: (taskId: string, newOrder: number, status: Task['status']) => void;
   onTaskCreate?: (task: Omit<Task, 'id'>) => Promise<void>;
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => Promise<void>;
+  selectedTaskId?: string;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 const getAssigneeGlassStyle = (assigneeName: 'User' | 'Archon' | 'AI IDE Agent') => {
@@ -193,6 +198,7 @@ interface DraggableTaskRowProps {
   onTaskUpdate?: (taskId: string, updates: Partial<Task>) => Promise<void>;
   tasksInStatus: Task[];
   style?: React.CSSProperties;
+  selectedTaskId?: string;
 }
 
 const DraggableTaskRow = ({ 
@@ -204,7 +210,8 @@ const DraggableTaskRow = ({
   onTaskReorder,
   onTaskUpdate,
   tasksInStatus,
-  style
+  style,
+  selectedTaskId
 }: DraggableTaskRowProps) => {
   const [editingField, setEditingField] = useState<string | null>(null);
   const [isHovering, setIsHovering] = useState(false);
@@ -266,12 +273,18 @@ const DraggableTaskRow = ({
     }
   };
 
+  const isHighlighted = task.id === selectedTaskId;
+
   return (
     <tr 
       ref={(node) => drag(drop(node))}
+      data-task-id={task.id}
       className={`
         group transition-all duration-200 cursor-move
-        ${index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'}
+        ${isHighlighted
+          ? 'bg-gradient-to-r from-cyan-100/90 to-cyan-50/90 dark:from-cyan-900/50 dark:to-cyan-800/50 ring-2 ring-cyan-400 dark:ring-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.4)]' 
+          : index % 2 === 0 ? 'bg-white/50 dark:bg-black/50' : 'bg-gray-50/80 dark:bg-gray-900/30'
+        }
         hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70 dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20
         border-b border-gray-200 dark:border-gray-800 last:border-b-0
         ${isDragging ? 'opacity-50 scale-105 shadow-lg z-50' : ''}
@@ -392,26 +405,71 @@ const DraggableTaskRow = ({
           >
             <Edit className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
-          {/* Copy Task ID Button - Matching Board View */}
+          {/* Enhanced Copy Task ID Button with shift-click support */}
           <button 
             type="button"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              navigator.clipboard.writeText(task.id);
-              // Visual feedback like in board view
-              const button = e.currentTarget;
+              
+              // Capture button reference before async call
+              const button = e.currentTarget as HTMLButtonElement;
               const originalHTML = button.innerHTML;
-              button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
-              setTimeout(() => {
-                button.innerHTML = originalHTML;
-              }, 2000);
+              
+              try {
+                const result = await handleCopyClick(e, 'task', projectId, task.id, currentView);
+                
+                if (result.success) {
+                  const message = result.copied === 'url' 
+                    ? 'Task URL copied to clipboard' 
+                    : 'Task ID copied to clipboard';
+                  showToast(message, 'success');
+                  
+                  // Visual feedback
+                  button.innerHTML = '<div class="flex items-center gap-1"><span class="w-3 h-3 text-green-500">✓</span><span class="text-green-500 text-xs">Copied</span></div>';
+                  setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                  }, 2000);
+                } else {
+                  showToast('Failed to copy to clipboard', 'error');
+                }
+              } catch (error) {
+                console.error('Exception in copy handler:', error);
+                showToast('Failed to copy to clipboard', 'error');
+              }
             }}
             className="p-1.5 rounded-full bg-gray-500/20 text-gray-500 hover:bg-gray-500/30 hover:shadow-[0_0_10px_rgba(107,114,128,0.3)] transition-all duration-300"
-            title="Copy Task ID to clipboard"
+            title="Copy Task ID • Shift-click for full URL"
             aria-label="Copy Task ID to clipboard"
           >
             <Clipboard className="w-3.5 h-3.5" aria-hidden="true" />
           </button>
+          
+          {/* Mobile Copy Link Button - shown on iOS/Android */}
+          {needsCopyLinkButton() && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation();
+                try {
+                  const result = await copyUrlToClipboard('task', projectId, task.id, currentView);
+                  
+                  if (result.success) {
+                    showToast('Task URL copied to clipboard', 'success');
+                  } else {
+                    showToast('Failed to copy URL', 'error');
+                  }
+                } catch (error) {
+                  console.error('Copy URL failed:', error);
+                  showToast('Failed to copy URL', 'error');
+                }
+              }}
+              className="p-1.5 rounded-full bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 hover:shadow-[0_0_10px_rgba(59,130,246,0.3)] transition-all duration-300"
+              title="Copy task URL"
+              aria-label="Copy task URL"
+            >
+              <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
+            </button>
+          )}
         </div>
       </td>
     </tr>
@@ -565,15 +623,75 @@ export const TaskTableView = ({
   onTaskDelete, 
   onTaskReorder,
   onTaskCreate,
-  onTaskUpdate
+  onTaskUpdate,
+  selectedTaskId,
+  projectId,
+  currentView = 'table'
 }: TaskTableViewProps) => {
-  const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('backlog');
+  const [statusFilter, setStatusFilter] = useState<Task['status'] | 'all'>('all');
 
   // State for delete confirmation modal
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const { showToast } = useToast();
+
+  // Auto-select status filter when a task is selected via deep URL
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      const selectedTask = tasks.find(task => task.id === selectedTaskId);
+      if (selectedTask) {
+        // If the selected task is not visible in the current filter, switch to its status or 'all'
+        if (statusFilter !== 'all' && statusFilter !== selectedTask.status) {
+          setStatusFilter(selectedTask.status);
+        }
+      }
+    }
+  }, [selectedTaskId, tasks, statusFilter]);
+
+  // Auto-scroll selected task into view (following projects pattern)
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      // Small delay to ensure DOM is updated and status filter has been applied
+      setTimeout(() => {
+        const taskRow = document.querySelector(`[data-task-id="${selectedTaskId}"]`);
+        const scrollContainer = tableContainerRef.current;
+        
+        
+        if (taskRow && scrollContainer) {
+          // Get the position of the row relative to the scroll container
+          const containerScrollTop = scrollContainer.scrollTop;
+          const containerHeight = scrollContainer.clientHeight;
+          
+          // Get row position relative to scroll container using getBoundingClientRect
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const rowRect = taskRow.getBoundingClientRect();
+          const rowOffsetTop = rowRect.top - containerRect.top + containerScrollTop;
+          const rowHeight = taskRow.clientHeight;
+          
+          // Calculate the scroll position to center the row
+          const targetScrollTop = Math.max(0, rowOffsetTop - (containerHeight / 2) + (rowHeight / 2));
+          
+          
+          // Store initial scroll position to verify movement
+          const initialScrollTop = scrollContainer.scrollTop;
+          
+          
+          // Check if scroll is actually needed
+          if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
+            return;
+          }
+          
+          // Smooth scroll to center the selected task
+          scrollContainer.scrollTo({
+            top: targetScrollTop,
+            behavior: 'smooth'
+          });
+          
+        }
+      }, 300); // Slightly longer delay to ensure status filter changes are applied
+    }
+  }, [selectedTaskId, tasks, statusFilter]); // Include statusFilter so it re-runs after filter changes
 
   // Refs for scroll fade effect
   const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -783,7 +901,7 @@ export const TaskTableView = ({
       {/* Scrollable table container */}
       <div 
         ref={tableContainerRef}
-        className="overflow-x-auto overflow-y-auto max-h-[600px] relative"
+        className="overflow-x-auto overflow-y-auto max-h-[600px] relative force-scrollbar"
         style={{
           maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.1) 90%, rgba(0,0,0,0) 100%)',
           WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.5) 70%, rgba(0,0,0,0.1) 90%, rgba(0,0,0,0) 100%)'
@@ -857,8 +975,9 @@ export const TaskTableView = ({
                 onTaskReorder={onTaskReorder}
                 onTaskUpdate={onTaskUpdate}
                 tasksInStatus={getTasksByStatus(task.status)}
+                selectedTaskId={selectedTaskId}
                 style={{ 
-                  opacity: scrollOpacities.get(`row-${index}`) || 1,
+                  opacity: task.id === selectedTaskId ? 1 : (scrollOpacities.get(`row-${index}`) || 1),
                   transition: 'opacity 0.2s ease-out'
                 }}
               />

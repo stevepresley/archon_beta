@@ -1,6 +1,19 @@
 __pycache__
 .env
 .serena
-.claude/settings.local.json
 PRPs/local
+PRPs/completed/
 /logs/
+.DS_Store
+*.log
+/tmp/
+
+# Claude
+.claude/
+claude.local.md
+.mcp.json
+.next-session.md
+
+# local build scripts
+/scripts/
+

@@ -14,7 +14,7 @@ import secrets
 import sys
 from typing import Any
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
 
 # Removed direct logging import - using unified config
@@ -533,6 +533,80 @@ async def list_project_tasks(project_id: str, include_archived: bool = False, ex
     except Exception as e:
         logfire.error(f"Failed to list project tasks | error={str(e)} | project_id={project_id}")
         raise HTTPException(status_code=500, detail={"error": str(e)})
+
+
+@router.get("/projects/{project_id}/stats")
+async def get_project_stats(project_id: str):
+    """
+    Get project statistics including task counts by status without returning full task data.
+    This is much more efficient than fetching all tasks just to count them.
+    """
+    try:
+        logfire.info(f"Getting project stats | project_id={project_id}")
+        
+        # Use Supabase efficient count queries instead of fetching all data
+        supabase_client = get_supabase_client()
+        
+        # Use server-side count queries for efficiency (O(1) instead of O(n))
+        task_counts = {
+            "todo": 0,      # todo status
+            "doing": 0,     # doing and review statuses  
+            "done": 0       # done status
+        }
+        
+        # Count todo tasks
+        todo_response = supabase_client.table("archon_tasks")\
+            .select("*", count="exact")\
+            .eq("project_id", project_id)\
+            .eq("status", "todo")\
+            .or_("archived.is.null,archived.is.false")\
+            .execute()
+        task_counts["todo"] = todo_response.count if hasattr(todo_response, 'count') else 0
+        
+        # Count doing tasks (doing and review)
+        doing_response = supabase_client.table("archon_tasks")\
+            .select("*", count="exact")\
+            .eq("project_id", project_id)\
+            .in_("status", ["doing", "review"])\
+            .or_("archived.is.null,archived.is.false")\
+            .execute()
+        task_counts["doing"] = doing_response.count if hasattr(doing_response, 'count') else 0
+        
+        # Count done tasks
+        done_response = supabase_client.table("archon_tasks")\
+            .select("*", count="exact")\
+            .eq("project_id", project_id)\
+            .eq("status", "done")\
+            .or_("archived.is.null,archived.is.false")\
+            .execute()
+        task_counts["done"] = done_response.count if hasattr(done_response, 'count') else 0
+        
+        # Get document count from docs JSONB field
+        doc_response = supabase_client.table("archon_projects")\
+            .select("docs")\
+            .eq("id", project_id)\
+            .execute()
+        doc_count = 0
+        if doc_response.data and doc_response.data[0].get("docs"):
+            doc_count = len(doc_response.data[0]["docs"])
+        
+        stats = {
+            "task_counts": task_counts,
+            "doc_count": doc_count,
+            "total_tasks": sum(task_counts.values())
+        }
+        
+        logfire.info(
+            f"Project stats retrieved | project_id={project_id} | task_counts={task_counts} | doc_count={doc_count}"
+        )
+        
+        return stats
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logfire.error(f"Failed to get project stats | error={str(e)} | project_id={project_id}")
+        raise HTTPException(status_code=500, detail="Failed to retrieve project statistics")
 
 
 # Remove the complex /tasks endpoint - it's not needed and breaks things

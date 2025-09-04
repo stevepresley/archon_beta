@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { useToast } from '../../contexts/ToastContext';
 import { DeleteConfirmModal } from '../../pages/ProjectPage';
@@ -15,6 +15,9 @@ interface TaskBoardViewProps {
   onTaskDelete: (task: Task) => void;
   onTaskMove: (taskId: string, newStatus: Task['status']) => void;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task['status']) => void;
+  selectedTaskId?: string;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 interface ColumnDropZoneProps {
@@ -28,9 +31,12 @@ interface ColumnDropZoneProps {
   onTaskReorder: (taskId: string, targetIndex: number, status: Task['status']) => void;
   allTasks: Task[];
   hoveredTaskId: string | null;
+  selectedTaskId?: string;
   onTaskHover: (taskId: string | null) => void;
   selectedTasks: Set<string>;
   onTaskSelect: (taskId: string) => void;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 const ColumnDropZone = ({
@@ -44,9 +50,12 @@ const ColumnDropZone = ({
   onTaskReorder,
   allTasks,
   hoveredTaskId,
+  selectedTaskId,
   onTaskHover,
   selectedTasks,
-  onTaskSelect
+  onTaskSelect,
+  projectId,
+  currentView
 }: ColumnDropZoneProps) => {
   const ref = useRef<HTMLDivElement>(null);
   
@@ -107,7 +116,7 @@ const ColumnDropZone = ({
         <div className={`absolute bottom-0 left-[15%] right-[15%] w-[70%] mx-auto h-[1px] ${getColumnGlow()}`}></div>
       </div>
       
-      <div className="px-1 flex-1 overflow-y-auto space-y-3 py-3">
+      <div className="px-1 flex-1 overflow-y-auto space-y-3 py-3 force-scrollbar">
         {organizedTasks.map((task, index) => (
           <DraggableTaskCard
             key={task.id}
@@ -121,6 +130,9 @@ const ColumnDropZone = ({
             allTasks={allTasks}
             hoveredTaskId={hoveredTaskId}
             onTaskHover={onTaskHover}
+            selectedTaskId={selectedTaskId}
+            projectId={projectId}
+            currentView={currentView}
           />
         ))}
       </div>
@@ -134,7 +146,10 @@ export const TaskBoardView = ({
   onTaskComplete,
   onTaskDelete,
   onTaskMove,
-  onTaskReorder
+  onTaskReorder,
+  selectedTaskId,
+  projectId,
+  currentView = 'board'
 }: TaskBoardViewProps) => {
   const [hoveredTaskId, setHoveredTaskId] = useState<string | null>(null);
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set());
@@ -144,6 +159,56 @@ export const TaskBoardView = ({
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
 
   const { showToast } = useToast();
+
+  // Auto-scroll selected task into view (following projects pattern)
+  useEffect(() => {
+    if (selectedTaskId && tasks.length > 0) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        const taskCard = document.querySelector(`[data-task-id="${selectedTaskId}"]`);
+        
+        if (taskCard) {
+          // Find the column scroll container (the parent with overflow-y-auto)
+          let scrollContainer = taskCard.parentElement;
+          while (scrollContainer && !scrollContainer.classList.contains('overflow-y-auto')) {
+            scrollContainer = scrollContainer.parentElement;
+          }
+          
+          
+          if (scrollContainer) {
+            // Get the position of the card relative to the scroll container
+            const containerScrollTop = scrollContainer.scrollTop;
+            const containerHeight = scrollContainer.clientHeight;
+            
+            // Get card position relative to scroll container using getBoundingClientRect
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const cardRect = taskCard.getBoundingClientRect();
+            const cardOffsetTop = cardRect.top - containerRect.top + containerScrollTop;
+            const cardHeight = taskCard.clientHeight;
+            
+            // Calculate the scroll position to center the card
+            const targetScrollTop = Math.max(0, cardOffsetTop - (containerHeight / 2) + (cardHeight / 2));
+            
+            
+            // Store initial scroll position to verify movement
+            const initialScrollTop = scrollContainer.scrollTop;
+            
+            // Check if scroll is actually needed
+            if (Math.abs(targetScrollTop - initialScrollTop) < 5) {
+              return;
+            }
+            
+            // Smooth scroll to center the selected task
+            scrollContainer.scrollTo({
+              top: targetScrollTop,
+              behavior: 'smooth'
+            });
+            
+          }
+        }
+      }, 300); // Small delay to ensure DOM is updated
+    }
+  }, [selectedTaskId, tasks]);
 
   // Multi-select handlers
   const toggleTaskSelection = useCallback((taskId: string) => {
@@ -326,9 +391,12 @@ export const TaskBoardView = ({
           onTaskReorder={onTaskReorder}
           allTasks={tasks}
           hoveredTaskId={hoveredTaskId}
+          selectedTaskId={selectedTaskId}
           onTaskHover={setHoveredTaskId}
           selectedTasks={selectedTasks}
           onTaskSelect={toggleTaskSelection}
+          projectId={projectId}
+          currentView={currentView}
         />
         
         {/* In Progress Column */}
@@ -343,9 +411,12 @@ export const TaskBoardView = ({
           onTaskReorder={onTaskReorder}
           allTasks={tasks}
           hoveredTaskId={hoveredTaskId}
+          selectedTaskId={selectedTaskId}
           onTaskHover={setHoveredTaskId}
           selectedTasks={selectedTasks}
           onTaskSelect={toggleTaskSelection}
+          projectId={projectId}
+          currentView={currentView}
         />
         
         {/* Review Column */}
@@ -360,9 +431,12 @@ export const TaskBoardView = ({
           onTaskReorder={onTaskReorder}
           allTasks={tasks}
           hoveredTaskId={hoveredTaskId}
+          selectedTaskId={selectedTaskId}
           onTaskHover={setHoveredTaskId}
           selectedTasks={selectedTasks}
           onTaskSelect={toggleTaskSelection}
+          projectId={projectId}
+          currentView={currentView}
         />
         
         {/* Complete Column */}
@@ -377,9 +451,12 @@ export const TaskBoardView = ({
           onTaskReorder={onTaskReorder}
           allTasks={tasks}
           hoveredTaskId={hoveredTaskId}
+          selectedTaskId={selectedTaskId}
           onTaskHover={setHoveredTaskId}
           selectedTasks={selectedTasks}
           onTaskSelect={toggleTaskSelection}
+          projectId={projectId}
+          currentView={currentView}
         />
       </div>
 

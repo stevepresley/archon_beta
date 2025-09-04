@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStaggeredEntrance } from '../hooks/useStaggeredEntrance';
@@ -8,7 +9,7 @@ import { DocsTab } from '../components/project-tasks/DocsTab';
 // import { DataTab } from '../components/project-tasks/DataTab';
 import { TasksTab } from '../components/project-tasks/TasksTab';
 import { Button } from '../components/ui/Button';
-import { ChevronRight, ShoppingCart, Code, Briefcase, Layers, Plus, X, AlertCircle, Loader2, Heart, BarChart3, Trash2, Pin, ListTodo, Activity, CheckCircle2, Clipboard } from 'lucide-react';
+import { ChevronRight, ShoppingCart, Code, Briefcase, Layers, Plus, X, AlertCircle, Loader2, Heart, BarChart3, Trash2, Pin, ListTodo, Activity, CheckCircle2, Clipboard, ExternalLink } from 'lucide-react';
 
 // Import our service layer and types
 import { projectService } from '../services/projectService';
@@ -17,6 +18,10 @@ import type { Task } from '../components/project-tasks/TaskTableView';
 import { ProjectCreationProgressCard } from '../components/ProjectCreationProgressCard';
 import { projectCreationProgressService } from '../services/projectCreationProgressService';
 import type { ProjectCreationProgressData } from '../services/projectCreationProgressService';
+
+// Import copy utilities
+import { handleCopyClick, copyUrlToClipboard } from '../utils/copyHelpers';
+import { needsCopyLinkButton } from '../utils/platformDetection';
 import { projectListSocketIO, taskUpdateSocketIO } from '../services/socketIOService';
 
 interface ProjectPageProps {
@@ -41,6 +46,11 @@ export function ProjectPage({
   className = '',
   'data-id': dataId
 }: ProjectPageProps) {
+  // URL parameters and navigation
+  const { projectId, documentId, taskId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   // State management for real data
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -51,10 +61,22 @@ export function ProjectPage({
   const [projectsError, setProjectsError] = useState<string | null>(null);
   const [tasksError, setTasksError] = useState<string | null>(null);
   
-  // UI state
-  const [activeTab, setActiveTab] = useState('tasks');
-  const [showProjectDetails, setShowProjectDetails] = useState(false);
+  // Background loading state
+  const [isLoadingBackgroundProjects, setIsLoadingBackgroundProjects] = useState(false);
+  const [totalProjectCount, setTotalProjectCount] = useState(0);
+  
+  // UI state - determine initial tab based on URL
+  const getInitialTab = useCallback(() => {
+    if (location.pathname.includes('/docs')) return 'docs';
+    if (location.pathname.includes('/tasks')) return 'tasks';
+    return 'tasks'; // default
+  }, [location.pathname]);
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [showProjectDetails, setShowProjectDetails] = useState(!!projectId);
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string | undefined>(documentId);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>(taskId);
   
   // New project form state
   const [newProjectForm, setNewProjectForm] = useState({
@@ -78,7 +100,7 @@ export function ProjectPage({
 
   const { showToast } = useToast();
 
-  // Load projects on mount - simplified approach
+  // Load projects based on URL - optimize to load only specific project when URL contains projectId
   useEffect(() => {
     const loadProjectsData = async () => {
       try {
@@ -86,61 +108,135 @@ export function ProjectPage({
         setIsLoadingProjects(true);
         setProjectsError(null);
         
-        const projectsData = await projectService.listProjects();
-        console.log(`📦 Received ${projectsData.length} projects from API`);
-        
-        // Log each project's pinned status
-        projectsData.forEach(p => {
-          console.log(`  - ${p.title}: pinned=${p.pinned} (type: ${typeof p.pinned})`);
-        });
-        
-        // Sort projects - pinned first, then alphabetically
-        const sortedProjects = [...projectsData].sort((a, b) => {
-          if (a.pinned && !b.pinned) return -1;
-          if (!a.pinned && b.pinned) return 1;
-          return a.title.localeCompare(b.title);
-        });
-        
-        setProjects(sortedProjects);
-        
-        // Load task counts for all projects
-        const projectIds = sortedProjects.map(p => p.id);
-        loadTaskCountsForAllProjects(projectIds);
-        
-        // Find pinned project - this is ALWAYS the default on page load
-        const pinnedProject = sortedProjects.find(p => p.pinned === true);
-        console.log(`📌 Pinned project:`, pinnedProject ? `${pinnedProject.title} (pinned=${pinnedProject.pinned})` : 'None found');
-        
-        // Debug: Log all projects and their pinned status
-        console.log('📋 All projects with pinned status:');
-        sortedProjects.forEach(p => {
-          console.log(`   - ${p.title}: pinned=${p.pinned} (type: ${typeof p.pinned})`);
-        });
-        
-        // On page load, ALWAYS select pinned project if it exists
-        if (pinnedProject) {
-          console.log(`✅ Selecting pinned project: ${pinnedProject.title}`);
-          setSelectedProject(pinnedProject);
-          setShowProjectDetails(true);
-          setActiveTab('tasks');
-          // Small delay to let Socket.IO connections establish
-          setTimeout(() => {
-            loadTasksForProject(pinnedProject.id);
-          }, 100);
-        } else if (sortedProjects.length > 0) {
-          // No pinned project, select first one
-          const firstProject = sortedProjects[0];
-          console.log(`📋 No pinned project, selecting first: ${firstProject.title}`);
-          setSelectedProject(firstProject);
-          setShowProjectDetails(true);
-          setActiveTab('tasks');
-          // Small delay to let Socket.IO connections establish
-          setTimeout(() => {
-            loadTasksForProject(firstProject.id);
-          }, 100);
+        if (projectId) {
+          // URL contains specific project ID - only load that project
+          console.log(`🎯 URL contains project ID: ${projectId}, loading specific project only`);
+          
+          try {
+            // Load ONLY the specific project
+            const targetProject = await projectService.getProject(projectId);
+            console.log(`🔗 Loaded specific project: ${targetProject.title}`);
+            
+            // Set minimal project list - just the target project for now
+            setProjects([targetProject]);
+            
+            // Only load task counts for the target project
+            loadTaskCountsForAllProjects([projectId]);
+            
+            // Set the target project as selected
+            setSelectedProject(targetProject);
+            setShowProjectDetails(true);
+            setActiveTab(getInitialTab());
+            
+            // Load tasks for the target project
+            setTimeout(() => {
+              loadTasksForProject(targetProject.id);
+            }, 100);
+            
+            // Set loading to false immediately since we have the target project
+            setIsLoadingProjects(false);
+            
+            // Show loading indicator immediately and get project count
+            console.log(`🔄 Setting up background loading indicator`);
+            setIsLoadingBackgroundProjects(true);
+            
+            // Get total project count and show loading
+            setTimeout(async () => {
+              try {
+                console.log(`🔄 Getting project count for background loading indicator`);
+                const allProjectsForCount = await projectService.listProjects(false);
+                console.log(`📊 Total project count: ${allProjectsForCount.length}`);
+                setTotalProjectCount(allProjectsForCount.length);
+                
+                // If there are more projects than just this one, continue showing loading
+                if (allProjectsForCount.length > 1) {
+                  console.log(`🔄 Background loading ${allProjectsForCount.length - 1} other projects in background for navigation only (lightweight)`);
+                  
+                  // Add a delay to actually show the loading indicator
+                  setTimeout(() => {
+                    const sortedProjects = [...allProjectsForCount].sort((a, b) => {
+                      if (a.pinned && !b.pinned) return -1;
+                      if (!a.pinned && b.pinned) return 1;
+                      return a.title.localeCompare(b.title);
+                    });
+                    setProjects(sortedProjects);
+                    console.log(`🔄 Setting isLoadingBackgroundProjects to false`);
+                    setIsLoadingBackgroundProjects(false);
+                    
+                    // Don't load task counts for other projects - only load them when user actually selects a project
+                    console.log(`🎯 Background project loading complete - task counts only loaded for current project`);
+                  }, 1500); // Give users time to see the loading indicator
+                } else {
+                  // Only 1 project, no need to show loading
+                  console.log(`🔄 Only 1 project total, hiding loading indicator`);
+                  setIsLoadingBackgroundProjects(false);
+                }
+              } catch (bgError) {
+                console.warn('Failed to load other projects in background:', bgError);
+                setIsLoadingBackgroundProjects(false);
+              }
+            }, 50); // Very quick delay
+            
+          } catch (projectError) {
+            console.warn(`⚠️ Project ${projectId} not found, loading all projects as fallback`);
+            // Fall back to loading all projects if specific project not found (lightweight for initial load)
+            const projectsData = await projectService.listProjects(false);
+            const sortedProjects = [...projectsData].sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return a.title.localeCompare(b.title);
+            });
+            setProjects(sortedProjects);
+            
+            // Load task counts for all projects (fallback behavior)
+            const projectIds = sortedProjects.map(p => p.id);
+            loadTaskCountsForAllProjects(projectIds);
+          }
+        } else {
+          // No specific project in URL - load projects list but optimize task counts loading (lightweight for initial load)
+          console.log('📦 No project ID in URL, loading projects list (lightweight)');
+          
+          const projectsData = await projectService.listProjects(false);
+          console.log(`📦 Received ${projectsData.length} projects from API`);
+          
+          // Sort projects - pinned first, then alphabetically
+          const sortedProjects = [...projectsData].sort((a, b) => {
+            if (a.pinned && !b.pinned) return -1;
+            if (!a.pinned && b.pinned) return 1;
+            return a.title.localeCompare(b.title);
+          });
+          
+          setProjects(sortedProjects);
+          
+          // Find pinned project - this is ALWAYS the default on page load
+          const pinnedProject = sortedProjects.find(p => p.pinned === true);
+          console.log(`📌 Pinned project:`, pinnedProject ? `${pinnedProject.title} (pinned=${pinnedProject.pinned})` : 'None found');
+          
+          // Select default project and load its task counts immediately
+          let defaultProject = pinnedProject || (sortedProjects.length > 0 ? sortedProjects[0] : null);
+          
+          if (defaultProject) {
+            console.log(`✅ Selecting default project: ${defaultProject.title}`);
+            setSelectedProject(defaultProject);
+            setShowProjectDetails(true);
+            setActiveTab('tasks');
+            
+            // Load task counts ONLY for the selected project initially
+            loadTaskCountsForAllProjects([defaultProject.id]);
+            
+            setTimeout(() => {
+              loadTasksForProject(defaultProject.id);
+            }, 100);
+            
+            // Don't load task counts for other projects in background
+            // Task counts will be loaded on-demand when user selects different projects
+            console.log(`🎯 Projects index loaded - task counts only loaded for default project, others will load on-demand`);
+          }
+          
+          // Set loading to false after default project is set up
+          setIsLoadingProjects(false);
         }
         
-        setIsLoadingProjects(false);
       } catch (error) {
         console.error('Failed to load projects:', error);
         setProjectsError(error instanceof Error ? error.message : 'Failed to load projects');
@@ -161,7 +257,7 @@ export function ProjectPage({
         projectListSocketIO.send({ type: 'subscribe_projects' });
         
         const handleProjectUpdate = (message: any) => {
-          console.log('📨 Received project list update via Socket.IO');
+          console.log('📨 Received lightweight project list update via Socket.IO');
           if (message.data && message.data.projects) {
             const projectsData = message.data.projects;
             
@@ -178,9 +274,11 @@ export function ProjectPage({
               return [...tempProjects, ...sortedProjects];
             });
             
-            // Refresh task counts
-            const projectIds = sortedProjects.map(p => p.id);
-            loadTaskCountsForAllProjects(projectIds);
+            // Refresh task counts only for currently selected project
+            // Don't spam the backend with task count requests for all projects
+            if (selectedProject) {
+              loadTaskCountsForAllProjects([selectedProject.id]);
+            }
           }
         };
         
@@ -203,21 +301,22 @@ export function ProjectPage({
     };
   }, []); // Only run once on mount
 
-  // Load task counts for all projects
+  // Load task counts for specified projects using optimized stats API
   const loadTaskCountsForAllProjects = useCallback(async (projectIds: string[]) => {
+    console.log(`📊 Loading task counts for ${projectIds.length} projects using optimized stats API:`, projectIds);
     try {
       const counts: Record<string, { todo: number; doing: number; done: number }> = {};
       
       for (const projectId of projectIds) {
         try {
-          const tasksData = await projectService.getTasksByProject(projectId);
-          const todos = tasksData.filter(t => t.uiStatus === 'backlog').length;
-          const doing = tasksData.filter(t => t.uiStatus === 'in-progress' || t.uiStatus === 'review').length;
-          const done = tasksData.filter(t => t.uiStatus === 'complete').length;
+          console.log(`📊 Loading stats for project: ${projectId}`);
+          // Use the new optimized stats endpoint that only returns counts
+          const stats = await projectService.getProjectStats(projectId);
           
-          counts[projectId] = { todo: todos, doing, done };
+          counts[projectId] = stats.task_counts;
+          console.log(`📊 Project ${projectId} task counts: ${stats.task_counts.todo} todo, ${stats.task_counts.doing} doing, ${stats.task_counts.done} done`);
         } catch (error) {
-          console.error(`Failed to load tasks for project ${projectId}:`, error);
+          console.error(`Failed to load stats for project ${projectId}:`, error);
           counts[projectId] = { todo: 0, doing: 0, done: 0 };
         }
       }
@@ -235,6 +334,26 @@ export function ProjectPage({
     }
   }, [selectedProject]);
 
+  // Handle URL parameter changes (browser navigation)
+  useEffect(() => {
+    if (projectId && projects.length > 0) {
+      const targetProject = projects.find(p => p.id === projectId);
+      if (targetProject && (!selectedProject || selectedProject.id !== projectId)) {
+        console.log(`🔄 URL changed to project: ${targetProject.title}`);
+        setSelectedProject(targetProject);
+        setShowProjectDetails(true);
+        setActiveTab(getInitialTab());
+        loadTasksForProject(targetProject.id);
+      }
+    }
+  }, [projectId, projects, selectedProject, getInitialTab]);
+
+  // Handle document/task ID changes
+  useEffect(() => {
+    setSelectedDocumentId(documentId);
+    setSelectedTaskId(taskId);
+  }, [documentId, taskId]);
+
   // Removed localStorage persistence for selected project
   // We always want to load the pinned project on page refresh
 
@@ -249,27 +368,35 @@ export function ProjectPage({
     
     // Define handlers outside so they can be removed in cleanup
     const handleTaskCreated = () => {
-      console.log('✅ Task created - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task created - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskUpdated = () => {
-      console.log('✅ Task updated - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task updated - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskDeleted = () => {
-      console.log('✅ Task deleted - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task deleted - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const handleTaskArchived = () => {
-      console.log('✅ Task archived - refreshing counts for all projects');
-      const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-      loadTaskCountsForAllProjects(projectIds);
+      console.log('✅ Task archived - refreshing counts only for current project');
+      // Only refresh counts for the currently selected project
+      if (selectedProject) {
+        loadTaskCountsForAllProjects([selectedProject.id]);
+      }
     };
     
     const connectWebSocket = async () => {
@@ -306,13 +433,80 @@ export function ProjectPage({
     };
   }, [selectedProject?.id]);
 
+  // Auto-scroll selected project into view
+  useEffect(() => {
+    if (selectedProject) {
+      if (isLoadingProjects || isLoadingBackgroundProjects) {
+        console.log(`AUTOSCROLL: WAITING - Loading projects=${isLoadingProjects}, background=${isLoadingBackgroundProjects}`);
+        return;
+      }
+    }
+    
+    if (selectedProject && !isLoadingProjects && !isLoadingBackgroundProjects) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        const projectCard = document.querySelector(`[data-project-id="${selectedProject.id}"]`);
+        const scrollContainer = document.querySelector('.overflow-x-auto');
+        
+        console.log(`AUTOSCROLL: Starting for ${selectedProject.title}`);
+        console.log(`AUTOSCROLL: Card=${!!projectCard} Container=${!!scrollContainer}`);
+        
+        if (projectCard && scrollContainer) {
+          // Get the position of the card relative to the scroll container
+          const containerScrollLeft = scrollContainer.scrollLeft;
+          const containerWidth = scrollContainer.clientWidth;
+          
+          // Get card position relative to scroll container using getBoundingClientRect
+          const containerRect = scrollContainer.getBoundingClientRect();
+          const cardRect = projectCard.getBoundingClientRect();
+          const cardOffsetLeft = cardRect.left - containerRect.left + containerScrollLeft;
+          const cardWidth = projectCard.clientWidth;
+          
+          // Calculate the scroll position to center the card
+          const targetScrollLeft = Math.max(0, cardOffsetLeft - (containerWidth / 2) + (cardWidth / 2));
+          
+          console.log(`AUTOSCROLL: Target=${targetScrollLeft} (Card=${cardOffsetLeft}, Container=${containerWidth})`);
+          
+          // Store initial scroll position to verify movement
+          const initialScrollLeft = scrollContainer.scrollLeft;
+          
+          // Check if scroll is actually needed
+          if (Math.abs(targetScrollLeft - initialScrollLeft) < 5) {
+            console.log(`AUTOSCROLL: NO SCROLL NEEDED - Already in correct position (${initialScrollLeft})`);
+            return;
+          }
+          
+          // Smooth scroll to center the selected card
+          scrollContainer.scrollTo({
+            left: targetScrollLeft,
+            behavior: 'smooth'
+          });
+          
+          // Verify the scroll actually worked after a delay
+          setTimeout(() => {
+            const finalScrollLeft = scrollContainer.scrollLeft;
+            const scrollDiff = Math.abs(finalScrollLeft - initialScrollLeft);
+            
+            if (scrollDiff > 5) { // Allow for small rounding differences
+              console.log(`AUTOSCROLL: REAL SUCCESS - Moved ${scrollDiff}px to position ${finalScrollLeft}`);
+            } else {
+              console.log(`AUTOSCROLL: REAL FAILURE - No movement detected (${initialScrollLeft} → ${finalScrollLeft})`);
+            }
+          }, 500); // Wait for smooth scroll to complete
+        } else {
+          console.log(`AUTOSCROLL: FAILED - Card=${!!projectCard} Container=${!!scrollContainer}`);
+        }
+      }, 200);
+    }
+  }, [selectedProject?.id, isLoadingProjects, isLoadingBackgroundProjects]);
+
   const loadProjects = async () => {
     try {
       console.log(`[LOAD PROJECTS] Starting loadProjects...`);
       setIsLoadingProjects(true);
       setProjectsError(null);
       
-      const projectsData = await projectService.listProjects();
+      const projectsData = await projectService.listProjects(false);
       console.log(`[LOAD PROJECTS] Projects loaded from API:`, projectsData.map(p => ({id: p.id, title: p.title, pinned: p.pinned})));
       
       // Sort projects - pinned first, then alphabetically by title
@@ -394,6 +588,15 @@ export function ProjectPage({
     setShowProjectDetails(true);
     setActiveTab('tasks'); // Default to tasks tab when a new project is selected
     loadTasksForProject(project.id); // Load tasks for the selected project
+    
+    // Load task counts for the newly selected project (on-demand loading)
+    loadTaskCountsForAllProjects([project.id]);
+    
+    // Update URL to reflect selection, preserving view parameter
+    const currentSearchParams = new URLSearchParams(window.location.search);
+    const viewParam = currentSearchParams.get('view');
+    const queryString = viewParam ? `?view=${viewParam}` : '';
+    navigate(`/projects/${project.id}/tasks${queryString}`, { replace: true });
   };
 
   const handleDeleteProject = useCallback(async (e: React.MouseEvent, projectId: string, projectTitle: string) => {
@@ -494,6 +697,23 @@ export function ProjectPage({
       showToast('Failed to update project. Please try again.', 'error');
     }
   }, [projectService, setProjects, selectedProject, setSelectedProject, showToast]);
+
+  // Handle tab changes and update URL accordingly
+  const handleTabChange = useCallback((newTab: string) => {
+    setActiveTab(newTab);
+    if (selectedProject) {
+      const basePath = `/projects/${selectedProject.id}`;
+      let newPath = basePath;
+      
+      if (newTab === 'docs') {
+        newPath = selectedDocumentId ? `${basePath}/docs/${selectedDocumentId}` : `${basePath}/docs`;
+      } else if (newTab === 'tasks') {
+        newPath = selectedTaskId ? `${basePath}/tasks/${selectedTaskId}` : `${basePath}/tasks`;
+      }
+      
+      navigate(newPath, { replace: true });
+    }
+  }, [selectedProject, selectedDocumentId, selectedTaskId, navigate]);
 
   const handleCreateProject = async () => {
     if (!newProjectForm.title.trim()) {
@@ -688,7 +908,7 @@ export function ProjectPage({
       {/* Project Cards - Horizontally Scrollable */}
       {!isLoadingProjects && !projectsError && (
         <motion.div className="relative mb-10" variants={itemVariants}>
-          <div className="overflow-x-auto pb-4 scrollbar-thin">
+          <div className="overflow-x-auto pb-4 force-scrollbar">
             <div className="flex gap-4 min-w-max">
               {projects.map(project => (
                 project.creationProgress ? (
@@ -731,6 +951,7 @@ export function ProjectPage({
                 <motion.div 
                   key={project.id} 
                   variants={itemVariants} 
+                  data-project-id={project.id}
                   onClick={() => handleProjectSelect(project)} 
                   className={`
                     relative p-4 rounded-xl backdrop-blur-md w-72 cursor-pointer overflow-hidden
@@ -787,7 +1008,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>ToDo</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-pink-300 dark:border-pink-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.todo || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-pink-600 dark:text-pink-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.todo !== undefined ? projectTaskCounts[project.id].todo : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -805,7 +1028,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>Doing</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-blue-300 dark:border-blue-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.doing || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-blue-600 dark:text-blue-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.doing !== undefined ? projectTaskCounts[project.id].doing : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -823,7 +1048,9 @@ export function ProjectPage({
                             <span className={`text-[8px] font-medium ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>Done</span>
                           </div>
                           <div className={`flex-1 flex items-center justify-center border-l ${selectedProject?.id === project.id ? 'border-green-300 dark:border-green-500/30' : 'border-gray-300/50 dark:border-gray-700/50'}`}>
-                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>{projectTaskCounts[project.id]?.done || 0}</span>
+                            <span className={`text-lg font-bold ${selectedProject?.id === project.id ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-600'}`}>
+                              {projectTaskCounts[project.id]?.done !== undefined ? projectTaskCounts[project.id].done : '–'}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -842,26 +1069,70 @@ export function ProjectPage({
                         <Pin className="w-3.5 h-3.5" fill={project.pinned === true ? 'currentColor' : 'none'} />
                       </button>
                       
-                      {/* Copy Project ID Button */}
+                      {/* Enhanced Copy Project ID Button with shift-click support */}
                       <button 
-                        onClick={(e) => {
+                        onClick={async (e) => {
                           e.stopPropagation();
-                          navigator.clipboard.writeText(project.id);
-                          showToast('Project ID copied to clipboard', 'success');
-                          // Visual feedback
-                          const button = e.currentTarget;
+                          e.preventDefault();
+                          
+                          // Capture button reference before async call
+                          const button = e.currentTarget as HTMLButtonElement;
                           const originalHTML = button.innerHTML;
-                          button.innerHTML = '<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
-                          setTimeout(() => {
-                            button.innerHTML = originalHTML;
-                          }, 2000);
+                          
+                          try {
+                            const result = await handleCopyClick(e, 'project', project.id);
+                            
+                            if (result.success) {
+                              const message = result.copied === 'url' 
+                                ? 'Project URL copied to clipboard' 
+                                : 'Project ID copied to clipboard';
+                              showToast(message, 'success');
+                              
+                              // Visual feedback
+                              button.innerHTML = '<svg class="w-3 h-3 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>Copied!';
+                              setTimeout(() => {
+                                button.innerHTML = originalHTML;
+                              }, 2000);
+                            } else {
+                              showToast('Failed to copy to clipboard', 'error');
+                            }
+                          } catch (error) {
+                            console.error('Exception in copy handler:', error);
+                            showToast('Failed to copy to clipboard', 'error');
+                          }
                         }}
                         className="flex-1 flex items-center justify-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors py-1"
-                        title="Copy Project ID to clipboard"
+                        title="Copy Project ID • Shift-click for full URL"
                       >
                         <Clipboard className="w-3 h-3" />
                         <span>Copy ID</span>
                       </button>
+                      
+                      {/* Mobile Copy Link Button - shown on iOS/Android */}
+                      {needsCopyLinkButton() && (
+                        <button
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              const result = await copyUrlToClipboard('project', project.id);
+                              
+                              if (result.success) {
+                                showToast('Project URL copied to clipboard', 'success');
+                              } else {
+                                showToast('Failed to copy URL', 'error');
+                              }
+                            } catch (error) {
+                              console.error('Copy URL failed:', error);
+                              showToast('Failed to copy URL', 'error');
+                            }
+                          }}
+                          className="flex items-center justify-center gap-1 px-2 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 transition-colors py-1"
+                          title="Copy project URL"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          <span>Copy URL</span>
+                        </button>
+                      )}
                       
                       {/* Delete button */}
                       <button
@@ -877,6 +1148,33 @@ export function ProjectPage({
                 </motion.div>
                 )
               ))}
+              
+              {/* Background loading indicator */}
+              {(() => {
+                console.log(`🎨 Render check - isLoadingBackgroundProjects: ${isLoadingBackgroundProjects}, totalProjectCount: ${totalProjectCount}, projects.length: ${projects.length}`);
+                return isLoadingBackgroundProjects;
+              })() && (
+                <motion.div 
+                  variants={itemVariants}
+                  className="w-72 p-4 rounded-xl backdrop-blur-md bg-gradient-to-b from-white/60 to-white/40 dark:from-white/5 dark:to-black/20 border border-gray-200/50 dark:border-zinc-800/30 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_10px_30px_-15px_rgba(0,0,0,0.5)]"
+                >
+                  <div className="flex items-center justify-center mb-4">
+                    <Loader2 className="w-5 h-5 text-purple-500 animate-spin mr-2" />
+                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {totalProjectCount > 1 
+                        ? `Loading ${totalProjectCount - 1} more projects...`
+                        : 'Loading other projects...'
+                      }
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {/* Skeleton placeholders */}
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                    <div className="h-3 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse w-3/4"></div>
+                    <div className="h-8 bg-gray-200/50 dark:bg-gray-700/30 rounded animate-pulse"></div>
+                  </div>
+                </motion.div>
+              )}
             </div>
           </div>
         </motion.div>
@@ -885,7 +1183,7 @@ export function ProjectPage({
       {/* Project Details Section */}
       {showProjectDetails && selectedProject && (
         <motion.div variants={itemVariants}>
-          <Tabs defaultValue="tasks" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue="tasks" value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList>
               <TabsTrigger value="docs" className="py-3 font-mono transition-all duration-300" color="blue">
                 Docs
@@ -905,7 +1203,17 @@ export function ProjectPage({
             <div>
               {activeTab === 'docs' && (
                 <TabsContent value="docs" className="mt-0">
-                  <DocsTab tasks={tasks} project={selectedProject} />
+                  <DocsTab 
+                    tasks={tasks} 
+                    project={selectedProject} 
+                    selectedDocumentId={selectedDocumentId}
+                    onDocumentSelect={(docId) => {
+                      setSelectedDocumentId(docId);
+                      if (selectedProject) {
+                        navigate(`/projects/${selectedProject.id}/docs/${docId}`, { replace: true });
+                      }
+                    }}
+                  />
                 </TabsContent>
               )}
               {/* {activeTab === 'features' && (
@@ -946,11 +1254,22 @@ export function ProjectPage({
                       initialTasks={tasks} 
                       onTasksChange={(updatedTasks) => {
                         setTasks(updatedTasks);
-                        // Refresh task counts for all projects when tasks change
-                        const projectIds = projects.map(p => p.id).filter(id => !id.startsWith('temp-'));
-                        loadTaskCountsForAllProjects(projectIds);
+                        // Refresh task counts only for current project when tasks change
+                        if (selectedProject) {
+                          loadTaskCountsForAllProjects([selectedProject.id]);
+                        }
                       }} 
                       projectId={selectedProject.id} 
+                      selectedTaskId={selectedTaskId}
+                      onTaskSelect={(taskId) => {
+                        setSelectedTaskId(taskId);
+                        if (selectedProject) {
+                          const currentSearchParams = new URLSearchParams(window.location.search);
+                          const viewParam = currentSearchParams.get('view');
+                          const queryString = viewParam ? `?view=${viewParam}` : '';
+                          navigate(`/projects/${selectedProject.id}/tasks/${taskId}${queryString}`, { replace: true });
+                        }
+                      }}
                     />
                   )}
                 </TabsContent>

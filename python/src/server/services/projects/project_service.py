@@ -134,6 +134,8 @@ class ProjectService:
                         "updated_at": project["updated_at"],
                         "pinned": project.get("pinned", False),
                         "description": project.get("description", ""),
+                        "data": [],  # Add empty array for UI compatibility
+                        "features": [],  # Add empty array for UI compatibility
                         "stats": {
                             "docs_count": docs_count,
                             "features_count": features_count,

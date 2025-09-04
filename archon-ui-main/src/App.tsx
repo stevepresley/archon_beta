@@ -25,9 +25,19 @@ const AppRoutes = () => {
       <Route path="/settings" element={<SettingsPage />} />
       <Route path="/mcp" element={<MCPPage />} />
       {projectsEnabled ? (
-        <Route path="/projects" element={<ProjectPage />} />
+        <>
+          <Route path="/projects" element={<ProjectPage />} />
+          <Route path="/projects/:projectId" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/docs" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/docs/:documentId" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/tasks" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/tasks/:taskId" element={<ProjectPage />} />
+        </>
       ) : (
-        <Route path="/projects" element={<Navigate to="/" replace />} />
+        <>
+          <Route path="/projects" element={<Navigate to="/" replace />} />
+          <Route path="/projects/*" element={<Navigate to="/" replace />} />
+        </>
       )}
     </Routes>
   );
@@ -59,17 +69,17 @@ const AppContent = () => {
         }
       },
       onReconnected: () => {
+        console.log('🏥 [Health] onReconnected called - clearing disconnect screen');
         setDisconnectScreenActive(false);
         setDisconnectScreenDismissed(false);
-        // Refresh the page to ensure all data is fresh
-        window.location.reload();
+        // Don't auto-reload - let the user stay on the current page
       }
     });
 
     return () => {
       serverHealthService.stopMonitoring();
     };
-  }, [disconnectScreenDismissed]);
+  }, []); // Only run once on mount, not when disconnectScreenDismissed changes
 
   const handleDismissDisconnectScreen = () => {
     setDisconnectScreenActive(false);

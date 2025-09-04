@@ -1,8 +1,11 @@
 import React, { useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
-import { Edit, Trash2, RefreshCw, Tag, User, Bot, Clipboard } from 'lucide-react';
+import { Edit, Trash2, RefreshCw, Tag, User, Bot, Clipboard, ExternalLink } from 'lucide-react';
 import { Task } from './TaskTableView';
 import { ItemTypes, getAssigneeIcon, getAssigneeGlow, getOrderColor, getOrderGlow } from '../../lib/task-utils';
+import { handleCopyClick, copyUrlToClipboard } from '../../utils/copyHelpers';
+import { needsCopyLinkButton } from '../../utils/platformDetection';
+import { useToast } from '../../contexts/ToastContext';
 
 export interface DraggableTaskCardProps {
   task: Task;
@@ -15,6 +18,9 @@ export interface DraggableTaskCardProps {
   allTasks?: Task[];
   hoveredTaskId?: string | null;
   onTaskHover?: (taskId: string | null) => void;
+  selectedTaskId?: string;
+  projectId: string;
+  currentView?: 'table' | 'board';
 }
 
 export const DraggableTaskCard = ({
@@ -26,7 +32,11 @@ export const DraggableTaskCard = ({
   allTasks = [],
   hoveredTaskId,
   onTaskHover,
+  selectedTaskId,
+  projectId,
+  currentView = 'board'
 }: DraggableTaskCardProps) => {
+  const { showToast } = useToast();
   
   const [{ isDragging }, drag] = useDrag({
     type: ItemTypes.TASK,
@@ -90,6 +100,11 @@ export const DraggableTaskCard = ({
   const cardScale = 'scale-100';
   const cardOpacity = 'opacity-100';
   
+  // Highlight for selected task (blue) and related tasks (cyan)
+  const selectedHighlight = selectedTaskId === task.id
+    ? 'bg-gradient-to-br from-blue-100/90 to-purple-100/90 dark:from-blue-900/50 dark:to-purple-900/50 border-blue-400/70 dark:border-blue-500/60 shadow-[0_0_15px_rgba(59,130,246,0.3)]'
+    : '';
+    
   // Subtle highlight effect for related tasks - applied to the card, not parent
   const highlightGlow = isHighlighted 
     ? 'border-cyan-400/50 shadow-[0_0_8px_rgba(34,211,238,0.2)]' 
@@ -107,6 +122,7 @@ export const DraggableTaskCard = ({
   return (
     <div 
       ref={(node) => drag(drop(node))}
+      data-task-id={task.id}
       style={{ 
         perspective: '1000px',
         transformStyle: 'preserve-3d'
@@ -119,7 +135,7 @@ export const DraggableTaskCard = ({
         className={`relative w-full min-h-[140px] transform-style-preserve-3d ${isFlipped ? 'rotate-y-180' : ''}`}
       >
         {/* Front side with subtle hover effect */}
-        <div className={`absolute w-full h-full backface-hidden ${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${highlightGlow} rounded-lg`}>
+        <div className={`absolute w-full h-full backface-hidden ${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${selectedHighlight || highlightGlow} rounded-lg`}>
           {/* Priority indicator */}
           <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${getOrderColor(task.task_order)} ${getOrderGlow(task.task_order)} rounded-l-lg opacity-80 group-hover:w-[4px] group-hover:opacity-100 transition-all duration-300`}></div>
           
@@ -196,33 +212,83 @@ export const DraggableTaskCard = ({
                 </div>
                 <span className="text-gray-600 dark:text-gray-400 text-xs">{task.assignee?.name || 'User'}</span>
               </div>
-              <button 
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigator.clipboard.writeText(task.id);
-                  // Optional: Add a small toast or visual feedback here
-                  const button = e.currentTarget;
-                  const originalHTML = button.innerHTML;
-                  button.innerHTML = '<span class="text-green-500">Copied!</span>';
-                  setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                  }, 2000);
-                }}
-                className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-                title="Copy Task ID to clipboard"
-                aria-label="Copy Task ID to clipboard"
-              >
-                <Clipboard className="w-3 h-3" aria-hidden="true" />
-                <span>Task ID</span>
-              </button>
+              
+              <div className="flex items-center gap-2">
+                {/* Enhanced Copy Task ID Button with shift-click support */}
+                <button 
+                  type="button"
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    
+                    // Capture button reference before async call
+                    const button = e.currentTarget as HTMLButtonElement;
+                    const originalHTML = button.innerHTML;
+                    
+                    try {
+                      const result = await handleCopyClick(e, 'task', projectId, task.id, currentView);
+                      
+                      if (result.success) {
+                        const message = result.copied === 'url' 
+                          ? 'Task URL copied to clipboard' 
+                          : 'Task ID copied to clipboard';
+                        showToast(message, 'success');
+                        
+                        // Visual feedback
+                        button.innerHTML = '<span class="text-green-500">Copied!</span>';
+                        setTimeout(() => {
+                          button.innerHTML = originalHTML;
+                        }, 2000);
+                      } else {
+                        showToast('Failed to copy to clipboard', 'error');
+                      }
+                    } catch (error) {
+                      console.error('Exception in copy handler:', error);
+                      showToast('Failed to copy to clipboard', 'error');
+                    }
+                  }}
+                  className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+                  title="Copy Task ID • Shift-click for full URL"
+                  aria-label="Copy Task ID to clipboard"
+                >
+                  <Clipboard className="w-3 h-3" aria-hidden="true" />
+                  <span>Task ID</span>
+                </button>
+                
+                {/* Mobile Copy Link Button - shown on iOS/Android */}
+                {needsCopyLinkButton() && (
+                  <button
+                    type="button"
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        const result = await copyUrlToClipboard('task', projectId, task.id, currentView);
+                        
+                        if (result.success) {
+                          showToast('Task URL copied to clipboard', 'success');
+                        } else {
+                          showToast('Failed to copy URL', 'error');
+                        }
+                      } catch (error) {
+                        console.error('Copy URL failed:', error);
+                        showToast('Failed to copy URL', 'error');
+                      }
+                    }}
+                    className="flex items-center gap-1 text-xs text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-200 transition-colors"
+                    title="Copy task URL"
+                    aria-label="Copy task URL"
+                  >
+                    <ExternalLink className="w-3 h-3" aria-hidden="true" />
+                    <span>Copy URL</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
         
         {/* Back side */}
         {/* Back side with same hover effect */}
-        <div className={`absolute w-full h-full backface-hidden ${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${highlightGlow} rounded-lg rotate-y-180 ${isDragging ? 'opacity-0' : 'opacity-100'}`}>
+        <div className={`absolute w-full h-full backface-hidden ${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${selectedHighlight || highlightGlow} rounded-lg rotate-y-180 ${isDragging ? 'opacity-0' : 'opacity-100'}`}>
           {/* Priority indicator */}
           <div className={`absolute left-0 top-0 bottom-0 w-[3px] ${getOrderColor(task.task_order)} ${getOrderGlow(task.task_order)} rounded-l-lg opacity-80 group-hover:w-[4px] group-hover:opacity-100 transition-all duration-300`}></div>
           

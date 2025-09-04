@@ -177,11 +177,12 @@ export const projectService = {
 
   /**
    * Get all projects
+   * @param include_content - If false, returns lightweight project data (no tasks/docs content)
    */
-  async listProjects(): Promise<Project[]> {
+  async listProjects(include_content: boolean = true): Promise<Project[]> {
     try {
-      console.log('[PROJECT SERVICE] Fetching projects from API');
-      const projects = await callAPI<Project[]>('/api/projects');
+      console.log(`[PROJECT SERVICE] Fetching projects from API | include_content=${include_content}`);
+      const projects = await callAPI<Project[]>(`/api/projects?include_content=${include_content}`);
       console.log('[PROJECT SERVICE] Raw API response:', projects);
       console.log('[PROJECT SERVICE] Raw API response length:', projects.length);
       
@@ -368,6 +369,27 @@ export const projectService = {
       return response;
     } catch (error) {
       console.error(`Failed to get features for project ${projectId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Get project statistics including task counts by status (optimized - no full data transfer)
+   */
+  async getProjectStats(projectId: string): Promise<{ 
+    task_counts: { todo: number; doing: number; done: number }; 
+    doc_count: number; 
+    total_tasks: number 
+  }> {
+    try {
+      const response = await callAPI<{ 
+        task_counts: { todo: number; doing: number; done: number }; 
+        doc_count: number; 
+        total_tasks: number 
+      }>(`/api/projects/${projectId}/stats`);
+      return response;
+    } catch (error) {
+      console.error(`Failed to get stats for project ${projectId}:`, error);
       throw error;
     }
   },
@@ -573,12 +595,30 @@ export const projectService = {
   },
 
   /**
+   * List project documents (light mode by default for performance)
+   */
+  async listDocuments(projectId: string, includeContent: boolean = false): Promise<Document[]> {
+    try {
+      const response = await callAPI<{documents: Document[]}>(`/api/projects/${projectId}/docs`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.documents;
+    } catch (error) {
+      console.error(`Failed to list documents for project ${projectId}:`, error);
+      throw error;
+    }
+  },
+
+  /**
    * Get a specific document with full content
    */
   async getDocument(projectId: string, docId: string): Promise<Document> {
     try {
-      const response = await callAPI<{document: Document}>(`/api/projects/${projectId}/docs/${docId}`);
-      return response.document;
+      const document = await callAPI<Document>(`/api/projects/${projectId}/docs/${docId}`);
+      return document;
     } catch (error) {
       console.error(`Failed to get document ${docId} from project ${projectId}:`, error);
       throw error;
