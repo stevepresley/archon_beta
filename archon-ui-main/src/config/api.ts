@@ -48,6 +48,10 @@ export function getWebSocketUrl(): string {
   
   // If using relative URLs, construct from current location
   if (!apiUrl) {
+    // Guard against SSR/tests where window is undefined
+    if (typeof window === 'undefined') {
+      return 'ws://localhost:8181';
+    }
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
     return `${protocol}//${host}`;
