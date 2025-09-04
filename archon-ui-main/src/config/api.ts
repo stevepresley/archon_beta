@@ -12,11 +12,6 @@ export function getApiUrl(): string {
     return '';
   }
 
-  // Guard against SSR/tests where window is undefined
-  if (typeof window === 'undefined') {
-    return import.meta.env.VITE_API_URL || 'http://localhost:8181';
-  }
-
   // Always construct from current window location for development
   // This ensures remote access works properly regardless of VITE_API_URL
   const protocol = window.location.protocol;
