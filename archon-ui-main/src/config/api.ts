@@ -74,14 +74,5 @@ export const getWsUrl = (): string => {
 };
 
 // Legacy exports for backward compatibility (lazy-evaluated)
-Object.defineProperty(exports, 'API_FULL_URL', {
-  get: () => getApiFullUrl(),
-  enumerable: true,
-  configurable: true
-});
-
-Object.defineProperty(exports, 'WS_URL', {
-  get: () => getWsUrl(),
-  enumerable: true,
-  configurable: true
-});
+export const API_FULL_URL = getApiFullUrl();
+export const WS_URL = getWsUrl();
