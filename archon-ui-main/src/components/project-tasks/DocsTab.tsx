@@ -615,16 +615,21 @@ export const DocsTab = ({
       console.log(`Loading full content for document: ${docId}`);
       const fullDoc = await projectService.getDocument(project.id, docId);
       
-      // Update the documents array with the full content
-      setDocuments(prev => prev.map(doc => 
-        doc.id === docId ? { ...doc, content: fullDoc.content || {} } : doc
-      ));
+      // Build enriched document from existing doc and full content
+      const enrichedDoc: ProjectDoc = existingDoc 
+        ? { ...existingDoc, content: fullDoc.content || {} }
+        : {
+            id: fullDoc.id,
+            title: fullDoc.title || 'Untitled Document',
+            created_at: fullDoc.created_at,
+            updated_at: fullDoc.updated_at,
+            document_type: fullDoc.document_type || 'document',
+            content: fullDoc.content || {}
+          };
       
-      // Set as selected document with full content
-      const enrichedDoc = documents.find(d => d.id === docId);
-      if (enrichedDoc) {
-        setSelectedDocument({ ...enrichedDoc, content: fullDoc.content || {} });
-      }
+      // Update documents array and selected document with the enriched data
+      setDocuments(prev => prev.map(doc => doc.id === docId ? enrichedDoc : doc));
+      setSelectedDocument(enrichedDoc);
       
       console.log(`✅ Loaded full content for document: ${fullDoc.title}`);
     } catch (error) {
