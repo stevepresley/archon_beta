@@ -708,8 +708,6 @@ export const TaskTableView = ({
     const containerCenter = containerRect.top + containerRect.height / 2;
     const containerHeight = containerRect.height;
     
-    // Distance from center (0 at center, 1 at edges)
-    const distanceFromCenter = Math.abs(rowCenter - containerCenter) / (containerHeight / 2);
     
     // Create a smooth fade effect
     // Rows at the top 40% of viewport get full opacity
