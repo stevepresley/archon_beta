@@ -8,20 +8,22 @@
 // Get the API URL from environment or construct it
 export function getApiUrl(): string {
   // For relative URLs in production (goes through proxy)
-  if (import.meta.env.PROD) {
-    return '';
+  if (import.meta.env.PROD) return '';
+
+  // SSR/test: avoid touching window; allow explicit override
+  if (typeof window === 'undefined') {
+    const envUrl = (import.meta.env as any).VITE_API_URL || '';
+    if (envUrl) console.log('[Archon] getApiUrl(): non-browser env → VITE_API_URL =', envUrl);
+    return envUrl;
   }
 
-  // Always construct from current window location for development
-  // This ensures remote access works properly regardless of VITE_API_URL
+  // Browser (dev): construct from current location
   const protocol = window.location.protocol;
   const host = window.location.hostname;
-  // Use configured port or default to 8181
   const port = import.meta.env.VITE_ARCHON_SERVER_PORT || '8181';
-  
-  console.log(`[Archon] Constructing API URL: ${protocol}//${host}:${port}`);
-  
-  return `${protocol}//${host}:${port}`;
+  const url = `${protocol}//${host}:${port}`;
+  console.log('[Archon] getApiUrl(): browser dev →', url);
+  return url;
 }
 
 // Get the base path for API endpoints
