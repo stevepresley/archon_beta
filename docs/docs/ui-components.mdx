@@ -192,12 +192,21 @@ src/components/
 - Progressive loading with light/full content modes
 
 ### TaskTableView.tsx
-**Purpose**: Table view for task management
+**Purpose**: Table view for task management with enhanced URL navigation
 
 **Features**:
 - Sortable columns
 - Inline editing
 - Bulk actions
+- **Deep URL Navigation**: Direct linking to specific tasks with highlighting
+- **Cross-Platform Copy**: Mobile-friendly "Copy URL" buttons with text labels
+- **Auto-Scroll**: Automatically scrolls to and highlights deep-linked tasks
+- **View Persistence**: Maintains table view in URL parameters
+
+**URL Features**:
+- `/projects/{projectId}/tasks/{taskId}?view=table` - Direct task linking in table view
+- Cross-platform scrollbar fixes for Mac/Windows/iOS
+- Status-based task display and filtering
 - Filter by status/assignee
 
 ### DraggableTaskCard.tsx
