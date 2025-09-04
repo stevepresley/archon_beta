@@ -35,7 +35,8 @@ export const constructDeepLinkUrl = (
  */
 export const copyToClipboardWithFallback = async (text: string): Promise<boolean> => {
   // Modern clipboard API (preferred for HTTPS contexts)
-  if (navigator.clipboard && window.isSecureContext) {
+  if (typeof navigator !== 'undefined' && typeof window !== 'undefined' && 
+      navigator.clipboard && window.isSecureContext) {
     try {
       await navigator.clipboard.writeText(text);
       return true;
