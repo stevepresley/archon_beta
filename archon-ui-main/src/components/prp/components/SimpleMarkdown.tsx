@@ -20,6 +20,16 @@ export const SimpleMarkdown: React.FC<SimpleMarkdownProps> = ({ content, classNa
   let currentList: string[] = [];
   let listType: 'ul' | 'ol' | null = null;
   
+  // Stable counters for unique keys (prevents React key duplication without performance hit)
+  let listCounter = 0;
+  let tableCounter = 0;
+  let codeCounter = 0;
+  let headingCounter = 0;
+  let checkboxCounter = 0;
+  let quoteCounter = 0;
+  let hrCounter = 0;
+  let paragraphCounter = 0;
+  
   const flushList = () => {
     if (currentList.length > 0 && listType) {
       const ListComponent = listType === 'ul' ? 'ul' : 'ol';
