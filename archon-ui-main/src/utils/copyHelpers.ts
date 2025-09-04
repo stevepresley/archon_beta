@@ -86,11 +86,34 @@ export const handleCopyClick = async (
 ): Promise<{ success: boolean; copied: 'id' | 'url'; text: string }> => {
   const isShiftClick = event.shiftKey;
   
+  // Guard: Types that require itemId should not fall back to projectId
+  const typesRequiringItemId: CopyButtonType[] = ['task', 'document'];
+  if (typesRequiringItemId.includes(type) && !itemId) {
+    console.error(`Copy operation failed: ${type} type requires itemId but none provided`);
+    return { 
+      success: false, 
+      copied: isShiftClick ? 'url' : 'id', 
+      text: `Error: Missing ${type} ID` 
+    };
+  }
+  
   let textToCopy: string;
   let copied: 'id' | 'url';
   
   if (isShiftClick) {
-    textToCopy = constructDeepLinkUrl(type, projectId, itemId, currentView);
+    const deepLinkUrl = constructDeepLinkUrl(type, projectId, itemId, currentView);
+    
+    // Validate constructed URL before copying
+    if (!deepLinkUrl || deepLinkUrl.includes('/undefined') || deepLinkUrl.endsWith('/')) {
+      console.error(`Copy operation failed: Invalid deep link URL constructed: ${deepLinkUrl}`);
+      return { 
+        success: false, 
+        copied: 'url', 
+        text: `Error: Invalid URL for ${type}` 
+      };
+    }
+    
+    textToCopy = deepLinkUrl;
     copied = 'url';
   } else {
     textToCopy = itemId || projectId;
