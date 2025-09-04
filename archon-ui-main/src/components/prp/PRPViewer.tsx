@@ -108,9 +108,9 @@ export const PRPViewer: React.FC<PRPViewerProps> = ({
         console.log(`PRPViewer: Found markdown content in field '${key}', using MarkdownDocumentRenderer`);
         // Create a proper document structure
         const documentContent = {
+          ...content, // Include all other fields as metadata
           title: content.title || 'Document',
-          content: value,
-          ...content // Include all other fields as metadata
+          content: value
         };
         return (
           <MarkdownDocumentRenderer
