@@ -12,7 +12,6 @@ import time
 from ..config.logfire_config import get_logger
 from ..services.background_task_manager import get_task_manager
 from ..services.projects.project_service import ProjectService
-from ..services.projects.source_linking_service import SourceLinkingService
 from ..socketio_app import get_socketio_instance
 
 logger = get_logger(__name__)
@@ -306,8 +305,6 @@ async def subscribe_projects(sid, data=None):
             )
             return
 
-        # Use SourceLinkingService to format projects with sources (but skip expensive source linking for Socket.IO)
-        source_service = SourceLinkingService()
         # PERFORMANCE: Skip source linking for Socket.IO to prevent 31 individual database calls
         formatted_projects = result["projects"]  # Use projects directly without source linking
 
