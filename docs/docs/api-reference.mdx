@@ -396,6 +396,132 @@ curl -X POST "http://localhost:8080/api/documents/upload" \
 }
 ```
 
+### List Project Documents
+
+**GET** `/api/projects/{project_id}/docs`
+
+List project documents with optional content loading modes for performance optimization.
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `project_id` | string | ✅ | Project UUID |
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `includeContent` | boolean | ❌ | Load full document content (default: false for light mode) |
+
+#### Content Loading Modes
+
+- **Light Mode** (`includeContent=false`): Returns document metadata only (title, type, ID) for fast loading of document lists and cards
+- **Full Mode** (`includeContent=true`): Returns complete document content including full text, used when viewing or editing documents
+
+#### Example Request (Light Mode)
+
+```bash
+curl -X GET "http://localhost:8080/api/projects/550e8400-e29b-41d4-a716-446655440000/docs" \
+  -H "Accept: application/json"
+```
+
+#### Example Response (Light Mode)
+
+```json
+{
+  "success": true,
+  "documents": [
+    {
+      "id": "doc-001",
+      "title": "API Specification",
+      "document_type": "spec",
+      "author": "Development Team",
+      "tags": ["api", "documentation"],
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2024-01-15T10:45:00Z",
+      "content": {}
+    }
+  ]
+}
+```
+
+#### Example Request (Full Mode)
+
+```bash
+curl -X GET "http://localhost:8080/api/projects/550e8400-e29b-41d4-a716-446655440000/docs?includeContent=true" \
+  -H "Accept: application/json"
+```
+
+#### Example Response (Full Mode)
+
+```json
+{
+  "success": true,
+  "documents": [
+    {
+      "id": "doc-001",
+      "title": "API Specification",
+      "document_type": "spec",
+      "author": "Development Team",
+      "tags": ["api", "documentation"],
+      "created_at": "2024-01-15T10:00:00Z",
+      "updated_at": "2024-01-15T10:45:00Z",
+      "content": {
+        "sections": [
+          {
+            "title": "Introduction",
+            "content": "This document describes the complete API specification..."
+          },
+          {
+            "title": "Endpoints",
+            "content": "The following endpoints are available..."
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+### Get Specific Project Document
+
+**GET** `/api/projects/{project_id}/docs/{doc_id}`
+
+Get a specific document with full content (always returns complete document).
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `project_id` | string | ✅ | Project UUID |
+| `doc_id` | string | ✅ | Document UUID |
+
+#### Example Response
+
+```json
+{
+  "success": true,
+  "document": {
+    "id": "doc-001",
+    "title": "API Specification",
+    "document_type": "spec",
+    "author": "Development Team",
+    "tags": ["api", "documentation"],
+    "created_at": "2024-01-15T10:00:00Z",
+    "updated_at": "2024-01-15T10:45:00Z",
+    "content": {
+      "sections": [
+        {
+          "title": "Introduction",
+          "content": "This document describes the complete API specification..."
+        }
+      ]
+    }
+  }
+}
+```
+
 ## 🔍 RAG (Retrieval-Augmented Generation) API
 
 ### Query Knowledge Base
