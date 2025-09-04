@@ -54,5 +54,34 @@ export function getWebSocketUrl(): string {
 
 // Export commonly used values
 export const API_BASE_URL = '/api';  // Always use relative URL for API calls
-export const API_FULL_URL = getApiUrl();
-export const WS_URL = getWebSocketUrl();
+
+// Lazy-evaluated exports to avoid calling getApiUrl/getWebSocketUrl at module load time
+let _apiFullUrl: string | null = null;
+let _wsUrl: string | null = null;
+
+export const getApiFullUrl = (): string => {
+  if (_apiFullUrl === null) {
+    _apiFullUrl = getApiUrl();
+  }
+  return _apiFullUrl;
+};
+
+export const getWsUrl = (): string => {
+  if (_wsUrl === null) {
+    _wsUrl = getWebSocketUrl();
+  }
+  return _wsUrl;
+};
+
+// Legacy exports for backward compatibility (lazy-evaluated)
+Object.defineProperty(exports, 'API_FULL_URL', {
+  get: () => getApiFullUrl(),
+  enumerable: true,
+  configurable: true
+});
+
+Object.defineProperty(exports, 'WS_URL', {
+  get: () => getWsUrl(),
+  enumerable: true,
+  configurable: true
+});
