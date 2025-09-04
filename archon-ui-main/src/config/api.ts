@@ -57,5 +57,12 @@ export function getWebSocketUrl(): string {
 
 // Export commonly used values
 export const API_BASE_URL = '/api';  // Always use relative URL for API calls
-export const API_FULL_URL = getApiUrl();
-export const WS_URL = getWebSocketUrl();
+
+// Lazy-evaluated exports to avoid calling getApiUrl/getWebSocketUrl at module load time
+let _apiFullUrl: string | null = null;
+let _wsUrl: string | null = null;
+
+export const getApiFullUrl = (): string => (_apiFullUrl ??= getApiUrl());
+export const getWsUrl = (): string => (_wsUrl ??= getWebSocketUrl());
+
+// Remove legacy CommonJS-style defineProperty exports — not needed and unsafe in ESM
