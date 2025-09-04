@@ -1031,11 +1031,15 @@ export const DocsTab = ({
                         // Call API to delete from database first
                         await projectService.deleteDocument(project.id, docId);
                         
-                        // Then remove from local state
-                        setDocuments(prev => prev.filter(d => d.id !== docId));
-                        if (selectedDocument?.id === docId) {
-                          setSelectedDocument(documents.find(d => d.id !== docId) || null);
-                        }
+                        // Then remove from local state and handle selection atomically
+                        setDocuments(prev => {
+                          const updatedDocuments = prev.filter(d => d.id !== docId);
+                          // If the deleted document was selected, update selection using the new list
+                          if (selectedDocument?.id === docId) {
+                            setSelectedDocument(updatedDocuments.find(d => d.id !== docId) || null);
+                          }
+                          return updatedDocuments;
+                        });
                         showToast('Document deleted', 'success');
                       } catch (error) {
                         console.error('Failed to delete document:', error);
