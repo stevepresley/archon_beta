@@ -134,7 +134,27 @@ export const copyUrlToClipboard = async (
   itemId?: string,
   currentView?: 'table' | 'board'
 ): Promise<{ success: boolean; text: string }> => {
+  // Guard: Types that require itemId should not fall back to projectId
+  const typesRequiringItemId: CopyButtonType[] = ['task', 'document'];
+  if (typesRequiringItemId.includes(type) && !itemId) {
+    console.error(`Copy URL operation failed: ${type} type requires itemId but none provided`);
+    return { 
+      success: false, 
+      text: `Error: Missing ${type} ID` 
+    };
+  }
+  
   const textToCopy = constructDeepLinkUrl(type, projectId, itemId, currentView);
+  
+  // Validate constructed URL
+  if (!textToCopy || textToCopy.includes('/undefined') || textToCopy.endsWith('/')) {
+    console.error(`Copy URL operation failed: Invalid deep link URL constructed: ${textToCopy}`);
+    return { 
+      success: false, 
+      text: `Error: Invalid URL for ${type}` 
+    };
+  }
+  
   const success = await copyToClipboardWithFallback(textToCopy);
   
   return { success, text: textToCopy };
