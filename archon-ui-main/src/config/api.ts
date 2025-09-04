@@ -42,14 +42,15 @@ export function getApiBasePath(): string {
 // Get WebSocket URL for real-time connections
 export function getWebSocketUrl(): string {
   const apiUrl = getApiUrl();
-  
-  // If using relative URLs, construct from current location
+
+  // If using relative URLs, construct from current location (handles PROD or empty env)
   if (!apiUrl) {
+    if (typeof window === 'undefined') return ''; // SSR/tests: return empty to avoid crashes
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
     const host = window.location.host;
     return `${protocol}//${host}`;
   }
-  
+
   // Convert http/https to ws/wss
   return apiUrl.replace(/^http/, 'ws');
 }
