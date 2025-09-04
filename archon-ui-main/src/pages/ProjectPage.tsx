@@ -1094,11 +1094,10 @@ export function ProjectPage({
                                 button.innerHTML = originalHTML;
                               }, 2000);
                             } else {
-                              console.log('[BUTTON-DEBUG] Showing error toast - copy failed');
                               showToast('Failed to copy to clipboard', 'error');
                             }
                           } catch (error) {
-                            console.error('[BUTTON-DEBUG] Exception in copy handler:', error);
+                            console.error('Exception in copy handler:', error);
                             showToast('Failed to copy to clipboard', 'error');
                           }
                         }}
