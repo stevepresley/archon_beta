@@ -39,6 +39,7 @@ export function getApiBasePath(): string {
   return `${apiUrl}/api`;
 }
 
+<<<<<<< HEAD
 // Get WebSocket URL for real-time connections
 export function getWebSocketUrl(): string {
   const apiUrl = getApiUrl();
@@ -66,3 +67,8 @@ export const getApiFullUrl = (): string => (_apiFullUrl ??= getApiUrl());
 export const getWsUrl = (): string => (_wsUrl ??= getWebSocketUrl());
 
 // Remove legacy CommonJS-style defineProperty exports — not needed and unsafe in ESM
+=======
+// Export commonly used values
+export const API_BASE_URL = '/api';  // Always use relative URL for API calls
+export const API_FULL_URL = getApiUrl();
+>>>>>>> upstream/main

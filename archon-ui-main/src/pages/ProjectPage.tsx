@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
@@ -23,12 +24,19 @@ import type { ProjectCreationProgressData } from '../services/projectCreationPro
 import { handleCopyClick, copyUrlToClipboard } from '../utils/copyHelpers';
 import { needsCopyLinkButton } from '../utils/platformDetection';
 import { projectListSocketIO, taskUpdateSocketIO } from '../services/socketIOService';
+=======
+import { ProjectsViewWithBoundary } from '../features/projects';
 
-interface ProjectPageProps {
-  className?: string;
-  'data-id'?: string;
+// Minimal wrapper for routing compatibility
+// All implementation is in features/projects/views/ProjectsView.tsx
+// Uses ProjectsViewWithBoundary for proper error handling
+>>>>>>> upstream/main
+
+function ProjectPage(props: any) {
+  return <ProjectsViewWithBoundary {...props} />;
 }
 
+<<<<<<< HEAD
 // Icon mapping for projects (since database stores icon names as strings)
 const getProjectIcon = (iconName?: string) => {
   const iconMap = {
@@ -1449,3 +1457,6 @@ export const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({ itemName
     </div>
   );
 };
+=======
+export { ProjectPage };
+>>>>>>> upstream/main

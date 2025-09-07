@@ -17,3 +17,6 @@ claude.local.md
 # local build scripts
 /scripts/
 
+.zed
+tmp/
+temp/
