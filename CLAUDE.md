@@ -198,21 +198,9 @@ Archon Beta is a microservices-based knowledge management system with MCP (Model
 - **Agents Service (port 8052)**: PydanticAI agents for AI/ML operations
   - Handles complex AI workflows and document processing
 
-<<<<<<< HEAD
-### Documents
-
-- `GET /api/projects/{id}/docs` - List project documents (light mode)
-- `POST /api/projects/{id}/docs` - Create document (returns full document with created_at/updated_at timestamps)
-- `GET /api/projects/{id}/docs/{doc_id}` - Get specific document (full mode with complete content)
-- `PUT /api/projects/{id}/docs/{doc_id}` - Update document
-- `DELETE /api/projects/{id}/docs/{doc_id}` - Delete document
-
-## Socket.IO Events
-=======
 - **Database**: Supabase (PostgreSQL + pgvector for embeddings)
   - Cloud or local Supabase both supported
   - pgvector for semantic search capabilities
->>>>>>> upstream/main
 
 ### Frontend Architecture Details
 
