@@ -20,6 +20,7 @@ export const CopyTooltip: React.FC<CopyTooltipProps> = ({
   isCopied = false,
   showTooltip = true,
   className,
+  announcementMessage,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
