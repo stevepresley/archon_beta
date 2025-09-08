@@ -12,7 +12,7 @@ import {
   X,
 } from "lucide-react";
 import type React from "react";
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../../ui/primitives";
 import type { DocumentCardProps, DocumentType } from "../types";
 
