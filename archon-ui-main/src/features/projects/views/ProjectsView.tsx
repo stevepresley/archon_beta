@@ -122,6 +122,10 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
         }
         
         return;
+      } else {
+        // Project not found in available projects
+        handleURLError("project_not_found", { projectId });
+        return;
       }
     }
 
