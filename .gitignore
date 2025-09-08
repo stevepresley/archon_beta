@@ -8,3 +8,14 @@ PRPs/completed/
 .zed
 tmp/
 temp/
+
+#claude
+.claude/docs/
+.claude/hooks/
+claude.local.md
+.claude/settings.local.json
+
+#local files
+/scripts/
+.mcp.json
+.next-session.md
