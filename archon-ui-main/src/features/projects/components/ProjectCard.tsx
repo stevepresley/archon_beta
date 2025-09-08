@@ -33,6 +33,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   // Ref for auto-scroll functionality
   const cardRef = useRef<HTMLDivElement>(null);
 
+  // Shift+Click copy functionality
+  const { isCopied, handleShiftClick } = useShiftClickCopy({
+    getUrlPath: () => `/projects/${project.id}`,
+  });
+
   // Auto-scroll to selected project (for deep URL navigation)
   useEffect(() => {
     if (isSelected && cardRef.current) {
