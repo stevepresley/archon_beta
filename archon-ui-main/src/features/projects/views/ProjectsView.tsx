@@ -67,9 +67,12 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
   // URL error handling hook
   const { handleURLError } = useURLErrorHandling();
 
-  // React Query hooks
+  // React Query hooks - prioritize projects list first
   const { data: projects = [], isLoading: isLoadingProjects, error: projectsError } = useProjects();
-  const { data: taskCounts = {}, refetch: refetchTaskCounts } = useTaskCounts();
+  // Only load task counts after projects are loaded (progressive loading)
+  const { data: taskCounts = {}, refetch: refetchTaskCounts } = useTaskCounts(
+    (projects as Project[]).length > 0 // Enable only after projects are loaded
+  );
 
   // Mutations
   const updateProjectMutation = useUpdateProject();
