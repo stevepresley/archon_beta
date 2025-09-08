@@ -4,7 +4,8 @@ import type React from "react";
 import { useEffect, useRef } from "react";
 import { cn } from "../../ui/primitives/styles";
 import { CopyTooltip } from "../../ui/components/CopyTooltip";
-import { useShiftClickCopy } from "../../ui/hooks/useShiftClickCopy";
+import { MobileCopyButton } from "../../ui/components/MobileCopyButton";
+import { useUniversalCopy } from "../../ui/hooks/useUniversalCopy";
 import type { Project } from "../types";
 import { ProjectCardActions } from "./ProjectCardActions";
 
