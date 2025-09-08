@@ -39,9 +39,28 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Local state for frontend-only priority
   // NOTE: Priority is display-only and doesn't sync with backend yet
   const [localPriority, setLocalPriority] = useState<Priority>("medium");
+  
+  // Ref for auto-scroll functionality
+  const cardRef = useRef<HTMLDivElement>(null);
 
   // Use business logic hook
   const { changeAssignee, isUpdating } = useTaskActions(projectId);
+
+  // Auto-scroll to selected task (for deep URL navigation)
+  useEffect(() => {
+    if (isSelectedProp && cardRef.current) {
+      // Delay scroll to allow for component mounting and DOM updates
+      const timer = setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSelectedProp]);
 
   // Handlers - now just call hook methods
   const handleEdit = useCallback(() => {
