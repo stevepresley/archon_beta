@@ -175,6 +175,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       }}
     >
       <div
+        ref={cardRef}
         className={`${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${highlightGlow} ${selectionGlow} w-full min-h-[140px] h-full`}
       >
         {/* Priority indicator with beautiful glow */}
