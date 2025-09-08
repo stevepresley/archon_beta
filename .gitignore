@@ -1,7 +1,6 @@
 __pycache__
 .env
 .serena
-.claude/settings.local.json
 PRPs/local
 PRPs/completed/
 /logs/
@@ -12,8 +11,9 @@ temp/
 #claude
 .claude/docs/
 .claude/hooks/
-claude.local.md
+.claude/settings.json
 .claude/settings.local.json
+claude.local.md
 
 #local files
 /scripts/
