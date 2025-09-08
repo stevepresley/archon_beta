@@ -65,7 +65,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   };
 
   return (
-    <CopyTooltip isCopied={isCopied}>
+    <CopyTooltip isCopied={isCopied} announcementMessage={announcementMessage}>
       <motion.div
         ref={cardRef}
         role="listitem"
