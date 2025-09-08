@@ -2,6 +2,8 @@ import { Tag } from "lucide-react";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
+import { CopyTooltip } from "../../../ui/components/CopyTooltip";
+import { useShiftClickCopy } from "../../../ui/hooks/useShiftClickCopy";
 import { useTaskActions } from "../hooks";
 import type { Assignee, Task } from "../types";
 import { getOrderColor, getOrderGlow, ItemTypes } from "../utils/task-styles";
