@@ -167,24 +167,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     "group-hover:border-cyan-400/70 dark:group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] dark:group-hover:shadow-[0_0_15px_rgba(34,211,238,0.6)]";
 
   return (
-    // biome-ignore lint/a11y/useSemanticElements: Drag-and-drop card with react-dnd - requires div for drag handle
-    <div
-      ref={(node) => drag(drop(node))}
-      role="button"
-      tabIndex={0}
-      className={`w-full min-h-[140px] cursor-move relative ${isDragging ? "opacity-50 scale-90" : "scale-100 opacity-100"} ${transitionStyles} group`}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={handleTaskClick}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          if (onEdit) {
-            onEdit(task);
+    <CopyTooltip isCopied={isCopied}>
+      {/* biome-ignore lint/a11y/useSemanticElements: Drag-and-drop card with react-dnd - requires div for drag handle */}
+      <div
+        ref={(node) => drag(drop(node))}
+        role="button"
+        tabIndex={0}
+        className={`w-full min-h-[140px] cursor-move relative ${isDragging ? "opacity-50 scale-90" : "scale-100 opacity-100"} ${transitionStyles} group`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onClick={handleTaskClick}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (onEdit) {
+              onEdit(task);
+            }
           }
-        }
-      }}
-    >
+        }}
+      >
       <div
         ref={cardRef}
         className={`${cardBaseStyles} ${transitionStyles} ${hoverEffectClasses} ${highlightGlow} ${selectionGlow} w-full min-h-[140px] h-full`}
