@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Activity, CheckCircle2, ListTodo } from "lucide-react";
 import type React from "react";
+import { useEffect, useRef } from "react";
 import { cn } from "../../ui/primitives/styles";
 import type { Project } from "../types";
 import { ProjectCardActions } from "./ProjectCardActions";
