@@ -50,6 +50,16 @@ export const TasksTab = ({ projectId, selectedTaskId, viewParam }: TasksTabProps
     }
   }, [viewParam, viewMode]);
 
+  // Validate selectedTaskId when tasks are loaded
+  useEffect(() => {
+    if (!selectedTaskId || isLoadingTasks || !tasks.length) return;
+    
+    const taskExists = (tasks as Task[]).some(task => task.id === selectedTaskId);
+    if (!taskExists) {
+      handleURLError("task_not_found", { projectId, taskId: selectedTaskId });
+    }
+  }, [selectedTaskId, tasks, isLoadingTasks, projectId, handleURLError]);
+
   // Update URL when view mode changes programmatically
   const handleViewModeChange = useCallback((newViewMode: "table" | "board") => {
     setViewMode(newViewMode);

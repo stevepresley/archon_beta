@@ -148,6 +148,54 @@ Key improvements:
 - **No namespace classes** - Removed complex abstraction layers
 - **Single root namespace** - Everything on `/` namespace for simplicity
 
+## Frontend Architecture
+
+### URL Routing System
+
+The React frontend uses comprehensive URL-based routing with React Router v6:
+
+```
+/projects                                          # Projects list
+/projects/{project-id}                            # Project view (tasks tab)  
+/projects/{project-id}/tasks/{task-id}            # Task modal (board view)
+/projects/{project-id}/tasks/{task-id}?view=table # Task modal (table view)
+/projects/{project-id}/docs                       # Documents tab
+/projects/{project-id}/docs/{document-id}         # Document viewer
+```
+
+### Frontend Components Architecture
+
+```
+ProjectsView.tsx (Main Router)
+├── URL Parameter Extraction (useParams, useSearchParams, useLocation)
+├── URL Validation (validateURLParams)
+├── Error Handling (useURLErrorHandling)
+├── Tab Selection Logic (URL-driven)
+├── TasksTab.tsx
+│   ├── Task Navigation & View Mode Handling
+│   ├── Task Validation (taskExists check)
+│   ├── Programmatic Navigation (navigate)
+│   └── Visual Highlighting (cyan glow effects)
+└── DocsTab.tsx
+    ├── Document Navigation
+    ├── Document Validation (docExists check)
+    └── URL Updates (handleDocumentSelect)
+```
+
+### State Management Pattern
+
+- **URL-Driven State**: All application state derived from URL parameters
+- **No localStorage Dependency**: Browser navigation and bookmarks work correctly
+- **TanStack Query Integration**: Data fetching driven by URL parameters  
+- **Error Fallbacks**: Graceful redirects for invalid URLs or missing resources
+
+### Validation & Error Handling
+
+- **UUID v4 Validation**: All resource IDs validated against proper format
+- **Resource Existence**: Verify resources exist in loaded data before navigation
+- **Hierarchical Validation**: Project → Task/Document validation order
+- **Graceful Fallbacks**: Automatic redirects to appropriate parent levels
+
 ## Important Notes
 
 - **No MCP imports in FastAPI** - Services only

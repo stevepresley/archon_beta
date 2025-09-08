@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStaggeredEntrance } from "../../../hooks/useStaggeredEntrance";
 import { DeleteConfirmModal } from "../../ui/components/DeleteConfirmModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/primitives";
@@ -46,6 +46,7 @@ const itemVariants = {
 export function ProjectsView({ className = "", "data-id": dataId }: ProjectsViewProps) {
   const { projectId, taskId, docId } = useParams();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   
@@ -112,7 +113,7 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
         setSelectedProject(project);
         
         // Set active tab based on URL structure
-        if (docId) {
+        if (docId || location.pathname.endsWith('/docs')) {
           setActiveTab("docs");
         } else if (taskId) {
           setActiveTab("tasks");
@@ -135,7 +136,7 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
       setSelectedProject(defaultProject);
       navigate(`/projects/${defaultProject.id}`, { replace: true });
     }
-  }, [sortedProjects, projectId, taskId, docId, selectedProject, navigate, handleURLError]);
+  }, [sortedProjects, projectId, taskId, docId, selectedProject, navigate, handleURLError, location.pathname]);
 
   // Refetch task counts when projects change
   useEffect(() => {

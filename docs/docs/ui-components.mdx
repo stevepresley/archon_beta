@@ -181,16 +181,29 @@ src/components/
 - Optimized with React.memo to prevent unnecessary re-renders
 
 ### TaskTableView.tsx
-**Purpose**: Table view for task management
+**Purpose**: Table view for task management with URL routing support
 
 **Features**:
 - Sortable columns
 - Inline editing
 - Bulk actions
 - Filter by status/assignee
+- **URL-Based Highlighting**: Selected task rows highlighted with cyan effects
+- **Deep Linking**: Row selection updates URL with task ID
 
-### DraggableTaskCard.tsx
-**Purpose**: Individual task card component
+**Visual Feedback**:
+```css
+/* Selected row styling */
+.selected-row {
+  background: rgba(6, 182, 212, 0.1);
+  border-left: 4px solid #06b6d4;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  ring: 2px solid rgba(34, 211, 238, 0.2);
+}
+```
+
+### DraggableTaskCard.tsx  
+**Purpose**: Individual task card component with deep linking support
 
 **Props**:
 | Prop | Type | Description |
@@ -199,6 +212,23 @@ src/components/
 | `onUpdate` | `(task: Task) => void` | Update handler |
 | `onDelete` | `(id: string) => void` | Delete handler |
 | `isDragging` | `boolean` | Drag state |
+| `isSelected` | `boolean` | **NEW**: URL-based selection state |
+
+**URL Integration**:
+- **Visual Highlighting**: Selected cards show cyan glow effects
+- **Deep Linking**: Card selection updates URL with task ID
+- **Browser Navigation**: Maintains selection through back/forward navigation
+
+**Visual Feedback**:
+```css
+/* Selected card styling */
+.selected-task {
+  border-color: #06b6d4;
+  box-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+  background: rgba(34, 211, 238, 0.1);
+  ring: 2px solid rgba(34, 211, 238, 0.2);
+}
+```
 
 ### BlockNoteEditor.tsx
 **Purpose**: Rich text editor for documents
@@ -213,13 +243,21 @@ src/components/
 ### Project Tab Components
 
 #### DocsTab.tsx
-**Purpose**: Project documentation management
+**Purpose**: Project documentation management with URL routing support
 
 **Features**:
-- Document list
-- Create/edit documents
+- Document list with URL-driven selection
+- Create/edit documents (disabled during migration)
 - Version history
 - Search functionality
+- **Deep Linking**: Direct access to specific documents via `/projects/{id}/docs/{doc-id}`
+- **Tab Navigation**: Auto-selects docs tab for `/projects/{id}/docs` URLs
+- **Error Handling**: Graceful fallbacks for invalid document IDs
+
+**URL Integration**:
+- Document selection updates URL for shareable links
+- Browser navigation maintains document selection
+- Document not found redirects to docs tab with error logging
 
 #### FeaturesTab.tsx
 **Purpose**: Project features organization

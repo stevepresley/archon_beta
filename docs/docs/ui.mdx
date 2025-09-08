@@ -164,6 +164,48 @@ Archon UI provides a comprehensive dashboard for managing your AI's knowledge ba
 - **React Router**: Client-side routing
 
 
+## 🔗 URL Routing & Deep Linking
+
+Archon UI provides comprehensive URL-based routing with deep linking support:
+
+### Supported URL Patterns
+
+```
+/projects                                          # Projects list
+/projects/{project-id}                            # Project view (tasks tab)
+/projects/{project-id}/tasks/{task-id}            # Task modal (board view)
+/projects/{project-id}/tasks/{task-id}?view=board # Task modal (board view)
+/projects/{project-id}/tasks/{task-id}?view=table # Task modal (table view)
+/projects/{project-id}/docs                       # Project docs tab
+/projects/{project-id}/docs/{document-id}         # Specific document
+```
+
+### URL-Driven Features
+
+- **Deep Linking**: Direct access to specific projects, tasks, and documents
+- **Browser Navigation**: Full back/forward button support and bookmarks
+- **State Management**: URL parameters drive component state (no localStorage)
+- **Error Handling**: Graceful fallbacks for invalid/missing resources
+- **Visual Feedback**: Automatic task highlighting and tab selection
+
+### Error Handling & Validation
+
+- **UUID Validation**: All IDs must be valid UUID v4 format
+- **Resource Validation**: Resources must exist in loaded data
+- **Fallback Behaviors**:
+  - Malformed URLs → Redirect to `/projects`
+  - Project not found → Redirect to `/projects`
+  - Task not found → Redirect to `/projects/{project-id}` (tasks tab)
+  - Document not found → Redirect to `/projects/{project-id}/docs` (docs tab)
+
+### Implementation Files
+
+- **urlValidation.ts**: UUID validation utilities and error types
+- **useURLErrorHandling.ts**: Centralized error handling with navigation fallbacks
+- **ProjectsView.tsx**: Main router with tab selection logic and project validation
+- **TasksTab.tsx**: Task navigation, view mode handling, and task validation
+- **DocsTab.tsx**: Document navigation and document validation
+
 ## 📄 Pages Documentation
 
 ### 1. Knowledge Base (`/`)
@@ -185,17 +227,30 @@ Browse and manage your knowledge items with multiple view modes.
 - Tag tooltips for overflow
 - Progress tracking for crawling operations
 
-### 2. Projects (`/projects`)
+### 2. Projects (`/projects`) - **With Deep Linking**
 
-Project dashboard with task management and documentation tabs.
+Project dashboard with comprehensive URL routing and task management.
+
+**URL Patterns:**
+- `/projects` - Projects list with auto-selection
+- `/projects/{id}` - Project view with tasks tab
+- `/projects/{id}/tasks/{task-id}?view=board|table` - Task modals with view modes
+- `/projects/{id}/docs` - Documents tab
+- `/projects/{id}/docs/{doc-id}` - Specific document viewer
 
 **Components:**
-- **Project List**: Create and select projects
-- **Task Tabs**: Manage tasks, features, docs and data
+- **Project List**: Create and select projects with URL-driven selection
+- **Task Tabs**: Board/table views with deep linking and visual highlighting
+- **Document Tabs**: Document viewer with URL-based document selection
 - **Progress Cards**: Real-time project creation status
 
 **Features:**
-- Hierarchical tasks
+- **Deep Linking**: Direct access to any project, task, or document
+- **Visual Feedback**: Cyan glow effects for selected tasks
+- **Browser Navigation**: Full back/forward support and bookmarkable URLs
+- **Error Handling**: Graceful fallbacks for invalid URLs or missing resources
+- **View Persistence**: Board/table view mode maintained in URL
+- Hierarchical tasks with drag-and-drop reordering
 - GitHub repository links
 - Socket.IO project progress
 

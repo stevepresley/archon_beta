@@ -79,16 +79,27 @@ import Admonition from '@theme/Admonition';
 
 ## 🎨 User Interface Features
 
+### Deep Linking & URL Routing
+- **Direct Access**: URL patterns for every project, task, and document
+  - `/projects/{project-id}` - Direct project access
+  - `/projects/{project-id}/tasks/{task-id}?view=board|table` - Task modals with view persistence
+  - `/projects/{project-id}/docs/{document-id}` - Document viewer
+- **Browser Navigation**: Full back/forward button support and bookmarkable URLs
+- **Shareable Links**: Send direct links to specific tasks or documents
+- **State Persistence**: View modes and selections maintained in URL
+
 ### Views Available
-1. **Board View**: Kanban-style task organization
-2. **Table View**: Spreadsheet-like task management
-3. **Project Dashboard**: Overview with tabs for Docs, Features, Data
+1. **Board View**: Kanban-style task organization with URL-based task highlighting
+2. **Table View**: Spreadsheet-like task management with row highlighting  
+3. **Project Dashboard**: Overview with tabs for Docs, Features, Data (URL-driven tab selection)
 
 ### Interactive Elements
-- **Drag & Drop**: Move tasks between status columns
-- **Quick Actions**: Single-click status updates
+- **Drag & Drop**: Move tasks between status columns with URL updates
+- **Quick Actions**: Single-click status updates with URL persistence
+- **Visual Feedback**: Selected tasks show cyan glow effects
 - **Real-time Updates**: Socket.IO powered live synchronization
 - **Search & Filter**: Find tasks by status, assignee, or text
+- **Error Handling**: Graceful fallbacks for invalid URLs with automatic redirects
 
 ## 🔧 Technical Capabilities
 

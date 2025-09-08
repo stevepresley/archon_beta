@@ -1,6 +1,7 @@
 import { FileText, Search } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useURLErrorHandling } from "../hooks/useURLErrorHandling";
 import { Input } from "../../ui/primitives";
 import { cn } from "../../ui/primitives/styles";
 import { DocumentCard } from "./components/DocumentCard";
@@ -25,6 +26,7 @@ interface DocsTabProps {
 export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
   const projectId = project?.id || "";
   const navigate = useNavigate();
+  const { handleURLError } = useURLErrorHandling();
 
   // Fetch documents from project's docs field
   const { data: documents = [], isLoading } = useProjectDocuments(projectId);
@@ -43,6 +45,10 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
       if (docFromUrl) {
         setSelectedDocument(docFromUrl);
         return;
+      } else {
+        // Document not found in available documents
+        handleURLError("document_not_found", { projectId, docId: selectedDocId });
+        return;
       }
     }
 
@@ -50,7 +56,7 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
     if (!selectedDocument) {
       setSelectedDocument(documents[0]);
     }
-  }, [documents, selectedDocId, selectedDocument]);
+  }, [documents, selectedDocId, selectedDocument, projectId, handleURLError]);
 
   // Handle document selection with URL update
   const handleDocumentSelect = useCallback((document: ProjectDocument) => {

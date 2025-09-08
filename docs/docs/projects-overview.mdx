@@ -613,21 +613,32 @@ Track feature development progress:
 
 ## 🎨 Frontend Integration
 
-The React frontend (`ProjectPage.tsx` - 593 lines) provides intuitive task management interfaces:
+The React frontend provides intuitive task management interfaces with comprehensive URL routing:
+
+### Deep Linking & URL Routing
+
+- **Direct Access**: URL patterns for projects, tasks, and documents
+  - `/projects/{project-id}` - Project view with tasks tab
+  - `/projects/{project-id}/tasks/{task-id}?view=board|table` - Task modals with view persistence
+  - `/projects/{project-id}/docs/{doc-id}` - Document viewer
+- **Browser Navigation**: Full back/forward button support and bookmarkable URLs
+- **Error Handling**: Graceful fallbacks for invalid URLs (UUID validation, resource existence)
+- **Visual Feedback**: Automatic task highlighting with cyan glow effects
 
 ### Project Dashboard Features
 
-- **Project Overview**: Title, description, GitHub integration
-- **Task Summary**: Status breakdown, progress indicators
-- **Document Management**: PRD viewer, document creation
+- **Project Overview**: Title, description, GitHub integration with URL-driven selection
+- **Task Summary**: Status breakdown, progress indicators  
+- **Document Management**: PRD viewer, document creation with deep linking
 - **Feature Tracking**: Feature status and dependencies
 
 ### Task Management Interface
 
-- **Task List**: Filterable by status, searchable
-- **Task Details**: Full task information, sources, code examples
-- **Status Updates**: Drag-and-drop status changes
+- **Task List**: Filterable by status, searchable with URL persistence
+- **Task Details**: Full task information, sources, code examples with deep linking
+- **Status Updates**: Drag-and-drop status changes with URL updates
 - **Task Grouping**: Organize tasks by feature or category
+- **View Modes**: Board/table views with URL-based view persistence
 
 ### Real-time Updates
 

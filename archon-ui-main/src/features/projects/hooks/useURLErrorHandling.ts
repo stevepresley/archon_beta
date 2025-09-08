@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
 import type { URLError, URLErrorType } from "../utils/urlValidation";
 
 /**
@@ -22,10 +21,7 @@ export const useURLErrorHandling = () => {
             message: "Invalid URL format. Redirecting to projects list.",
             redirectTo: "/projects",
           };
-          toast.error("Invalid URL format", {
-            duration: 4000,
-            position: "top-center",
-          });
+          console.error("Invalid URL format detected:", { projectId: context?.projectId, taskId: context?.taskId, docId: context?.docId });
           break;
 
         case "project_not_found":
@@ -34,10 +30,7 @@ export const useURLErrorHandling = () => {
             message: `Project not found. Redirecting to projects list.`,
             redirectTo: "/projects",
           };
-          toast.error("Project not found", {
-            duration: 4000,
-            position: "top-center",
-          });
+          console.error("Project not found:", context?.projectId);
           break;
 
         case "task_not_found":
@@ -46,22 +39,16 @@ export const useURLErrorHandling = () => {
             message: `Task not found in project.`,
             redirectTo: context?.projectId ? `/projects/${context.projectId}` : "/projects",
           };
-          toast.error("Task not found", {
-            duration: 4000,
-            position: "top-center",
-          });
+          console.error("Task not found:", { projectId: context?.projectId, taskId: context?.taskId });
           break;
 
         case "document_not_found":
           error = {
             type: errorType,
             message: `Document not found in project.`,
-            redirectTo: context?.projectId ? `/projects/${context.projectId}` : "/projects",
+            redirectTo: context?.projectId ? `/projects/${context.projectId}/docs` : "/projects",
           };
-          toast.error("Document not found", {
-            duration: 4000,
-            position: "top-center",
-          });
+          console.error("Document not found:", { projectId: context?.projectId, docId: context?.docId });
           break;
 
         default:
