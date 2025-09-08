@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useStaggeredEntrance } from "../../../hooks/useStaggeredEntrance";
 import { DeleteConfirmModal } from "../../ui/components/DeleteConfirmModal";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/primitives";
