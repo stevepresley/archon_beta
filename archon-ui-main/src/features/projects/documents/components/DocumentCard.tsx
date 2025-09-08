@@ -65,6 +65,25 @@ const getTypeColor = (type?: DocumentType) => {
 export const DocumentCard = memo(({ document, isActive, onSelect, onDelete }: DocumentCardProps) => {
   const [showDelete, setShowDelete] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  
+  // Ref for auto-scroll functionality
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to selected document (for deep URL navigation)
+  useEffect(() => {
+    if (isActive && cardRef.current) {
+      // Delay scroll to allow for component mounting and DOM updates
+      const timer = setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isActive]);
 
   const handleCopyId = useCallback(
     (e: React.MouseEvent) => {
