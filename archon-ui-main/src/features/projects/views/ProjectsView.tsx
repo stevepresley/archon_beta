@@ -146,6 +146,24 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
     }
   }, [projects, refetchTaskCounts]);
 
+  // Progressive loading optimization: prefetch tasks for the first/selected project
+  useEffect(() => {
+    if (!sortedProjects.length) return;
+
+    const projectToPrefetch = selectedProject || sortedProjects[0];
+    if (projectToPrefetch) {
+      // Background prefetch tasks for the most likely project to be viewed
+      queryClient.prefetchQuery({
+        queryKey: taskKeys.all(projectToPrefetch.id),
+        queryFn: async () => {
+          const { taskService } = await import("../tasks/services");
+          return taskService.getTasksByProject(projectToPrefetch.id);
+        },
+        staleTime: 30000, // Keep prefetched data fresh for 30 seconds
+      });
+    }
+  }, [sortedProjects, selectedProject, queryClient]);
+
   // Handle pin toggle
   const handlePinProject = async (e: React.MouseEvent, projectId: string) => {
     e.stopPropagation();
