@@ -199,7 +199,8 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
           <X className="w-4 h-4" aria-hidden="true" />
         </Button>
       )}
-    </div>
+      </div>
+    </CopyTooltip>
   );
 });
 
