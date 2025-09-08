@@ -167,6 +167,7 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
                   key={doc.id}
                   document={doc}
                   isActive={selectedDocument?.id === doc.id}
+                  projectId={projectId}
                   onSelect={handleDocumentSelect}
                   onDelete={() => {}} // No delete in read-only mode
                 />
