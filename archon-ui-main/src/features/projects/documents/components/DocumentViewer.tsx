@@ -64,7 +64,7 @@ export const DocumentViewer = ({ document }: DocumentViewerProps) => {
                   ))}
                 </ul>
               ) : (
-                <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs overflow-x-auto scrollbar-mac-horizontal">
+                <pre className="bg-gray-100 dark:bg-gray-900 p-2 rounded text-xs overflow-x-auto scrollbar-mac-h">
                   {JSON.stringify(value, null, 2)}
                 </pre>
               )}
