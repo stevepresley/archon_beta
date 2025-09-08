@@ -13,6 +13,7 @@ export interface TaskCardProps {
   task: Task;
   index: number;
   projectId: string; // Need this for mutations
+  isSelected?: boolean;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task["status"]) => void;
   onEdit?: (task: Task) => void; // Optional edit handler
   onDelete?: (task: Task) => void; // Optional delete handler
@@ -26,6 +27,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   index,
   projectId,
+  isSelected: isSelectedProp,
   onTaskReorder,
   onEdit,
   onDelete,
@@ -100,7 +102,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   });
 
   const isHighlighted = hoveredTaskId === task.id;
-  const isSelected = selectedTasks?.has(task.id) || false;
+  const isSelected = isSelectedProp || selectedTasks?.has(task.id) || false;
 
   const handleMouseEnter = () => {
     onTaskHover?.(task.id);
@@ -125,9 +127,9 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Subtle highlight effect for related tasks
   const highlightGlow = isHighlighted ? "border-cyan-400/50 shadow-[0_0_8px_rgba(34,211,238,0.2)]" : "";
 
-  // Selection styling with glassmorphism
+  // Selection styling with glassmorphism - enhanced for deep linking
   const selectionGlow = isSelected
-    ? "border-blue-500 shadow-[0_0_12px_rgba(59,130,246,0.4)] bg-blue-50/30 dark:bg-blue-900/20"
+    ? "border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.5)] bg-cyan-50/40 dark:bg-cyan-900/30 ring-2 ring-cyan-400/20"
     : "";
 
   // Beautiful hover effect with glowing borders

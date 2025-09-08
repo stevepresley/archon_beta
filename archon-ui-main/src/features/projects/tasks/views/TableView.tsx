@@ -12,6 +12,7 @@ import { getOrderColor, getOrderGlow, ItemTypes } from "../utils/task-styles";
 interface TableViewProps {
   tasks: Task[];
   projectId: string;
+  selectedTaskId?: string;
   onTaskView?: (task: Task) => void;
   onTaskComplete?: (taskId: string) => void;
   onTaskDelete?: (task: Task) => void;
@@ -23,6 +24,7 @@ interface DraggableRowProps {
   task: Task;
   index: number;
   projectId: string;
+  isSelected?: boolean;
   onTaskView?: (task: Task) => void;
   onTaskComplete?: (taskId: string) => void;
   onTaskDelete?: (task: Task) => void;
@@ -33,6 +35,7 @@ const DraggableRow = ({
   task,
   index,
   projectId,
+  isSelected,
   onTaskView,
   onTaskComplete,
   onTaskDelete,
@@ -121,6 +124,7 @@ const DraggableRow = ({
         "border-b border-gray-200 dark:border-gray-800",
         isDragging && "opacity-50 scale-105 shadow-lg",
         isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
+        isSelected && "bg-cyan-100/70 dark:bg-cyan-900/40 border-cyan-500 border-l-4 shadow-lg ring-2 ring-cyan-400/20",
       )}
     >
       {/* Priority/Order Indicator */}
@@ -223,6 +227,7 @@ const DraggableRow = ({
 export const TableView = ({
   tasks,
   projectId,
+  selectedTaskId,
   onTaskView,
   onTaskComplete,
   onTaskDelete,
@@ -296,6 +301,7 @@ export const TableView = ({
                     task={task}
                     index={index}
                     projectId={projectId}
+                    isSelected={task.id === selectedTaskId}
                     onTaskView={onTaskView}
                     onTaskComplete={onTaskComplete}
                     onTaskDelete={onTaskDelete}

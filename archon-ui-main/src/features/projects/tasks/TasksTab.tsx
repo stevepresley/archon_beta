@@ -1,7 +1,8 @@
 import { LayoutGrid, Plus, Table } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { useNavigate } from "react-router-dom";
 import { DeleteConfirmModal } from "../../ui/components/DeleteConfirmModal";
 import { Button } from "../../ui/primitives";
 import { cn, glassmorphism } from "../../ui/primitives/styles";
@@ -13,10 +14,19 @@ import { BoardView, TableView } from "./views";
 
 interface TasksTabProps {
   projectId: string;
+  selectedTaskId?: string;
+  viewParam?: string | null;
 }
 
-export const TasksTab = ({ projectId }: TasksTabProps) => {
-  const [viewMode, setViewMode] = useState<"table" | "board">("board");
+export const TasksTab = ({ projectId, selectedTaskId, viewParam }: TasksTabProps) => {
+  const navigate = useNavigate();
+  
+  // Initialize view mode based on URL parameter, defaulting to "board"
+  const [viewMode, setViewMode] = useState<"table" | "board">(() => {
+    if (viewParam === "table") return "table";
+    if (viewParam === "board") return "board";
+    return "board";
+  });
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
@@ -29,10 +39,35 @@ export const TasksTab = ({ projectId }: TasksTabProps) => {
   const updateTaskMutation = useUpdateTask(projectId);
   const deleteTaskMutation = useDeleteTask(projectId);
 
+  // Handle URL parameter changes for view mode
+  useEffect(() => {
+    if (viewParam === "table" && viewMode !== "table") {
+      setViewMode("table");
+    } else if (viewParam === "board" && viewMode !== "board") {
+      setViewMode("board");
+    }
+  }, [viewParam, viewMode]);
+
+  // Update URL when view mode changes programmatically
+  const handleViewModeChange = useCallback((newViewMode: "table" | "board") => {
+    setViewMode(newViewMode);
+    
+    // Update URL with new view parameter
+    const currentPath = selectedTaskId 
+      ? `/projects/${projectId}/tasks/${selectedTaskId}`
+      : `/projects/${projectId}`;
+    
+    navigate(`${currentPath}?view=${newViewMode}`, { replace: true });
+  }, [projectId, selectedTaskId, navigate]);
+
   // Modal management functions
   const openEditModal = (task: Task) => {
     setEditingTask(task);
     setIsModalOpen(true);
+    
+    // Update URL to reflect selected task
+    const currentView = viewMode;
+    navigate(`/projects/${projectId}/tasks/${task.id}?view=${currentView}`, { replace: true });
   };
 
   const openCreateModal = () => {
@@ -130,13 +165,17 @@ export const TasksTab = ({ projectId }: TasksTabProps) => {
           },
         });
 
+        // Update URL to reflect moved task
+        const currentView = viewMode;
+        navigate(`/projects/${projectId}/tasks/${taskId}?view=${currentView}`, { replace: true });
+
         // Success handled by mutation
       } catch (error) {
         console.error("Failed to move task:", error, { taskId, newStatus });
         // Error toast handled by mutation
       }
     },
-    [tasks, updateTaskMutation, getDefaultTaskOrder],
+    [tasks, updateTaskMutation, getDefaultTaskOrder, projectId, viewMode, navigate],
   );
 
   const completeTask = useCallback(
@@ -182,6 +221,7 @@ export const TasksTab = ({ projectId }: TasksTabProps) => {
             <TableView
               tasks={tasks as Task[]}
               projectId={projectId}
+              selectedTaskId={selectedTaskId}
               onTaskView={openEditModal}
               onTaskComplete={completeTask}
               onTaskDelete={openDeleteModal}
@@ -192,6 +232,7 @@ export const TasksTab = ({ projectId }: TasksTabProps) => {
             <BoardView
               tasks={tasks as Task[]}
               projectId={projectId}
+              selectedTaskId={selectedTaskId}
               onTaskMove={moveTask}
               onTaskReorder={handleTaskReorder}
               onTaskEdit={openEditModal}
@@ -201,7 +242,7 @@ export const TasksTab = ({ projectId }: TasksTabProps) => {
         </div>
 
         {/* Fixed View Controls using Radix primitives */}
-        <ViewControls viewMode={viewMode} onViewChange={setViewMode} onAddTask={openCreateModal} />
+        <ViewControls viewMode={viewMode} onViewChange={handleViewModeChange} onAddTask={openCreateModal} />
 
         {/* Edit/Create Task Modal */}
         <TaskEditModal isModalOpen={isModalOpen} editingTask={editingTask} projectId={projectId} onClose={closeModal} />

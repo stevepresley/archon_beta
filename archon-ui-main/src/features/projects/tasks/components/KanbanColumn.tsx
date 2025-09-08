@@ -10,6 +10,7 @@ interface KanbanColumnProps {
   title: string;
   tasks: Task[];
   projectId: string;
+  selectedTaskId?: string;
   onTaskMove: (taskId: string, newStatus: Task["status"]) => void;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task["status"]) => void;
   onTaskEdit?: (task: Task) => void;
@@ -23,6 +24,7 @@ export const KanbanColumn = ({
   title,
   tasks,
   projectId,
+  selectedTaskId,
   onTaskMove,
   onTaskReorder,
   onTaskEdit,
@@ -89,6 +91,7 @@ export const KanbanColumn = ({
               task={task}
               index={index}
               projectId={projectId}
+              isSelected={task.id === selectedTaskId}
               onTaskReorder={onTaskReorder}
               onEdit={onTaskEdit}
               onDelete={onTaskDelete}

@@ -5,6 +5,7 @@ import type { Task } from "../types";
 interface BoardViewProps {
   tasks: Task[];
   projectId: string;
+  selectedTaskId?: string;
   onTaskMove: (taskId: string, newStatus: Task["status"]) => void;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task["status"]) => void;
   onTaskEdit?: (task: Task) => void;
@@ -14,6 +15,7 @@ interface BoardViewProps {
 export const BoardView = ({
   tasks,
   projectId,
+  selectedTaskId,
   onTaskMove,
   onTaskReorder,
   onTaskEdit,
@@ -45,6 +47,7 @@ export const BoardView = ({
             title={title}
             tasks={getTasksByStatus(status)}
             projectId={projectId}
+            selectedTaskId={selectedTaskId}
             onTaskMove={onTaskMove}
             onTaskReorder={onTaskReorder}
             onTaskEdit={onTaskEdit}

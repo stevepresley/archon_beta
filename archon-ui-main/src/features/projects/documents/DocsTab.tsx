@@ -1,5 +1,6 @@
 import { FileText, Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Input } from "../../ui/primitives";
 import { cn } from "../../ui/primitives/styles";
 import { DocumentCard } from "./components/DocumentCard";
@@ -14,14 +15,16 @@ interface DocsTabProps {
     created_at?: string;
     updated_at?: string;
   } | null;
+  selectedDocId?: string;
 }
 
 /**
  * Read-only documents tab
  * Displays existing documents from the project's JSONB field
  */
-export const DocsTab = ({ project }: DocsTabProps) => {
+export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
   const projectId = project?.id || "";
+  const navigate = useNavigate();
 
   // Fetch documents from project's docs field
   const { data: documents = [], isLoading } = useProjectDocuments(projectId);
@@ -30,12 +33,30 @@ export const DocsTab = ({ project }: DocsTabProps) => {
   const [selectedDocument, setSelectedDocument] = useState<ProjectDocument | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Auto-select first document when documents load
+  // Auto-select document based on URL or default to first
   useEffect(() => {
-    if (documents.length > 0 && !selectedDocument) {
+    if (documents.length === 0) return;
+
+    if (selectedDocId) {
+      // Select document from URL parameter
+      const docFromUrl = documents.find((d) => d.id === selectedDocId);
+      if (docFromUrl) {
+        setSelectedDocument(docFromUrl);
+        return;
+      }
+    }
+
+    // Default to first document if no selection
+    if (!selectedDocument) {
       setSelectedDocument(documents[0]);
     }
-  }, [documents, selectedDocument]);
+  }, [documents, selectedDocId, selectedDocument]);
+
+  // Handle document selection with URL update
+  const handleDocumentSelect = useCallback((document: ProjectDocument) => {
+    setSelectedDocument(document);
+    navigate(`/projects/${projectId}/docs/${document.id}`, { replace: true });
+  }, [projectId, navigate]);
 
   // Update selected document if it was updated
   useEffect(() => {
@@ -140,7 +161,7 @@ export const DocsTab = ({ project }: DocsTabProps) => {
                   key={doc.id}
                   document={doc}
                   isActive={selectedDocument?.id === doc.id}
-                  onSelect={setSelectedDocument}
+                  onSelect={handleDocumentSelect}
                   onDelete={() => {}} // No delete in read-only mode
                 />
               ))

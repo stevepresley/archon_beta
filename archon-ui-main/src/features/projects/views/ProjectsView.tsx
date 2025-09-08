@@ -42,9 +42,13 @@ const itemVariants = {
 };
 
 export function ProjectsView({ className = "", "data-id": dataId }: ProjectsViewProps) {
-  const { projectId } = useParams();
+  const { projectId, taskId, docId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  
+  // Extract view parameter for tasks (board/table)
+  const viewParam = searchParams.get('view');
 
   // State management
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -94,6 +98,17 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
       const project = sortedProjects.find((p) => p.id === projectId);
       if (project) {
         setSelectedProject(project);
+        
+        // Set active tab based on URL structure
+        if (docId) {
+          setActiveTab("docs");
+        } else if (taskId) {
+          setActiveTab("tasks");
+        } else {
+          // Default to tasks for project URLs without specific content
+          setActiveTab("tasks");
+        }
+        
         return;
       }
     }
@@ -104,7 +119,7 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
       setSelectedProject(defaultProject);
       navigate(`/projects/${defaultProject.id}`, { replace: true });
     }
-  }, [sortedProjects, projectId, selectedProject, navigate]);
+  }, [sortedProjects, projectId, taskId, docId, selectedProject, navigate]);
 
   // Refetch task counts when projects change
   useEffect(() => {
@@ -204,12 +219,19 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
             <div>
               {activeTab === "docs" && (
                 <TabsContent value="docs" className="mt-0">
-                  <DocsTab project={selectedProject} />
+                  <DocsTab 
+                    project={selectedProject} 
+                    selectedDocId={docId}
+                  />
                 </TabsContent>
               )}
               {activeTab === "tasks" && (
                 <TabsContent value="tasks" className="mt-0">
-                  <TasksTab projectId={selectedProject.id} />
+                  <TasksTab 
+                    projectId={selectedProject.id} 
+                    selectedTaskId={taskId}
+                    viewParam={viewParam}
+                  />
                 </TabsContent>
               )}
             </div>
