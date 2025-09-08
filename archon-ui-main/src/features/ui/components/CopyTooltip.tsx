@@ -1,6 +1,7 @@
 import type React from "react";
 import { useState } from "react";
 import { cn } from "../primitives/styles";
+import { CopyAnnouncer } from "./CopyAnnouncer";
 
 export interface CopyTooltipProps {
   children: React.ReactNode;
