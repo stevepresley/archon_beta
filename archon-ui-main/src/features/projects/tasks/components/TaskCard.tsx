@@ -49,9 +49,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Use business logic hook
   const { changeAssignee, isUpdating } = useTaskActions(projectId);
 
-  // Shift+Click copy functionality
-  const { isCopied, handleShiftClick } = useShiftClickCopy({
+  // Universal copy functionality (desktop + mobile)
+  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
     getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
+    title: task.title,
+    text: `Check out this task: ${task.title}`,
   });
 
   // Auto-scroll to selected task (for deep URL navigation)
