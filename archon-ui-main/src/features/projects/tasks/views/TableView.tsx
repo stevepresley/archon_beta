@@ -44,6 +44,25 @@ const DraggableRow = ({
   const updateTaskMutation = useUpdateTask(projectId);
   const deleteTaskMutation = useDeleteTask(projectId);
   const [localAssignee, setLocalAssignee] = useState<Assignee>(task.assignee);
+  
+  // Ref for auto-scroll functionality
+  const rowRef = useRef<HTMLTableRowElement>(null);
+
+  // Auto-scroll to selected task (for deep URL navigation)
+  useEffect(() => {
+    if (isSelected && rowRef.current) {
+      // Delay scroll to allow for component mounting and DOM updates
+      const timer = setTimeout(() => {
+        rowRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'nearest'
+        });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSelected]);
 
   // Drag and drop handlers
   const [{ isDragging }, drag] = useDrag({
