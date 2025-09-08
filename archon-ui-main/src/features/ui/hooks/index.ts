@@ -1,3 +1,4 @@
+export * from "./useCopyFeedback";
 export * from "./useCopyToClipboard";
 export * from "./usePlatformDetection";
 export * from "./useShiftClickCopy";
