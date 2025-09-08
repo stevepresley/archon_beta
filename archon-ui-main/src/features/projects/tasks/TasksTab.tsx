@@ -21,6 +21,7 @@ interface TasksTabProps {
 
 export const TasksTab = ({ projectId, selectedTaskId, viewParam }: TasksTabProps) => {
   const navigate = useNavigate();
+  const { handleURLError } = useURLErrorHandling();
   
   // Initialize view mode based on URL parameter, defaulting to "board"
   const [viewMode, setViewMode] = useState<"table" | "board">(() => {
