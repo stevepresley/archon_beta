@@ -8,6 +8,8 @@ import type { CreateTaskRequest, Task, UpdateTaskRequest } from "../types";
 // Query keys factory for tasks
 export const taskKeys = {
   all: (projectId: string) => ["projects", projectId, "tasks"] as const,
+  task: (taskId: string) => ["tasks", taskId] as const,
+  deepLink: (projectId: string, taskId: string) => ["projects", projectId, "tasks", taskId, "deep-link"] as const,
 };
 
 // Fetch tasks for a specific project with deep link optimization
