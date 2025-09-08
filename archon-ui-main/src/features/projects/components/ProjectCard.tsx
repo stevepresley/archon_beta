@@ -289,6 +289,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
           onDelete={(e) => onDelete(e, project.id, project.title)}
         />
       </div>
-    </motion.div>
+      </motion.div>
+    </CopyTooltip>
   );
 };
