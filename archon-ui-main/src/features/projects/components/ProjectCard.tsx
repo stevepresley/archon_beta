@@ -54,12 +54,20 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
     }
   }, [isSelected]);
 
+  const handleClick = (e: React.MouseEvent) => {
+    handleShiftClick(e);
+    if (!e.shiftKey) {
+      onSelect(project);
+    }
+  };
+
   return (
-    <motion.div
-      ref={cardRef}
-      role="listitem"
-      onClick={() => onSelect(project)}
-      className={cn(
+    <CopyTooltip isCopied={isCopied}>
+      <motion.div
+        ref={cardRef}
+        role="listitem"
+        onClick={handleClick}
+        className={cn(
         "relative rounded-xl backdrop-blur-md w-72 min-h-[180px] cursor-pointer overflow-visible group flex flex-col",
         "transition-all duration-300",
         project.pinned
