@@ -17,16 +17,17 @@ export const projectKeys = {
   documents: (projectId: string) => [...projectKeys.detail(projectId), "documents"] as const,
 };
 
-// Fetch all projects with smart polling
+// Fetch all projects with smart polling (optimized for API call reduction)
 export function useProjects() {
-  const { refetchInterval } = useSmartPolling(20000); // 20 second base interval for projects
+  const { refetchInterval } = useSmartPolling(30000); // Increased to 30s - projects change infrequently
 
   return useQuery<Project[]>({
     queryKey: projectKeys.lists(),
     queryFn: () => projectService.listProjects(),
     refetchInterval, // Smart interval based on page visibility/focus
     refetchOnWindowFocus: true, // Refetch immediately when tab gains focus (ETag makes this cheap)
-    staleTime: 15000, // Consider data stale after 15 seconds
+    staleTime: 120000, // Increased to 2 minutes - projects are relatively stable
+    gcTime: 15 * 60 * 1000, // Keep project list cached for 15 minutes
   });
 }
 
