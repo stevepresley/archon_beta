@@ -54,6 +54,8 @@ const AppRoutes = () => {
         <>
           <Route path="/projects" element={<ProjectPage />} />
           <Route path="/projects/:projectId" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/tasks/:taskId" element={<ProjectPage />} />
+          <Route path="/projects/:projectId/docs/:docId" element={<ProjectPage />} />
         </>
       ) : (
         <Route path="/projects" element={<Navigate to="/" replace />} />
