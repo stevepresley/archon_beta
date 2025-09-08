@@ -59,7 +59,11 @@ export interface UniversalCopyResult {
 export function useUniversalCopy(options: UniversalCopyOptions): UniversalCopyResult {
   const { getUrlPath, title, text, onCopySuccess, onCopyError } = options;
   const platformInfo = usePlatformDetection();
-  const { copyToClipboard } = useCopyToClipboard();
+  const copyFeedback = useCopyFeedback({
+    successMessage: `${title ? `${title} ` : ""}link copied to clipboard`,
+    onCopySuccess,
+    onCopyError,
+  });
   
   // Desktop Shift+Click functionality
   const shiftClickCopy = useShiftClickCopy({
