@@ -14,6 +14,8 @@ import {
 import type React from "react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "../../../ui/primitives";
+import { CopyTooltip } from "../../../ui/components/CopyTooltip";
+import { useShiftClickCopy } from "../../../ui/hooks/useShiftClickCopy";
 import type { DocumentCardProps, DocumentType } from "../types";
 
 const getDocumentIcon = (type?: DocumentType) => {
