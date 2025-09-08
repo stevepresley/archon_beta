@@ -135,7 +135,7 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
       setSelectedProject(defaultProject);
       navigate(`/projects/${defaultProject.id}`, { replace: true });
     }
-  }, [sortedProjects, projectId, taskId, docId, selectedProject, navigate]);
+  }, [sortedProjects, projectId, taskId, docId, selectedProject, navigate, handleURLError]);
 
   // Refetch task counts when projects change
   useEffect(() => {
