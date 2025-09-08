@@ -72,9 +72,11 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
   // Ref for auto-scroll functionality
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Shift+Click copy functionality
-  const { isCopied: isUrlCopied, handleShiftClick } = useShiftClickCopy({
+  // Universal copy functionality (desktop + mobile)
+  const { isCopied: isUrlCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
     getUrlPath: () => `/projects/${projectId}/docs/${document.id}`,
+    title: document.title,
+    text: `Check out this document: ${document.title}`,
   });
 
   // Auto-scroll to selected document (for deep URL navigation)
