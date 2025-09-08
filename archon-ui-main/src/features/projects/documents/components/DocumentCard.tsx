@@ -110,31 +110,39 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
     [document, onDelete],
   );
 
+  const handleClick = (e: React.MouseEvent) => {
+    handleShiftClick(e);
+    if (!e.shiftKey) {
+      onSelect(document);
+    }
+  };
+
   return (
-    // biome-ignore lint/a11y/useSemanticElements: Complex card with nested interactive elements - semantic button would break layout
-    <div
-      ref={cardRef}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          onSelect(document);
-        }
-      }}
-      className={`
-        relative flex-shrink-0 w-48 p-4 rounded-lg cursor-pointer
-        transition-all duration-200 group
-        ${
-          isActive
-            ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 shadow-lg scale-105"
-            : "bg-white/50 dark:bg-black/30 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md"
-        }
-      `}
-      onClick={() => onSelect(document)}
-      onMouseEnter={() => setShowDelete(true)}
-      onMouseLeave={() => setShowDelete(false)}
-    >
+    <CopyTooltip isCopied={isUrlCopied}>
+      {/* biome-ignore lint/a11y/useSemanticElements: Complex card with nested interactive elements - semantic button would break layout */}
+      <div
+        ref={cardRef}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onSelect(document);
+          }
+        }}
+        className={`
+          relative flex-shrink-0 w-48 p-4 rounded-lg cursor-pointer
+          transition-all duration-200 group
+          ${
+            isActive
+              ? "bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-500 shadow-lg scale-105"
+              : "bg-white/50 dark:bg-black/30 border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md"
+          }
+        `}
+        onClick={handleClick}
+        onMouseEnter={() => setShowDelete(true)}
+        onMouseLeave={() => setShowDelete(false)}
+      >
       {/* Document Type Badge */}
       <div
         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium mb-2 border ${getTypeColor(
