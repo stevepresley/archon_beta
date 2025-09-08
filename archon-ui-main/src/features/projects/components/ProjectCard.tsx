@@ -28,6 +28,25 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   onPin,
   onDelete,
 }) => {
+  // Ref for auto-scroll functionality
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to selected project (for deep URL navigation)
+  useEffect(() => {
+    if (isSelected && cardRef.current) {
+      // Delay scroll to allow for component mounting and DOM updates
+      const timer = setTimeout(() => {
+        cardRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+          inline: 'center' // Center horizontally for project cards
+        });
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isSelected]);
+
   return (
     <motion.div
       role="listitem"
