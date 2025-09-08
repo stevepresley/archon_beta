@@ -40,6 +40,7 @@ export type DocumentType =
 export interface DocumentCardProps {
   document: ProjectDocument;
   isActive: boolean;
+  projectId: string; // For deep linking URL generation
   onSelect: (doc: ProjectDocument) => void;
   onDelete: (doc: ProjectDocument) => void;
 }
