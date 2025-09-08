@@ -83,7 +83,12 @@ export function useUniversalCopy(options: UniversalCopyOptions): UniversalCopyRe
     
     // Mobile functionality
     copyUrl,
-    copyToClipboard,
+    copyToClipboard: copyFeedback.copyToClipboard,
+    
+    // Enhanced feedback
+    isError: copyFeedback.isError,
+    announcementMessage: copyFeedback.announcementMessage,
+    reset: copyFeedback.reset,
     
     // Platform info
     platform: platformInfo.platform,
