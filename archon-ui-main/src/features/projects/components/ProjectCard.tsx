@@ -3,6 +3,8 @@ import { Activity, CheckCircle2, ListTodo } from "lucide-react";
 import type React from "react";
 import { useEffect, useRef } from "react";
 import { cn } from "../../ui/primitives/styles";
+import { CopyTooltip } from "../../ui/components/CopyTooltip";
+import { useShiftClickCopy } from "../../ui/hooks/useShiftClickCopy";
 import type { Project } from "../types";
 import { ProjectCardActions } from "./ProjectCardActions";
 
