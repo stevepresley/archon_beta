@@ -218,6 +218,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
             {/* Action buttons group */}
             <div className="ml-auto flex items-center gap-1.5">
+              {/* Mobile copy button */}
+              {(isMobile || isTouch) && (
+                <MobileCopyButton
+                  url={copyUrl}
+                  title={task.title}
+                  text={`Check out this task: ${task.title}`}
+                  size="sm"
+                />
+              )}
+              
               <TaskCardActions
                 taskId={task.id}
                 taskTitle={task.title}
