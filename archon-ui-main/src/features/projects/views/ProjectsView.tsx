@@ -98,6 +98,13 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
   useEffect(() => {
     if (!sortedProjects.length) return;
 
+    // Validate URL parameters first
+    const validation = validateURLParams({ projectId, taskId, docId });
+    if (!validation.isValid) {
+      handleURLError("malformed_url");
+      return;
+    }
+
     // If there's a projectId in the URL, select that project
     if (projectId) {
       const project = sortedProjects.find((p) => p.id === projectId);
