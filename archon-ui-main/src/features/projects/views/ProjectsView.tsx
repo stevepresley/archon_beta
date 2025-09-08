@@ -62,6 +62,9 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
     title: string;
   } | null>(null);
 
+  // URL error handling hook
+  const { handleURLError } = useURLErrorHandling();
+
   // React Query hooks
   const { data: projects = [], isLoading: isLoadingProjects, error: projectsError } = useProjects();
   const { data: taskCounts = {}, refetch: refetchTaskCounts } = useTaskCounts();
