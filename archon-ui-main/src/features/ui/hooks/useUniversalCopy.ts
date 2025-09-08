@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useCopyToClipboard } from "./useCopyToClipboard";
+import { useCopyFeedback } from "./useCopyFeedback";
 import { usePlatformDetection } from "./usePlatformDetection";
 import { useShiftClickCopy } from "./useShiftClickCopy";
 
