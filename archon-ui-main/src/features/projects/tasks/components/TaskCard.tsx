@@ -48,6 +48,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   // Use business logic hook
   const { changeAssignee, isUpdating } = useTaskActions(projectId);
 
+  // Shift+Click copy functionality
+  const { isCopied, handleShiftClick } = useShiftClickCopy({
+    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
+  });
+
   // Auto-scroll to selected task (for deep URL navigation)
   useEffect(() => {
     if (isSelectedProp && cardRef.current) {
