@@ -18,6 +18,7 @@ import {
 } from "../hooks/useProjectQueries";
 import { useURLErrorHandling } from "../hooks/useURLErrorHandling";
 import { TasksTab } from "../tasks/TasksTab";
+import { taskKeys } from "../tasks/hooks/useTaskQueries";
 import type { Project } from "../types";
 import { validateURLParams } from "../utils/urlValidation";
 
