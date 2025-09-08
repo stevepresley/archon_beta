@@ -16,8 +16,10 @@ import {
   useTaskCounts,
   useUpdateProject,
 } from "../hooks/useProjectQueries";
+import { useURLErrorHandling } from "../hooks/useURLErrorHandling";
 import { TasksTab } from "../tasks/TasksTab";
 import type { Project } from "../types";
+import { validateURLParams } from "../utils/urlValidation";
 
 interface ProjectsViewProps {
   className?: string;
