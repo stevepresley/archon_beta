@@ -134,7 +134,11 @@ const DraggableRow = ({
 
   return (
     <tr
-      ref={(node) => drag(drop(node))}
+      ref={(node) => {
+        // Combine drag/drop ref with scroll ref
+        drag(drop(node));
+        rowRef.current = node;
+      }}
       className={cn(
         "group transition-all duration-200 cursor-move",
         index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
