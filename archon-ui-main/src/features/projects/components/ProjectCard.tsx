@@ -34,9 +34,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   // Ref for auto-scroll functionality
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // Shift+Click copy functionality
-  const { isCopied, handleShiftClick } = useShiftClickCopy({
+  // Universal copy functionality (desktop + mobile)
+  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
     getUrlPath: () => `/projects/${project.id}`,
+    title: project.title,
+    text: `Check out this project: ${project.title}`,
   });
 
   // Auto-scroll to selected project (for deep URL navigation)
