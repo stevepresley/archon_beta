@@ -49,6 +49,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
   return (
     <motion.div
+      ref={cardRef}
       role="listitem"
       onClick={() => onSelect(project)}
       className={cn(
