@@ -10,11 +10,8 @@ export const taskKeys = {
   all: (projectId: string) => ["projects", projectId, "tasks"] as const,
 };
 
-// Fetch tasks for a specific project with deep link optimization
-export function useProjectTasks(projectId: string | undefined, enabled = true, options?: {
-  priority?: 'high' | 'normal'; // High priority for deep link scenarios
-  prefetchRelated?: boolean; // Pre-load related data
-}) {
+// Fetch tasks for a specific project
+export function useProjectTasks(projectId: string | undefined, enabled = true) {
   const { refetchInterval } = useSmartPolling(5000); // 5 second base interval for faster MCP updates
 
   return useQuery<Task[]>({
@@ -26,10 +23,7 @@ export function useProjectTasks(projectId: string | undefined, enabled = true, o
     enabled: !!projectId && enabled,
     refetchInterval, // Smart interval based on page visibility/focus
     refetchOnWindowFocus: true, // Refetch immediately when tab gains focus (ETag makes this cheap)
-    staleTime: options?.priority === 'high' ? 5000 : 10000, // Shorter stale time for deep links
-    retry: options?.priority === 'high' ? 3 : 1, // More retries for critical deep link loads
-    retryDelay: options?.priority === 'high' ? 300 : 1000, // Faster retry for deep links
-    networkMode: 'online', // Ensure network requests for deep links
+    staleTime: 10000, // Consider data stale after 10 seconds
   });
 }
 
