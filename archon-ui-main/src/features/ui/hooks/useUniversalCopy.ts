@@ -40,6 +40,11 @@ export interface UniversalCopyResult {
   copyUrl: string;
   copyToClipboard: (url: string) => Promise<boolean>;
   
+  // Enhanced feedback
+  isError: boolean;
+  announcementMessage: string;
+  reset: () => void;
+  
   // Platform info
   platform: "ios" | "android" | "desktop";
   isMobile: boolean;
