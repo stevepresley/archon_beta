@@ -35,7 +35,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
   const cardRef = useRef<HTMLDivElement>(null);
 
   // Universal copy functionality (desktop + mobile)
-  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
+  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch, announcementMessage } = useUniversalCopy({
     getUrlPath: () => `/projects/${project.id}`,
     title: project.title,
     text: `Check out this project: ${project.title}`,
