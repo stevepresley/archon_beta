@@ -64,12 +64,17 @@ const getTypeColor = (type?: DocumentType) => {
   }
 };
 
-export const DocumentCard = memo(({ document, isActive, onSelect, onDelete }: DocumentCardProps) => {
+export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onDelete }: DocumentCardProps) => {
   const [showDelete, setShowDelete] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
   
   // Ref for auto-scroll functionality
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Shift+Click copy functionality
+  const { isCopied: isUrlCopied, handleShiftClick } = useShiftClickCopy({
+    getUrlPath: () => `/projects/${projectId}/docs/${document.id}`,
+  });
 
   // Auto-scroll to selected document (for deep URL navigation)
   useEffect(() => {
