@@ -106,6 +106,7 @@ export const DocumentCard = memo(({ document, isActive, onSelect, onDelete }: Do
   return (
     // biome-ignore lint/a11y/useSemanticElements: Complex card with nested interactive elements - semantic button would break layout
     <div
+      ref={cardRef}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
