@@ -69,6 +69,14 @@ export const CopyTooltip: React.FC<CopyTooltipProps> = ({
           />
         </div>
       )}
+      
+      {/* Accessibility announcer for screen readers */}
+      {announcementMessage && (
+        <CopyAnnouncer
+          message={announcementMessage}
+          isActive={Boolean(announcementMessage)}
+        />
+      )}
     </div>
   );
 };
