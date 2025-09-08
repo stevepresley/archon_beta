@@ -8,6 +8,7 @@ export interface CopyTooltipProps {
   isCopied?: boolean;
   showTooltip?: boolean;
   className?: string;
+  announcementMessage?: string;
 }
 
 /**
