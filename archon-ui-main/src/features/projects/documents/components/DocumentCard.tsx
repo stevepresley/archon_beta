@@ -170,23 +170,37 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
           isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         } transition-opacity duration-200`}
       >
-        <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[120px]" title={document.id}>
+        <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[80px]" title={document.id}>
           {document.id.slice(0, 8)}...
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleCopyId}
-          className="p-1 h-auto min-h-0"
-          title="Copy Document ID to clipboard"
-          aria-label="Copy Document ID to clipboard"
-        >
-          {isCopied ? (
-            <span className="text-green-500 text-xs">✓</span>
-          ) : (
-            <Clipboard className="w-3 h-3" aria-hidden="true" />
+        
+        <div className="flex items-center gap-1">
+          {/* Mobile copy button for document URL */}
+          {(isMobile || isTouch) && (
+            <MobileCopyButton
+              url={copyUrl}
+              title={document.title}
+              text={`Check out this document: ${document.title}`}
+              size="sm"
+            />
           )}
-        </Button>
+          
+          {/* Desktop ID copy button */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleCopyId}
+            className="p-1 h-auto min-h-0"
+            title="Copy Document ID to clipboard"
+            aria-label="Copy Document ID to clipboard"
+          >
+            {isCopied ? (
+              <span className="text-green-500 text-xs">✓</span>
+            ) : (
+              <Clipboard className="w-3 h-3" aria-hidden="true" />
+            )}
+          </Button>
+        </div>
       </div>
 
       {/* Delete Button */}
