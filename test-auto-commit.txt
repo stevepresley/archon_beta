@@ -1,0 +1,2 @@
+This is a test file to verify auto-commit hook functionality.
+If auto-commit is working, this should be automatically committed after the Write tool completes.
