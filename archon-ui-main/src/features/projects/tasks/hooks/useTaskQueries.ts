@@ -12,7 +12,7 @@ export const taskKeys = {
 
 // Fetch tasks for a specific project
 export function useProjectTasks(projectId: string | undefined, enabled = true) {
-  const { refetchInterval } = useSmartPolling(5000); // 5 second base interval for faster MCP updates
+  const { refetchInterval } = useSmartPolling(10000); // Increased from 5s to 10s - API call reduction
 
   return useQuery<Task[]>({
     queryKey: projectId ? taskKeys.all(projectId) : ["tasks-undefined"],
@@ -23,7 +23,8 @@ export function useProjectTasks(projectId: string | undefined, enabled = true) {
     enabled: !!projectId && enabled,
     refetchInterval, // Smart interval based on page visibility/focus
     refetchOnWindowFocus: true, // Refetch immediately when tab gains focus (ETag makes this cheap)
-    staleTime: 10000, // Consider data stale after 10 seconds
+    staleTime: 30000, // Increased from 10s to 30s - keep data fresh longer (API call reduction)
+    gcTime: 5 * 60 * 1000, // Keep cached data for 5 minutes after component unmount
   });
 }
 
