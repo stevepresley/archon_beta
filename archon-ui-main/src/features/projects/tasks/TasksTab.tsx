@@ -4,6 +4,7 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import { useNavigate } from "react-router-dom";
 import { DeleteConfirmModal } from "../../ui/components/DeleteConfirmModal";
+import { useURLErrorHandling } from "../hooks/useURLErrorHandling";
 import { Button } from "../../ui/primitives";
 import { cn, glassmorphism } from "../../ui/primitives/styles";
 import { TaskEditModal } from "./components/TaskEditModal";
