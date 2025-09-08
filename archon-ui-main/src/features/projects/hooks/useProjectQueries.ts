@@ -30,11 +30,12 @@ export function useProjects() {
   });
 }
 
-// Fetch task counts for all projects
-export function useTaskCounts() {
+// Fetch task counts for all projects (with progressive loading support)
+export function useTaskCounts(enabled = true) {
   return useQuery<Awaited<ReturnType<typeof taskService.getTaskCountsForAllProjects>>>({
     queryKey: projectKeys.taskCounts(),
     queryFn: () => taskService.getTaskCountsForAllProjects(),
+    enabled,
     refetchInterval: false, // Don't poll, only refetch manually
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
