@@ -124,7 +124,7 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
         {/* Left Sidebar - Document List */}
         <div
           className={cn(
-            "w-80 flex flex-col",
+            "w-80 flex flex-col min-h-0",
             "border-r border-gray-200 dark:border-gray-700",
             "bg-gray-50 dark:bg-gray-900",
           )}
