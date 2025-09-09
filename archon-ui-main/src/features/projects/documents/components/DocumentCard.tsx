@@ -103,19 +103,28 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
       
       if (e.shiftKey) {
         // Shift+Click: Copy full URL
-        handleShiftClick(e);
+        try {
+          const fullUrl = `${window.location.origin}/projects/${projectId}/docs/${document.id}`;
+          await navigator.clipboard.writeText(fullUrl);
+          showToast("Document URL copied to clipboard", "success");
+        } catch (err) {
+          console.error('Failed to copy document URL:', err);
+          showToast("Failed to copy Document URL", "error");
+        }
       } else {
         // Regular click: Copy just the document ID
         try {
           await navigator.clipboard.writeText(document.id);
           setIsCopied(true);
           setTimeout(() => setIsCopied(false), 2000);
+          showToast("Document ID copied to clipboard", "success");
         } catch (err) {
           console.error('Failed to copy document ID:', err);
+          showToast("Failed to copy Document ID", "error");
         }
       }
     },
-    [document.id, handleShiftClick],
+    [document.id, projectId, showToast],
   );
 
   const handleDelete = useCallback(
