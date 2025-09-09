@@ -109,7 +109,7 @@ export const DocumentViewer = ({ document }: DocumentViewerProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-900">{renderContent()}</div>
+      <div className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-900 scrollbar-mac-v">{renderContent()}</div>
     </div>
   );
 };
