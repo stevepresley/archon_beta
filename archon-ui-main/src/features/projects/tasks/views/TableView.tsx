@@ -233,8 +233,8 @@ const DraggableRow = ({
 
       {/* Actions */}
       <td className="px-4 py-2 w-28">
-        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-          {/* Mobile copy button - ONLY show on mobile/touch devices */}
+        <div className="flex items-center gap-1 transition-opacity">
+          {/* Mobile copy button - ONLY show on mobile/touch devices - ALWAYS VISIBLE */}
           {(isMobile || isTouch) && (
             <MobileCopyButton
               url={copyUrl}
@@ -245,59 +245,62 @@ const DraggableRow = ({
             />
           )}
           
-          <TooltipProvider>
-            {/* Desktop Copy ID button with Shift+Click tooltip */}
-            {!(isMobile || isTouch) && (
-              <CopyTooltip isCopied={isCopied}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button variant="ghost" size="xs" onClick={handleCopyIdClick} className="h-7 w-7 p-0">
-                      <Clipboard className="w-3 h-3" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Shift-click to copy URL</TooltipContent>
-                </Tooltip>
-              </CopyTooltip>
-            )}
+          {/* Desktop actions group - HIDDEN until hover */}
+          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <TooltipProvider>
+              {/* Desktop Copy ID button with Shift+Click tooltip */}
+              {!(isMobile || isTouch) && (
+                <CopyTooltip isCopied={isCopied}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button variant="ghost" size="xs" onClick={handleCopyIdClick} className="h-7 w-7 p-0">
+                        <Clipboard className="w-3 h-3" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>Shift-click to copy URL</TooltipContent>
+                  </Tooltip>
+                </CopyTooltip>
+              )}
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
-                  <Edit className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit task</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
+                    <Edit className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit task</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleComplete}
-                  className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
-                >
-                  <Check className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Mark as complete</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={handleComplete}
+                    className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
+                  >
+                    <Check className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Mark as complete</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleDelete}
-                  className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-                  disabled={deleteTaskMutation.isPending}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete task</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={handleDelete}
+                    className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
+                    disabled={deleteTaskMutation.isPending}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete task</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
         </div>
       </td>
     </tr>
