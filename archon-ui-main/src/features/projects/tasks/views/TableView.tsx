@@ -230,6 +230,20 @@ const DraggableRow = ({
           )}
           
           <TooltipProvider>
+            {/* Desktop Copy ID button with Shift+Click tooltip */}
+            {!(isMobile || isTouch) && (
+              <CopyTooltip isCopied={isCopied}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="xs" onClick={handleRowClick} className="h-7 w-7 p-0">
+                      <Clipboard className="w-3 h-3" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Shift+Click to copy URL</TooltipContent>
+                </Tooltip>
+              </CopyTooltip>
+            )}
+
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
