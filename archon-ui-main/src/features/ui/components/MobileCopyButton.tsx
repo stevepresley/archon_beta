@@ -110,17 +110,8 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
       return <div className={cn("animate-spin rounded-full border-2 border-current border-t-transparent", config.icon)} />;
     }
     
-    if (supportsShare) {
-      return <Share className={config.icon} />;
-    }
-    
-    // For copy action, show Link + Copy to make it clear it's copying a link
-    return (
-      <div className="relative">
-        <Link className={config.icon} />
-        <Copy className={cn("absolute -bottom-0.5 -right-0.5", config.icon === "w-3 h-3" ? "w-2 h-2" : config.icon === "w-4 h-4" ? "w-2.5 h-2.5" : "w-3 h-3")} />
-      </div>
-    );
+    // Always use Link icon for consistency
+    return <Link className={config.icon} />;
   };
 
   return (
