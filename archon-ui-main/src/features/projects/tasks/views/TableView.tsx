@@ -1,4 +1,4 @@
-import { Check, Edit, Tag, Trash2 } from "lucide-react";
+import { Check, Clipboard, Edit, Tag, Trash2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
 import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../../../ui/primitives";
