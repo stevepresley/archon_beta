@@ -285,21 +285,11 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
 
         {/* Action Buttons - fixed to bottom right */}
         <div className="flex items-center gap-2">
-          {/* Mobile copy button */}
-          {(isMobile || isTouch) && (
-            <MobileCopyButton
-              url={copyUrl}
-              title={project.title}
-              text={`Check out this project: ${project.title}`}
-              size="sm"
-              showText={false} // Keep compact for project card
-            />
-          )}
-          
           <ProjectCardActions
             projectId={project.id}
             projectTitle={project.title}
             isPinned={project.pinned}
+            copyUrl={copyUrl}
             onPin={(e) => onPin(e, project.id)}
             onDelete={(e) => onDelete(e, project.id, project.title)}
           />
