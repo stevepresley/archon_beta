@@ -244,11 +244,11 @@ const DraggableRow = ({
               <CopyTooltip isCopied={isCopied}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="xs" onClick={handleRowClick} className="h-7 w-7 p-0">
+                    <Button variant="ghost" size="xs" onClick={handleCopyClick} className="h-7 w-7 p-0">
                       <Clipboard className="w-3 h-3" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Shift+Click to copy URL</TooltipContent>
+                  <TooltipContent>Copy URL</TooltipContent>
                 </Tooltip>
               </CopyTooltip>
             )}
