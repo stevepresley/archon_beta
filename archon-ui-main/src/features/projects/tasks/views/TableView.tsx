@@ -217,8 +217,18 @@ const DraggableRow = ({
       </td>
 
       {/* Actions */}
-      <td className="px-4 py-2 w-28">
+      <td className="px-4 py-2 w-32">
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {/* Mobile copy button */}
+          {(isMobile || isTouch) && (
+            <MobileCopyButton
+              url={copyUrl}
+              title={task.title}
+              text={`Check out this task: ${task.title}`}
+              size="sm"
+            />
+          )}
+          
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
