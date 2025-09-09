@@ -16,31 +16,45 @@ interface TaskCardActionsProps {
 export const TaskCardActions: React.FC<TaskCardActionsProps> = ({
   taskId,
   taskTitle,
+  projectId,
   onEdit,
   onDelete,
   isDeleting = false,
 }) => {
   const { showToast } = useToast();
 
-  const handleCopyId = async (e: React.MouseEvent) => {
+  const handleCopyIdClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(taskId);
-      showToast("Task ID copied to clipboard", "success");
-    } catch {
-      // Fallback for older browsers
+    
+    if (e.shiftKey) {
+      // Shift+Click: Copy full URL
       try {
-        const ta = document.createElement("textarea");
-        ta.value = taskId;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
+        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${taskId}`;
+        await navigator.clipboard.writeText(fullUrl);
+        showToast("Task URL copied to clipboard", "success");
+      } catch {
+        showToast("Failed to copy Task URL", "error");
+      }
+    } else {
+      // Regular click: Copy just the task ID
+      try {
+        await navigator.clipboard.writeText(taskId);
         showToast("Task ID copied to clipboard", "success");
       } catch {
-        showToast("Failed to copy Task ID", "error");
+        // Fallback for older browsers
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = taskId;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showToast("Task ID copied to clipboard", "success");
+        } catch {
+          showToast("Failed to copy Task ID", "error");
+        }
       }
     }
   };
