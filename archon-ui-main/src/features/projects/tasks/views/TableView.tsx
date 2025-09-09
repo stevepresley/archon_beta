@@ -148,25 +148,24 @@ const DraggableRow = ({
   };
 
   return (
-    <CopyTooltip isCopied={isCopied}>
-      <tr
-        ref={(node) => {
-          // Combine drag/drop ref with scroll ref
-          drag(drop(node));
-          rowRef.current = node;
-        }}
-        onClick={handleRowClick}
-        className={cn(
-          "group transition-all duration-200 cursor-move",
-          index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
-          "hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70",
-          "dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20",
-          "border-b border-gray-200 dark:border-gray-800",
-          isDragging && "opacity-50 scale-105 shadow-lg",
-          isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
-          isSelected && "bg-cyan-100/70 dark:bg-cyan-900/40 border-cyan-500 border-l-4 shadow-lg ring-2 ring-cyan-400/20",
-        )}
-      >
+    <tr
+      ref={(node) => {
+        // Combine drag/drop ref with scroll ref
+        drag(drop(node));
+        rowRef.current = node;
+      }}
+      onClick={handleRowClick}
+      className={cn(
+        "group transition-all duration-200 cursor-move",
+        index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
+        "hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70",
+        "dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20",
+        "border-b border-gray-200 dark:border-gray-800",
+        isDragging && "opacity-50 scale-105 shadow-lg",
+        isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
+        isSelected && "bg-cyan-100/70 dark:bg-cyan-900/40 border-cyan-500 border-l-4 shadow-lg ring-2 ring-cyan-400/20",
+      )}
+    >
       {/* Priority/Order Indicator */}
       <td className="w-1 p-0">
         <div className={cn("w-1 h-full", getOrderColor(task.task_order), getOrderGlow(task.task_order))} />
