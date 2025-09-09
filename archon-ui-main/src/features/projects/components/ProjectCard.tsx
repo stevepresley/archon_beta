@@ -292,6 +292,7 @@ export const ProjectCard: React.FC<ProjectCardProps> = ({
               title={project.title}
               text={`Check out this project: ${project.title}`}
               size="sm"
+              showText={false} // Keep compact for project card
             />
           )}
           
