@@ -1,8 +1,9 @@
-import { Clipboard, Link, Pin, Trash2 } from "lucide-react";
+import { Clipboard, Pin, Trash2 } from "lucide-react";
 import type React from "react";
 import { useToast } from "../../ui/hooks/useToast";
 import { cn, glassmorphism } from "../../ui/primitives/styles";
 import { SimpleTooltip } from "../../ui/primitives/tooltip";
+import { MobileCopyButton } from "../../ui/components/MobileCopyButton";
 import { usePlatformDetection } from "../../ui/hooks/usePlatformDetection";
 
 interface ProjectCardActionsProps {
