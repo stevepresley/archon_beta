@@ -138,23 +138,13 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
 
       {/* Mobile copy URL button - ONLY show on mobile/touch devices */}
       {(isMobile || isTouch) && (
-        <SimpleTooltip content="Copy Project URL">
-          <button
-            type="button"
-            onClick={handleCopyUrlClick}
-            className={cn(
-              "w-5 h-5 rounded-full flex items-center justify-center",
-              "transition-all duration-300",
-              glassmorphism.priority.low.background,
-              glassmorphism.priority.low.text,
-              glassmorphism.priority.low.hover,
-              glassmorphism.priority.low.glow,
-            )}
-            aria-label="Copy Project URL"
-          >
-            <Link className="w-3 h-3" />
-          </button>
-        </SimpleTooltip>
+        <MobileCopyButton
+          url={copyUrl}
+          title={projectTitle}
+          text={`Check out this project: ${projectTitle}`}
+          size="sm"
+          showText={false}
+        />
       )}
     </div>
   );
