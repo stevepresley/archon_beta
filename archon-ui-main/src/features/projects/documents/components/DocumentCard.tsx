@@ -186,12 +186,8 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
         {new Date(document.updated_at || document.created_at || Date.now()).toLocaleDateString()}
       </p>
 
-      {/* ID Display Section - Always visible for active, hover for others */}
-      <div
-        className={`flex items-center justify-between mt-2 ${
-          isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-        } transition-opacity duration-200`}
-      >
+      {/* ID Display Section - ALWAYS VISIBLE */}
+      <div className="flex items-center justify-between mt-2 opacity-100">
         <span className="text-xs text-gray-400 dark:text-gray-500 truncate max-w-[80px]" title={document.id}>
           {document.id.slice(0, 8)}...
         </span>
