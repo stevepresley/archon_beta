@@ -131,10 +131,8 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
         config.button,
         showText && config.gap,
         
-        // Colors and states
-        isMobile
-          ? "bg-blue-500 text-white hover:bg-blue-600 active:bg-blue-700"
-          : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700",
+        // Colors and states - neutral styling to match design system
+        "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700",
         
         // Disabled state
         isSharing && "opacity-50 cursor-not-allowed",
