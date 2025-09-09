@@ -17,6 +17,11 @@ temp/
 .claude/settings.local.json
 claude.local.md
 
+#Codex
+AGENTS.md
+Codex.local.md	
+
+
 #local files
 /scripts/
 .mcp.json
