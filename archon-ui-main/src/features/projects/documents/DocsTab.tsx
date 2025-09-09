@@ -155,7 +155,7 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
           </div>
 
           {/* Document List */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="flex-1 overflow-y-auto p-4 space-y-2 scrollbar-mac-v">
             {filteredDocuments.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <FileText className="w-12 h-12 mx-auto mb-3 opacity-30" />
