@@ -148,15 +148,14 @@ const DraggableRow = ({
   };
 
   return (
-    <CopyTooltip isCopied={isCopied}>
-      <tr
-        ref={(node) => {
-          // Combine drag/drop ref with scroll ref
-          drag(drop(node));
-          rowRef.current = node;
-        }}
-        onClick={handleRowClick}
-        className={cn(
+    <tr
+      ref={(node) => {
+        // Combine drag/drop ref with scroll ref
+        drag(drop(node));
+        rowRef.current = node;
+      }}
+      onClick={handleRowClick}
+      className={cn(
         "group transition-all duration-200 cursor-move",
         index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
         "hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70",
