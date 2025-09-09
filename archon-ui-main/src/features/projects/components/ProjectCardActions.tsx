@@ -20,11 +20,13 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
   projectId,
   projectTitle,
   isPinned,
+  copyUrl,
   onPin,
   onDelete,
   isDeleting = false,
 }) => {
   const { showToast } = useToast();
+  const { isMobile, isTouch } = usePlatformDetection();
 
   const handleCopyIdClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
