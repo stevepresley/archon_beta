@@ -182,6 +182,7 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
               title={document.title}
               text={`Check out this document: ${document.title}`}
               size="sm"
+              showText={false} // Keep compact for document card
             />
           )}
           
