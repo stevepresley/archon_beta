@@ -12,6 +12,7 @@ export interface MobileCopyButtonProps {
   text?: string;
   className?: string;
   size?: "sm" | "md" | "lg";
+  showText?: boolean;
 }
 
 /**
