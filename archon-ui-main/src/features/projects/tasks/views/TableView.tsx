@@ -154,13 +154,22 @@ const DraggableRow = ({
     
     if (e.shiftKey) {
       // Shift+Click: Copy full URL
-      handleShiftClick(e);
+      try {
+        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${task.id}`;
+        await navigator.clipboard.writeText(fullUrl);
+        showToast("Task URL copied to clipboard", "success");
+      } catch (err) {
+        console.error('Failed to copy task URL:', err);
+        showToast("Failed to copy Task URL", "error");
+      }
     } else {
       // Regular click: Copy just the task ID
       try {
         await navigator.clipboard.writeText(task.id);
+        showToast("Task ID copied to clipboard", "success");
       } catch (err) {
         console.error('Failed to copy task ID:', err);
+        showToast("Failed to copy Task ID", "error");
       }
     }
   };
