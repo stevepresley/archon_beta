@@ -255,7 +255,7 @@ const DraggableRow = ({
                       <Clipboard className="w-3 h-3" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent>Click or Shift+Click to copy URL</TooltipContent>
+                  <TooltipContent>Shift-click to copy URL</TooltipContent>
                 </Tooltip>
               </CopyTooltip>
             )}
