@@ -217,23 +217,25 @@ const DraggableRow = ({
 
       {/* Actions */}
       <td className="px-4 py-2 w-20 md:w-32">
+        <div className="flex items-center gap-1">
+          {/* Mobile copy button - ONLY show on mobile/touch devices */}
+          {(isMobile || isTouch) && (
+            <CopyTooltip isCopied={isCopied}>
+              <MobileCopyButton
+                url={copyUrl}
+                title={task.title}
+                text={`Check out this task: ${task.title}`}
+                size="sm"
+                showText={false}
+              />
+            </CopyTooltip>
+          )}
+          
+          {/* Desktop action buttons - always visible with hover behavior */}
           <div className={cn(
             "flex items-center gap-1 transition-opacity",
             (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           )}>
-            {/* Mobile copy button - ONLY show on mobile/touch devices */}
-            {(isMobile || isTouch) && (
-              <CopyTooltip isCopied={isCopied}>
-                <MobileCopyButton
-                  url={copyUrl}
-                  title={task.title}
-                  text={`Check out this task: ${task.title}`}
-                  size="sm"
-                  showText={false}
-                />
-              </CopyTooltip>
-            )}
-            
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -274,7 +276,8 @@ const DraggableRow = ({
               </Tooltip>
             </TooltipProvider>
           </div>
-        </td>
+        </div>
+      </td>
     </tr>
   );
 };
