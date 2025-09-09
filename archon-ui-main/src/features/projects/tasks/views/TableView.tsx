@@ -215,29 +215,30 @@ const DraggableRow = ({
         />
       </td>
 
-      {/* Actions */}
-      <td className={cn(
-        "px-4 py-2",
-        // Responsive width: smaller on mobile, full width on desktop
-        (isMobile || isTouch) ? "w-20" : "w-32"
-      )}>
-        <div className={cn(
-          "flex items-center gap-1 transition-opacity",
-          // Always show on mobile/touch devices, hide on desktop until hover
-          (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      {/* Actions - conditionally render based on content */}
+      {((isMobile || isTouch) || !(isMobile || isTouch)) && (
+        <td className={cn(
+          "px-4 py-2",
+          // Responsive width: smaller on mobile, full width on desktop
+          (isMobile || isTouch) ? "w-16" : "w-32"
         )}>
-          {/* Mobile copy button */}
-          {(isMobile || isTouch) && (
-            <CopyTooltip isCopied={isCopied}>
-              <MobileCopyButton
-                url={copyUrl}
-                title={task.title}
-                text={`Check out this task: ${task.title}`}
-                size="sm"
-                showText={true} // Show text in table view for clarity
-              />
-            </CopyTooltip>
-          )}
+          <div className={cn(
+            "flex items-center gap-1 transition-opacity",
+            // Always show on mobile/touch devices, hide on desktop until hover
+            (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}>
+            {/* Mobile copy button */}
+            {(isMobile || isTouch) && (
+              <CopyTooltip isCopied={isCopied}>
+                <MobileCopyButton
+                  url={copyUrl}
+                  title={task.title}
+                  text={`Check out this task: ${task.title}`}
+                  size="sm"
+                  showText={false} // Use icon-only on mobile to save space
+                />
+              </CopyTooltip>
+            )}
           
           {/* Desktop-only action buttons */}
           {!(isMobile || isTouch) && (
