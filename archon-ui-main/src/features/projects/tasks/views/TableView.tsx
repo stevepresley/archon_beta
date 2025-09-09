@@ -48,6 +48,7 @@ const DraggableRow = ({
   const updateTaskMutation = useUpdateTask(projectId);
   const deleteTaskMutation = useDeleteTask(projectId);
   const [localAssignee, setLocalAssignee] = useState<Assignee>(task.assignee);
+  const { showToast } = useToast();
   
   // Universal copy functionality (desktop + mobile)
   const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
