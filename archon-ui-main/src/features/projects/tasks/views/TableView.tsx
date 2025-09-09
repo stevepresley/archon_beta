@@ -329,7 +329,7 @@ export const TableView = ({
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-32">Status</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-40">Feature</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-36">Assignee</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-32">Actions</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-20 md:w-32">Actions</th>
           </tr>
         </thead>
         <tbody>
