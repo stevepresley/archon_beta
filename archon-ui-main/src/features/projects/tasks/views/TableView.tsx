@@ -223,7 +223,7 @@ const DraggableRow = ({
           (isMobile || isTouch) ? "w-16" : "w-32"
         )}>
           <div className="flex items-center gap-1 opacity-100 transition-opacity">
-            {/* Mobile copy button - always show on touch devices */}
+            {/* Copy button - always visible */}
             <CopyTooltip isCopied={isCopied}>
               <MobileCopyButton
                 url={copyUrl}
@@ -234,8 +234,8 @@ const DraggableRow = ({
               />
             </CopyTooltip>
           
-          {/* Desktop-only action buttons */}
-          {!(isMobile || isTouch) && (
+          {/* Additional desktop action buttons - show on hover for desktop */}
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity hidden md:flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
