@@ -216,7 +216,11 @@ const DraggableRow = ({
       </td>
 
       {/* Actions */}
-      <td className="px-4 py-2 w-32">
+      <td className={cn(
+        "px-4 py-2",
+        // Responsive width: smaller on mobile, full width on desktop
+        (isMobile || isTouch) ? "w-20" : "w-32"
+      )}>
         <div className={cn(
           "flex items-center gap-1 transition-opacity",
           // Always show on mobile/touch devices, hide on desktop until hover
