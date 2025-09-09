@@ -137,9 +137,6 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
         // Disabled state
         isSharing && "opacity-50 cursor-not-allowed",
         
-        // Shadow for mobile
-        isMobile && "shadow-lg hover:shadow-xl active:shadow-md",
-        
         className
       )}
       title={supportsShare ? `Share ${title}` : `Copy link to ${title}`}
