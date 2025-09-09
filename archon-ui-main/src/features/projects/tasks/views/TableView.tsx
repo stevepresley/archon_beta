@@ -149,10 +149,17 @@ const DraggableRow = ({
 
   const handleCopyClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(copyUrl);
-    } catch (err) {
-      console.error('Failed to copy URL:', err);
+    
+    // Handle both regular click and Shift+Click
+    handleShiftClick(e);
+    
+    // Also handle regular click to copy
+    if (!e.shiftKey) {
+      try {
+        await navigator.clipboard.writeText(copyUrl);
+      } catch (err) {
+        console.error('Failed to copy URL:', err);
+      }
     }
   };
 
