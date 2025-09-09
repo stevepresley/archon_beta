@@ -105,10 +105,10 @@ export const TaskCardActions: React.FC<TaskCardActionsProps> = ({
         </button>
       </SimpleTooltip>
 
-      <SimpleTooltip content="Copy Task ID">
+      <SimpleTooltip content="Shift-click to copy URL">
         <button
           type="button"
-          onClick={handleCopyId}
+          onClick={handleCopyIdClick}
           className={cn(
             "w-5 h-5 rounded-full flex items-center justify-center",
             "transition-all duration-300",
