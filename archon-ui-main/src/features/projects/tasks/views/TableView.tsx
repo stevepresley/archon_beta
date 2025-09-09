@@ -227,18 +227,16 @@ const DraggableRow = ({
             // Always show on mobile/touch devices, hide on desktop until hover
             (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           )}>
-            {/* Mobile copy button */}
-            {(isMobile || isTouch) && (
-              <CopyTooltip isCopied={isCopied}>
-                <MobileCopyButton
-                  url={copyUrl}
-                  title={task.title}
-                  text={`Check out this task: ${task.title}`}
-                  size="sm"
-                  showText={false} // Use icon-only on mobile to save space
-                />
-              </CopyTooltip>
-            )}
+            {/* Mobile copy button - always show on touch devices */}
+            <CopyTooltip isCopied={isCopied}>
+              <MobileCopyButton
+                url={copyUrl}
+                title={task.title}
+                text={`Check out this task: ${task.title}`}
+                size="sm"
+                showText={false} // Use icon-only to save space
+              />
+            </CopyTooltip>
           
           {/* Desktop-only action buttons */}
           {!(isMobile || isTouch) && (
