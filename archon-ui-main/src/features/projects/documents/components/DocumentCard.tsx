@@ -197,21 +197,23 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
             />
           )}
           
-          {/* Desktop ID copy button */}
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleCopyId}
-            className="p-1 h-auto min-h-0"
-            title="Copy Document ID to clipboard"
-            aria-label="Copy Document ID to clipboard"
-          >
-            {isCopied ? (
-              <span className="text-green-500 text-xs">✓</span>
-            ) : (
-              <Clipboard className="w-3 h-3" aria-hidden="true" />
-            )}
-          </Button>
+          {/* Desktop ID copy button with Shift+Click for URL */}
+          {!(isMobile || isTouch) && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCopyIdClick}
+              className="p-1 h-auto min-h-0"
+              title="Shift-click to copy URL"
+              aria-label="Copy Document ID to clipboard"
+            >
+              {isCopied ? (
+                <span className="text-green-500 text-xs">✓</span>
+              ) : (
+                <Clipboard className="w-3 h-3" aria-hidden="true" />
+              )}
+            </Button>
+          )}
         </div>
       </div>
 
