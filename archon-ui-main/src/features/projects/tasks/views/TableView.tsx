@@ -226,6 +226,7 @@ const DraggableRow = ({
               title={task.title}
               text={`Check out this task: ${task.title}`}
               size="sm"
+              showText={true} // Show text in table view for clarity
             />
           )}
           
