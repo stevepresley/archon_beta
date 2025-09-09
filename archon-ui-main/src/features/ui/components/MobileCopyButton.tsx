@@ -1,4 +1,4 @@
-import { Copy, Share } from "lucide-react";
+import { Copy, Link, Share } from "lucide-react";
 import type React from "react";
 import { useCallback, useState } from "react";
 import { cn } from "../primitives/styles";
