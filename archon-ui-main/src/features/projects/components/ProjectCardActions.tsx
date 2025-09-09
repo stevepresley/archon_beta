@@ -23,25 +23,38 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
 }) => {
   const { showToast } = useToast();
 
-  const handleCopyId = async (e: React.MouseEvent) => {
+  const handleCopyIdClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    try {
-      await navigator.clipboard.writeText(projectId);
-      showToast("Project ID copied to clipboard", "success");
-    } catch {
-      // Fallback for older browsers
+    
+    if (e.shiftKey) {
+      // Shift+Click: Copy full URL
       try {
-        const ta = document.createElement("textarea");
-        ta.value = projectId;
-        ta.style.position = "fixed";
-        ta.style.opacity = "0";
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand("copy");
-        document.body.removeChild(ta);
+        const fullUrl = `${window.location.origin}/projects/${projectId}`;
+        await navigator.clipboard.writeText(fullUrl);
+        showToast("Project URL copied to clipboard", "success");
+      } catch {
+        showToast("Failed to copy Project URL", "error");
+      }
+    } else {
+      // Regular click: Copy just the project ID
+      try {
+        await navigator.clipboard.writeText(projectId);
         showToast("Project ID copied to clipboard", "success");
       } catch {
-        showToast("Failed to copy Project ID", "error");
+        // Fallback for older browsers
+        try {
+          const ta = document.createElement("textarea");
+          ta.value = projectId;
+          ta.style.position = "fixed";
+          ta.style.opacity = "0";
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          showToast("Project ID copied to clipboard", "success");
+        } catch {
+          showToast("Failed to copy Project ID", "error");
+        }
       }
     }
   };
