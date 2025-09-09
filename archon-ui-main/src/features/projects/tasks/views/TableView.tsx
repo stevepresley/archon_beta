@@ -224,7 +224,7 @@ const DraggableRow = ({
             <MobileCopyButton
               url={copyUrl}
               title={task.title}
-              text={`Check out this task: ${task.title}`}
+              text="Copy URL"
               size="sm"
               showText={false}
             />
