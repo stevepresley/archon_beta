@@ -215,13 +215,8 @@ const DraggableRow = ({
         />
       </td>
 
-      {/* Actions - conditionally render based on content */}
-      {((isMobile || isTouch) || !(isMobile || isTouch)) && (
-        <td className={cn(
-          "px-4 py-2",
-          // Responsive width: smaller on mobile, full width on desktop
-          (isMobile || isTouch) ? "w-16" : "w-32"
-        )}>
+      {/* Actions */}
+      <td className="px-4 py-2 w-20 md:w-32">
           <div className="flex items-center gap-1 opacity-100 transition-opacity">
             {/* Copy button - always visible */}
             <CopyTooltip isCopied={isCopied}>
