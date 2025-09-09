@@ -220,13 +220,15 @@ const DraggableRow = ({
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {/* Mobile copy button */}
           {(isMobile || isTouch) && (
-            <MobileCopyButton
-              url={copyUrl}
-              title={task.title}
-              text={`Check out this task: ${task.title}`}
-              size="sm"
-              showText={true} // Show text in table view for clarity
-            />
+            <CopyTooltip isCopied={isCopied}>
+              <MobileCopyButton
+                url={copyUrl}
+                title={task.title}
+                text={`Check out this task: ${task.title}`}
+                size="sm"
+                showText={true} // Show text in table view for clarity
+              />
+            </CopyTooltip>
           )}
           
           <TooltipProvider>
