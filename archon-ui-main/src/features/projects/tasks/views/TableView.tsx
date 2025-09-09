@@ -235,45 +235,48 @@ const DraggableRow = ({
             </CopyTooltip>
           )}
           
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
-                  <Edit className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Edit task</TooltipContent>
-            </Tooltip>
+          {/* Desktop-only action buttons */}
+          {!(isMobile || isTouch) && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
+                    <Edit className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Edit task</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleComplete}
-                  className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
-                >
-                  <Check className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Mark as complete</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={handleComplete}
+                    className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
+                  >
+                    <Check className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Mark as complete</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleDelete}
-                  className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-                  disabled={deleteTaskMutation.isPending}
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Delete task</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="xs"
+                    onClick={handleDelete}
+                    className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
+                    disabled={deleteTaskMutation.isPending}
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Delete task</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
       </td>
     </tr>
