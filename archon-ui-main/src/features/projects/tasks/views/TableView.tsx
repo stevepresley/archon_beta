@@ -48,13 +48,6 @@ const DraggableRow = ({
   const deleteTaskMutation = useDeleteTask(projectId);
   const [localAssignee, setLocalAssignee] = useState<Assignee>(task.assignee);
   
-  // Universal copy functionality (desktop + mobile)
-  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
-    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
-    title: task.title,
-    text: "Copy URL",
-  });
-  
   // Ref for auto-scroll functionality
   const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -142,31 +135,24 @@ const DraggableRow = ({
     }
   };
 
-  const handleRowClick = (e: React.MouseEvent) => {
-    // Handle Shift+Click for copy functionality first
-    handleShiftClick(e);
-  };
-
   return (
-    <CopyTooltip isCopied={isCopied}>
-      <tr
-        ref={(node) => {
-          // Combine drag/drop ref with scroll ref
-          drag(drop(node));
-          rowRef.current = node;
-        }}
-        onClick={handleRowClick}
-        className={cn(
-          "group transition-all duration-200 cursor-move",
-          index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
-          "hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70",
-          "dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20",
-          "border-b border-gray-200 dark:border-gray-800",
-          isDragging && "opacity-50 scale-105 shadow-lg",
-          isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
-          isSelected && "bg-cyan-100/70 dark:bg-cyan-900/40 border-cyan-500 border-l-4 shadow-lg ring-2 ring-cyan-400/20",
-        )}
-      >
+    <tr
+      ref={(node) => {
+        // Combine drag/drop ref with scroll ref
+        drag(drop(node));
+        rowRef.current = node;
+      }}
+      className={cn(
+        "group transition-all duration-200 cursor-move",
+        index % 2 === 0 ? "bg-white/50 dark:bg-black/50" : "bg-gray-50/80 dark:bg-gray-900/30",
+        "hover:bg-gradient-to-r hover:from-cyan-50/70 hover:to-purple-50/70",
+        "dark:hover:from-cyan-900/20 dark:hover:to-purple-900/20",
+        "border-b border-gray-200 dark:border-gray-800",
+        isDragging && "opacity-50 scale-105 shadow-lg",
+        isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
+        isSelected && "bg-cyan-100/70 dark:bg-cyan-900/40 border-cyan-500 border-l-4 shadow-lg ring-2 ring-cyan-400/20",
+      )}
+    >
       {/* Priority/Order Indicator */}
       <td className="w-1 p-0">
         <div className={cn("w-1 h-full", getOrderColor(task.task_order), getOrderGlow(task.task_order))} />
@@ -217,68 +203,50 @@ const DraggableRow = ({
       </td>
 
       {/* Actions */}
-      <td className="px-4 py-2 w-20 md:w-32">
-        <div className="flex items-center gap-1">
-          {/* Mobile copy button - ONLY show on mobile/touch devices */}
-          {(isMobile || isTouch) && (
-            <MobileCopyButton
-              url={copyUrl}
-              title={task.title}
-              text="Copy URL"
-              size="sm"
-              showText={false}
-            />
-          )}
-          
-          {/* Desktop action buttons - always visible with hover behavior */}
-          <div className={cn(
-            "flex items-center gap-1 transition-opacity",
-            (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          )}>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
-                    <Edit className="w-3 h-3" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Edit task</TooltipContent>
-              </Tooltip>
+      <td className="px-4 py-2 w-28">
+        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100 sm:opacity-100 transition-opacity">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="ghost" size="xs" onClick={handleEdit} className="h-7 w-7 p-0">
+                  <Edit className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Edit task</TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    onClick={handleComplete}
-                    className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
-                  >
-                    <Check className="w-3 h-3" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Mark as complete</TooltipContent>
-              </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleComplete}
+                  className="h-7 w-7 p-0 text-green-600 hover:text-green-700"
+                >
+                  <Check className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Mark as complete</TooltipContent>
+            </Tooltip>
 
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="xs"
-                    onClick={handleDelete}
-                    className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
-                    disabled={deleteTaskMutation.isPending}
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Delete task</TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleDelete}
+                  className="h-7 w-7 p-0 text-red-600 hover:text-red-700"
+                  disabled={deleteTaskMutation.isPending}
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Delete task</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </td>
-      </tr>
-    </CopyTooltip>
+    </tr>
   );
 };
 
@@ -324,7 +292,7 @@ export const TableView = ({
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-32">Status</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-40">Feature</th>
             <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-36">Assignee</th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-20 md:w-32">Actions</th>
+            <th className="px-4 py-3 text-left text-sm font-medium text-gray-700 dark:text-gray-300 w-28">Actions</th>
           </tr>
         </thead>
         <tbody>
