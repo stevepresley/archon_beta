@@ -64,16 +64,6 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
     }
   };
 
-  const handleCopyUrlClick = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    
-    try {
-      await navigator.clipboard.writeText(copyUrl);
-      showToast("Project URL copied to clipboard", "success");
-    } catch {
-      showToast("Failed to copy Project URL", "error");
-    }
-  };
   return (
     <div className="flex items-center gap-1.5">
       {/* Delete Button */}
