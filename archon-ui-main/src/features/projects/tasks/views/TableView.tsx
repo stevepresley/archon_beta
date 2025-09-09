@@ -221,15 +221,13 @@ const DraggableRow = ({
         <div className="flex items-center gap-1">
           {/* Mobile copy button - ONLY show on mobile/touch devices */}
           {(isMobile || isTouch) && (
-            <CopyTooltip isCopied={isCopied}>
-              <MobileCopyButton
-                url={copyUrl}
-                title={task.title}
-                text={`Check out this task: ${task.title}`}
-                size="sm"
-                showText={false}
-              />
-            </CopyTooltip>
+            <MobileCopyButton
+              url={copyUrl}
+              title={task.title}
+              text={`Check out this task: ${task.title}`}
+              size="sm"
+              showText={false}
+            />
           )}
           
           {/* Desktop action buttons - always visible with hover behavior */}
