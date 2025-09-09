@@ -282,8 +282,9 @@ const DraggableRow = ({
               </Tooltip>
             </TooltipProvider>
           )}
-        </div>
-      </td>
+          </div>
+        </td>
+      )}
     </tr>
   );
 };
