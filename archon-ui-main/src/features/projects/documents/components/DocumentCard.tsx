@@ -17,6 +17,7 @@ import { Button } from "../../../ui/primitives";
 import { CopyTooltip } from "../../../ui/components/CopyTooltip";
 import { MobileCopyButton } from "../../../ui/components/MobileCopyButton";
 import { useUniversalCopy } from "../../../ui/hooks/useUniversalCopy";
+import { useToast } from "../../../ui/hooks/useToast";
 import type { DocumentCardProps, DocumentType } from "../types";
 
 const getDocumentIcon = (type?: DocumentType) => {
