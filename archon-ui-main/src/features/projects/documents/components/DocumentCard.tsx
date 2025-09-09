@@ -69,6 +69,7 @@ const getTypeColor = (type?: DocumentType) => {
 export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onDelete }: DocumentCardProps) => {
   const [showDelete, setShowDelete] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
+  const { showToast } = useToast();
   
   // Ref for auto-scroll functionality
   const cardRef = useRef<HTMLDivElement>(null);
