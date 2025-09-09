@@ -232,6 +232,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
               <TaskCardActions
                 taskId={task.id}
                 taskTitle={task.title}
+                projectId={projectId}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
                 isDeleting={false}
