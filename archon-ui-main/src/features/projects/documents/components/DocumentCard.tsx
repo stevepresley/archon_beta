@@ -95,14 +95,25 @@ export const DocumentCard = memo(({ document, isActive, projectId, onSelect, onD
     }
   }, [isActive]);
 
-  const handleCopyId = useCallback(
-    (e: React.MouseEvent) => {
+  const handleCopyIdClick = useCallback(
+    async (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigator.clipboard.writeText(document.id);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      
+      if (e.shiftKey) {
+        // Shift+Click: Copy full URL
+        handleShiftClick(e);
+      } else {
+        // Regular click: Copy just the document ID
+        try {
+          await navigator.clipboard.writeText(document.id);
+          setIsCopied(true);
+          setTimeout(() => setIsCopied(false), 2000);
+        } catch (err) {
+          console.error('Failed to copy document ID:', err);
+        }
+      }
     },
-    [document.id],
+    [document.id, handleShiftClick],
   );
 
   const handleDelete = useCallback(
