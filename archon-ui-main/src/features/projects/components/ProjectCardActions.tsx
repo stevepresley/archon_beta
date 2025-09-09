@@ -3,11 +3,14 @@ import type React from "react";
 import { useToast } from "../../ui/hooks/useToast";
 import { cn, glassmorphism } from "../../ui/primitives/styles";
 import { SimpleTooltip } from "../../ui/primitives/tooltip";
+import { MobileCopyButton } from "../../ui/components/MobileCopyButton";
+import { usePlatformDetection } from "../../ui/hooks/usePlatformDetection";
 
 interface ProjectCardActionsProps {
   projectId: string;
   projectTitle: string;
   isPinned: boolean;
+  copyUrl: string;
   onPin: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
   isDeleting?: boolean;
