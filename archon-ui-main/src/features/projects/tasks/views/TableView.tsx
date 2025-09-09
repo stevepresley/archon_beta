@@ -251,7 +251,7 @@ const DraggableRow = ({
               <CopyTooltip isCopied={isCopied}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="xs" onClick={handleCopyClick} className="h-7 w-7 p-0">
+                    <Button variant="ghost" size="xs" onClick={handleCopyIdClick} className="h-7 w-7 p-0">
                       <Clipboard className="w-3 h-3" />
                     </Button>
                   </TooltipTrigger>
