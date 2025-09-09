@@ -52,7 +52,7 @@ const DraggableRow = ({
   const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
     getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
     title: task.title,
-    text: `Check out this task: ${task.title}`,
+    text: "Copy URL",
   });
   
   // Ref for auto-scroll functionality
