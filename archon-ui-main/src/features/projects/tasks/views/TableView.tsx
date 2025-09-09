@@ -275,10 +275,9 @@ const DraggableRow = ({
                 <TooltipContent>Delete task</TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          )}
+          </div>
           </div>
         </td>
-      )}
     </tr>
   );
 };
