@@ -245,17 +245,6 @@ const DraggableRow = ({
       {/* Actions */}
       <td className="px-4 py-2 w-28">
         <div className="flex items-center gap-1">
-          {/* Mobile copy button - ONLY show on mobile/touch devices */}
-          {(isMobile || isTouch) && (
-            <MobileCopyButton
-              url={copyUrl}
-              title={task.title}
-              text="Copy URL"
-              size="sm"
-              showText={false}
-            />
-          )}
-          
           <TooltipProvider>
             {/* Desktop Copy ID button with Shift+Click tooltip */}
             {!(isMobile || isTouch) && (
@@ -269,6 +258,17 @@ const DraggableRow = ({
                   <TooltipContent>Shift-click to copy URL</TooltipContent>
                 </Tooltip>
               </CopyTooltip>
+            )}
+
+            {/* Mobile copy button - ONLY show on mobile/touch devices */}
+            {(isMobile || isTouch) && (
+              <MobileCopyButton
+                url={copyUrl}
+                title={task.title}
+                text="Copy URL"
+                size="sm"
+                showText={false}
+              />
             )}
 
             <Tooltip>
