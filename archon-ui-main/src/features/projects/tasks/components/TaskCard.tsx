@@ -225,6 +225,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
                   title={task.title}
                   text={`Check out this task: ${task.title}`}
                   size="sm"
+                  showText={false} // Keep compact for TaskCard
                 />
               )}
               
