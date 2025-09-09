@@ -25,6 +25,7 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
   text,
   className,
   size = "md",
+  showText = false,
 }) => {
   const [isSharing, setIsSharing] = useState(false);
   const { supportsShare, isMobile } = usePlatformDetection();
