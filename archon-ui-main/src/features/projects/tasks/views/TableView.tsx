@@ -222,11 +222,7 @@ const DraggableRow = ({
           // Responsive width: smaller on mobile, full width on desktop
           (isMobile || isTouch) ? "w-16" : "w-32"
         )}>
-          <div className={cn(
-            "flex items-center gap-1 transition-opacity",
-            // Always show on mobile/touch devices, hide on desktop until hover
-            (isMobile || isTouch) ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          )}>
+          <div className="flex items-center gap-1 opacity-100 transition-opacity">
             {/* Mobile copy button - always show on touch devices */}
             <CopyTooltip isCopied={isCopied}>
               <MobileCopyButton
