@@ -142,6 +142,11 @@ const DraggableRow = ({
     }
   };
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    // Handle Shift+Click for copy functionality first
+    handleShiftClick(e);
+  };
+
   return (
     <tr
       ref={(node) => {
