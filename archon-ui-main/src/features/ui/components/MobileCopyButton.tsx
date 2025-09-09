@@ -83,24 +83,45 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
   // Size configurations
   const sizeConfig = {
     sm: {
-      button: "w-8 h-8 min-w-[32px] min-h-[32px]", // Still meets 44px touch target with padding
+      button: showText ? "px-3 py-2 min-h-[32px]" : "w-8 h-8 min-w-[32px] min-h-[32px]",
       icon: "w-3 h-3",
       text: "text-xs",
+      gap: "gap-1.5",
     },
     md: {
-      button: "w-11 h-11 min-w-[44px] min-h-[44px]", // 44px touch target
+      button: showText ? "px-4 py-2 min-h-[44px]" : "w-11 h-11 min-w-[44px] min-h-[44px]",
       icon: "w-4 h-4",
       text: "text-sm",
+      gap: "gap-2",
     },
     lg: {
-      button: "w-12 h-12 min-w-[48px] min-h-[48px]", // Larger touch target
+      button: showText ? "px-5 py-3 min-h-[48px]" : "w-12 h-12 min-w-[48px] min-h-[48px]",
       icon: "w-5 h-5",
       text: "text-base",
+      gap: "gap-2",
     },
   };
 
   const config = sizeConfig[size];
-  const icon = supportsShare ? <Share className={config.icon} /> : <Copy className={config.icon} />;
+  
+  // Better icon combination for clarity
+  const renderIcon = () => {
+    if (isSharing) {
+      return <div className={cn("animate-spin rounded-full border-2 border-current border-t-transparent", config.icon)} />;
+    }
+    
+    if (supportsShare) {
+      return <Share className={config.icon} />;
+    }
+    
+    // For copy action, show Link + Copy to make it clear it's copying a link
+    return (
+      <div className="relative">
+        <Link className={config.icon} />
+        <Copy className={cn("absolute -bottom-0.5 -right-0.5", config.icon === "w-3 h-3" ? "w-2 h-2" : config.icon === "w-4 h-4" ? "w-2.5 h-2.5" : "w-3 h-3")} />
+      </div>
+    );
+  };
 
   return (
     <button
