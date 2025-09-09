@@ -130,13 +130,15 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
       disabled={isSharing}
       className={cn(
         // Base styling
-        "inline-flex items-center justify-center rounded-full",
+        "inline-flex items-center justify-center",
+        showText ? "rounded-lg" : "rounded-full",
         "transition-all duration-200 ease-out",
         "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
         "active:scale-95", // Touch feedback
         
         // Size and touch target
         config.button,
+        showText && config.gap,
         
         // Colors and states
         isMobile
@@ -151,13 +153,14 @@ export const MobileCopyButton: React.FC<MobileCopyButtonProps> = ({
         
         className
       )}
-      title={supportsShare ? `Share ${title}` : `Copy ${title} link`}
-      aria-label={supportsShare ? `Share ${title}` : `Copy ${title} link to clipboard`}
+      title={supportsShare ? `Share ${title}` : `Copy link to ${title}`}
+      aria-label={supportsShare ? `Share ${title}` : `Copy link to ${title}`}
     >
-      {isSharing ? (
-        <div className={cn("animate-spin rounded-full border-2 border-current border-t-transparent", config.icon)} />
-      ) : (
-        icon
+      {renderIcon()}
+      {showText && (
+        <span className={cn("font-medium whitespace-nowrap", config.text)}>
+          {supportsShare ? "Share" : "Copy Link"}
+        </span>
       )}
     </button>
   );
