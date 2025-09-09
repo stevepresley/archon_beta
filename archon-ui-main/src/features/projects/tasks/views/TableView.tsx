@@ -279,7 +279,8 @@ const DraggableRow = ({
           </div>
         </div>
       </td>
-    </tr>
+      </tr>
+    </CopyTooltip>
   );
 };
 
