@@ -147,6 +147,15 @@ const DraggableRow = ({
     handleShiftClick(e);
   };
 
+  const handleCopyClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(copyUrl);
+    } catch (err) {
+      console.error('Failed to copy URL:', err);
+    }
+  };
+
   return (
     <tr
       ref={(node) => {
