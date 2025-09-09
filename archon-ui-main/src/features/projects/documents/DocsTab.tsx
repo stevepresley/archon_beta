@@ -120,7 +120,7 @@ export const DocsTab = ({ project, selectedDocId }: DocsTabProps) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         {/* Left Sidebar - Document List */}
         <div
           className={cn(
