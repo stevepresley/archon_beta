@@ -48,6 +48,13 @@ const DraggableRow = ({
   const deleteTaskMutation = useDeleteTask(projectId);
   const [localAssignee, setLocalAssignee] = useState<Assignee>(task.assignee);
   
+  // Universal copy functionality (desktop + mobile)
+  const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
+    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
+    title: task.title,
+    text: `Check out this task: ${task.title}`,
+  });
+  
   // Ref for auto-scroll functionality
   const rowRef = useRef<HTMLTableRowElement>(null);
 
