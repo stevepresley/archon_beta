@@ -147,18 +147,18 @@ const DraggableRow = ({
     handleShiftClick(e);
   };
 
-  const handleCopyClick = async (e: React.MouseEvent) => {
+  const handleCopyIdClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Handle both regular click and Shift+Click
-    handleShiftClick(e);
-    
-    // Also handle regular click to copy
-    if (!e.shiftKey) {
+    if (e.shiftKey) {
+      // Shift+Click: Copy full URL
+      handleShiftClick(e);
+    } else {
+      // Regular click: Copy just the task ID
       try {
-        await navigator.clipboard.writeText(copyUrl);
+        await navigator.clipboard.writeText(task.id);
       } catch (err) {
-        console.error('Failed to copy URL:', err);
+        console.error('Failed to copy task ID:', err);
       }
     }
   };
