@@ -187,7 +187,7 @@ export function MinimalLayout({ children, className }: MainLayoutProps) {
       />
 
       {/* Centered Content */}
-      <div className="relative w-full max-w-4xl px-6">{children}</div>
+      <div className="relative w-full max-w-7xl px-6">{children}</div>
     </div>
   );
 }
