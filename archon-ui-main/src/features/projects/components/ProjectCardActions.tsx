@@ -111,11 +111,11 @@ export const ProjectCardActions: React.FC<ProjectCardActionsProps> = ({
         </button>
       </SimpleTooltip>
 
-      {/* Copy Project ID Button */}
-      <SimpleTooltip content="Copy Project ID">
+      {/* Copy Project ID Button with Shift+Click for URL */}
+      <SimpleTooltip content="Shift-click to copy URL">
         <button
           type="button"
-          onClick={handleCopyId}
+          onClick={handleCopyIdClick}
           className={cn(
             "w-5 h-5 rounded-full flex items-center justify-center",
             "transition-all duration-300",
