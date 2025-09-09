@@ -7,6 +7,7 @@ import { SimpleTooltip } from "../../../ui/primitives/tooltip";
 interface TaskCardActionsProps {
   taskId: string;
   taskTitle: string;
+  projectId: string;
   onEdit: () => void;
   onDelete: () => void;
   isDeleting?: boolean;
