@@ -133,9 +133,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   const handleTaskClick = (e: React.MouseEvent) => {
-    // Handle Shift+Click for copy functionality first
-    handleShiftClick(e);
-    
     // Handle multi-select on Ctrl/Cmd+Click
     if (e.ctrlKey || e.metaKey) {
       e.stopPropagation();
