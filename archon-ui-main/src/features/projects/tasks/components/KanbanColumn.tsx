@@ -81,7 +81,7 @@ export const KanbanColumn = ({
       </div>
 
       {/* Tasks Container */}
-      <div className="px-2 flex-1 overflow-y-auto space-y-2 py-3 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+      <div className="px-2 flex-1 overflow-y-auto space-y-2 py-3 scrollbar-thin">
         {tasks.length === 0 ? (
           <div className={cn("text-center py-8 text-gray-400 dark:text-gray-600 text-sm", "opacity-60")}>No tasks</div>
         ) : (
