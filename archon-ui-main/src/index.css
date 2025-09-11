@@ -157,12 +157,12 @@
 }
 
 .scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 6px !important;
+  height: 6px !important;
 }
 
 .scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
+  background: transparent !important;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb {
@@ -170,10 +170,10 @@
     to bottom,
     hsl(var(--blue-accent) / 0.60),
     hsl(var(--blue-accent) / 0.30)
-  );
-  border-radius: 3px;
-  box-shadow: 0 0 3px hsl(var(--blue-accent) / 0.40);
-  transition: background 0.2s ease, box-shadow 0.2s ease;
+  ) !important;
+  border-radius: 3px !important;
+  box-shadow: 0 0 3px hsl(var(--blue-accent) / 0.40) !important;
+  transition: background 0.2s ease, box-shadow 0.2s ease !important;
 }
 
 .scrollbar-thin::-webkit-scrollbar-thumb:hover {
@@ -181,10 +181,10 @@
     to bottom,
     hsl(var(--blue-accent) / 0.80),
     hsl(var(--blue-accent) / 0.50)
-  );
+  ) !important;
   box-shadow:
     0 0 6px hsl(var(--blue-accent) / 0.60),
-    inset 0 0 3px hsl(var(--blue-accent) / 0.30);
+    inset 0 0 3px hsl(var(--blue-accent) / 0.30) !important;
 }
 
 .dark .scrollbar-thin {
