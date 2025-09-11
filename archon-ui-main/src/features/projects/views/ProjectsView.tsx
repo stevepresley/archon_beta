@@ -261,7 +261,7 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
       {/* Project Details Section */}
       {selectedProject && (
         <motion.div variants={itemVariants} className="relative">
-          <Tabs defaultValue="tasks" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs defaultValue="tasks" value={activeTab} onValueChange={handleTabChange} className="w-full">
             <TabsList>
               <TabsTrigger value="docs" className="py-3 font-mono transition-all duration-300" color="blue">
                 Docs
