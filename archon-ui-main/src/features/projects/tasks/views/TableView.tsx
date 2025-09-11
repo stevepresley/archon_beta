@@ -17,7 +17,6 @@ interface TableViewProps {
   tasks: Task[];
   projectId: string;
   selectedTaskId?: string;
-  viewMode?: "table" | "board";
   onTaskView?: (task: Task) => void;
   onTaskComplete?: (taskId: string) => void;
   onTaskDelete?: (task: Task) => void;
