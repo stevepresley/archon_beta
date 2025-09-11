@@ -250,5 +250,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         </div>
       </div>
       </div>
+    </>
   );
 };
