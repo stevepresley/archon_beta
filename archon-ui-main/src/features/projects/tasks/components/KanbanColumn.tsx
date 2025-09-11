@@ -5,6 +5,16 @@ import type { Task } from "../types";
 import { getColumnColor, getColumnGlow, ItemTypes } from "../utils/task-styles";
 import { TaskCard } from "./TaskCard";
 
+// Tron-themed scrollbar styles
+const scrollbarStyles: React.CSSProperties = {
+  scrollbarWidth: 'thin',
+  scrollbarColor: 'hsl(217 91% 60% / 0.40) transparent',
+} as React.CSSProperties & {
+  '&::-webkit-scrollbar'?: any;
+  '&::-webkit-scrollbar-thumb'?: any;
+  '&::-webkit-scrollbar-track'?: any;
+};
+
 interface KanbanColumnProps {
   status: Task["status"];
   title: string;
