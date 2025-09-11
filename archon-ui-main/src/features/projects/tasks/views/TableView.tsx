@@ -52,7 +52,7 @@ const DraggableRow = ({
   
   // Universal copy functionality (desktop + mobile)
   const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
-    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}?view=${viewMode}`,
+    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}?view=table`,
     title: task.title,
     text: "Copy URL",
   });
