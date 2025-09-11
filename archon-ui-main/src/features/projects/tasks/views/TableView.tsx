@@ -190,7 +190,7 @@ const DraggableRow = ({
         "border-b border-gray-200 dark:border-gray-800",
         isDragging && "opacity-50 scale-105 shadow-lg",
         isOver && "bg-cyan-100/50 dark:bg-cyan-900/20 border-cyan-400",
-        isSelected && "bg-cyan-50/40 dark:bg-cyan-900/30 border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.5)] ring-2 ring-cyan-400/20",
+        isSelected && "bg-cyan-50/40 dark:bg-cyan-900/30 border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.5)] ring-2 ring-cyan-400/20 border-l-4 border-l-cyan-500",
       )}
     >
       {/* Priority/Order Indicator */}
