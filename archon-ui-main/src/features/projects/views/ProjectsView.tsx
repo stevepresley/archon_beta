@@ -99,6 +99,23 @@ export function ProjectsView({ className = "", "data-id": dataId }: ProjectsView
     [selectedProject?.id, navigate],
   );
 
+  // Handle tab changes with URL updates
+  const handleTabChange = useCallback(
+    (newTab: string) => {
+      if (!selectedProject) return;
+      
+      setActiveTab(newTab);
+      
+      // Update URL based on tab selection
+      if (newTab === "docs") {
+        navigate(`/projects/${selectedProject.id}/docs`, { replace: true });
+      } else if (newTab === "tasks") {
+        navigate(`/projects/${selectedProject.id}/tasks`, { replace: true });
+      }
+    },
+    [selectedProject, navigate],
+  );
+
   // Auto-select project based on URL or default to leftmost
   useEffect(() => {
     if (!sortedProjects.length) return;
