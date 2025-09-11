@@ -158,6 +158,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
     "group-hover:border-cyan-400/70 dark:group-hover:border-cyan-500/50 group-hover:shadow-[0_0_15px_rgba(34,211,238,0.4)] dark:group-hover:shadow-[0_0_15px_rgba(34,211,238,0.6)]";
 
   return (
+    <>
       {/* biome-ignore lint/a11y/useSemanticElements: Drag-and-drop card with react-dnd - requires div for drag handle */}
       <div
         ref={(node) => drag(drop(node))}
