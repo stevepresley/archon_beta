@@ -53,7 +53,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
   // Universal copy functionality (desktop + mobile)
   const { isCopied, handleShiftClick, copyUrl, isMobile, isTouch } = useUniversalCopy({
-    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}`,
+    getUrlPath: () => `/projects/${projectId}/tasks/${task.id}?view=${viewMode}`,
     title: task.title,
     text: `Check out this task: ${task.title}`,
   });
