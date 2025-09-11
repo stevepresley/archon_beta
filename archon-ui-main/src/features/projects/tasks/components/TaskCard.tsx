@@ -16,6 +16,7 @@ export interface TaskCardProps {
   task: Task;
   index: number;
   projectId: string; // Need this for mutations
+  viewMode?: "table" | "board";
   isSelected?: boolean;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task["status"]) => void;
   onEdit?: (task: Task) => void; // Optional edit handler
