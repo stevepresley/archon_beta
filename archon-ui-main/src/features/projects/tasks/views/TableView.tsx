@@ -41,6 +41,7 @@ const DraggableRow = ({
   task,
   index,
   projectId,
+  viewMode = "table",
   isSelected,
   onTaskView,
   onTaskComplete,
