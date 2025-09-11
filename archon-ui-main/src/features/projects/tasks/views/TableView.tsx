@@ -322,6 +322,7 @@ export const TableView = ({
   tasks,
   projectId,
   selectedTaskId,
+  viewMode = "table",
   onTaskView,
   onTaskComplete,
   onTaskDelete,
