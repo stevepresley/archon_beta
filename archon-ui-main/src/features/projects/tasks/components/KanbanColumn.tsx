@@ -81,7 +81,13 @@ export const KanbanColumn = ({
       </div>
 
       {/* Tasks Container */}
-      <div className="px-2 flex-1 overflow-y-auto space-y-2 py-3 custom-scrollbar">
+      <div 
+        className="px-2 flex-1 overflow-y-auto space-y-2 py-3"
+        style={{
+          scrollbarWidth: 'thin',
+          scrollbarColor: 'hsl(217 91% 60% / 0.40) transparent'
+        }}
+      >
         {tasks.length === 0 ? (
           <div className={cn("text-center py-8 text-gray-400 dark:text-gray-600 text-sm", "opacity-60")}>No tasks</div>
         ) : (
