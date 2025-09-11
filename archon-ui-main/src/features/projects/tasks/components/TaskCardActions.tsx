@@ -29,7 +29,7 @@ export const TaskCardActions: React.FC<TaskCardActionsProps> = ({
     if (e.shiftKey) {
       // Shift+Click: Copy full URL
       try {
-        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${taskId}`;
+        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${taskId}?view=board`;
         await navigator.clipboard.writeText(fullUrl);
         showToast("Task URL copied to clipboard", "success");
       } catch {
