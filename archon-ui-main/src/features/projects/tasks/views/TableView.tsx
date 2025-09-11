@@ -396,6 +396,7 @@ export const TableView = ({
                     task={task}
                     index={index}
                     projectId={projectId}
+                    viewMode={viewMode}
                     isSelected={task.id === selectedTaskId}
                     onTaskView={onTaskView}
                     onTaskComplete={onTaskComplete}
