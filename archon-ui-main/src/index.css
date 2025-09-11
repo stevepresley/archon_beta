@@ -188,7 +188,7 @@
 }
 
 .dark .scrollbar-thin {
-  scrollbar-color: hsl(var(--blue-accent) / 0.50) transparent;
+  scrollbar-color: hsl(var(--blue-accent) / 0.50) transparent !important;
 }
 
 .dark .scrollbar-thin::-webkit-scrollbar-thumb {
@@ -196,8 +196,8 @@
     to bottom,
     hsl(var(--blue-accent) / 0.50),
     hsl(var(--blue-accent) / 0.20)
-  );
-  box-shadow: 0 0 4px hsl(var(--blue-accent) / 0.50);
+  ) !important;
+  box-shadow: 0 0 4px hsl(var(--blue-accent) / 0.50) !important;
 }
 
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
@@ -205,10 +205,10 @@
     to bottom,
     hsl(var(--blue-accent) / 0.70),
     hsl(var(--blue-accent) / 0.40)
-  );
+  ) !important;
   box-shadow:
     0 0 8px hsl(var(--blue-accent) / 0.70),
-    inset 0 0 3px hsl(var(--blue-accent) / 0.40);
+    inset 0 0 3px hsl(var(--blue-accent) / 0.40) !important;
 }
 
 /* Note: Mac scrollbar styles moved to TailwindCSS utilities */
