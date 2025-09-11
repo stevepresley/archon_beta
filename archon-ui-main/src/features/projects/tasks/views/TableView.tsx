@@ -29,6 +29,7 @@ interface DraggableRowProps {
   task: Task;
   index: number;
   projectId: string;
+  viewMode?: "table" | "board";
   isSelected?: boolean;
   onTaskView?: (task: Task) => void;
   onTaskComplete?: (taskId: string) => void;
