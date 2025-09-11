@@ -16,7 +16,6 @@ export const BoardView = ({
   tasks,
   projectId,
   selectedTaskId,
-  viewMode = "board",
   onTaskMove,
   onTaskReorder,
   onTaskEdit,
