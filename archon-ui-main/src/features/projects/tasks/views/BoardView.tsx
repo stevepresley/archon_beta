@@ -6,6 +6,7 @@ interface BoardViewProps {
   tasks: Task[];
   projectId: string;
   selectedTaskId?: string;
+  viewMode?: "table" | "board";
   onTaskMove: (taskId: string, newStatus: Task["status"]) => void;
   onTaskReorder: (taskId: string, targetIndex: number, status: Task["status"]) => void;
   onTaskEdit?: (task: Task) => void;
