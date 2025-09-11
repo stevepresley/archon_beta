@@ -30,7 +30,6 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   index,
   projectId,
-  viewMode = "board",
   isSelected: isSelectedProp,
   onTaskReorder,
   onEdit,
