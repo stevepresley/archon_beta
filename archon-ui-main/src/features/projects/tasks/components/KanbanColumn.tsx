@@ -52,7 +52,7 @@ export const KanbanColumn = ({
     <div
       ref={ref}
       className={cn(
-        "flex flex-col h-full",
+        "flex flex-col h-full scrollbar-thin",
         "bg-gradient-to-b from-white/20 to-transparent dark:from-black/30 dark:to-transparent",
         "backdrop-blur-sm",
         "transition-all duration-200",
