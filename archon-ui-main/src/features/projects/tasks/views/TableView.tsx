@@ -158,7 +158,7 @@ const DraggableRow = ({
     if (e.shiftKey) {
       // Shift+Click: Copy full URL
       try {
-        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${task.id}`;
+        const fullUrl = `${window.location.origin}/projects/${projectId}/tasks/${task.id}?view=${viewMode}`;
         await navigator.clipboard.writeText(fullUrl);
         showToast("Task URL copied to clipboard", "success");
       } catch (err) {
