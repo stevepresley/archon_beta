@@ -48,7 +48,6 @@ export const BoardView = ({
             tasks={getTasksByStatus(status)}
             projectId={projectId}
             selectedTaskId={selectedTaskId}
-            viewMode={viewMode}
             onTaskMove={onTaskMove}
             onTaskReorder={onTaskReorder}
             onTaskEdit={onTaskEdit}
