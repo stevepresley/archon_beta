@@ -25,7 +25,6 @@ export const KanbanColumn = ({
   tasks,
   projectId,
   selectedTaskId,
-  viewMode = "board",
   onTaskMove,
   onTaskReorder,
   onTaskEdit,
