@@ -93,6 +93,7 @@ export const KanbanColumn = ({
               task={task}
               index={index}
               projectId={projectId}
+              viewMode={viewMode}
               isSelected={task.id === selectedTaskId}
               onTaskReorder={onTaskReorder}
               onEdit={onTaskEdit}
