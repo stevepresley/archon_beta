@@ -228,7 +228,7 @@ export const TasksTab = ({ projectId, selectedTaskId, viewParam }: TasksTabProps
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-[70vh] relative">
         {/* Main content - Table or Board view */}
-        <div className="relative h-[calc(100vh-220px)] overflow-auto">
+        <div className="relative h-[calc(100vh-220px)] overflow-auto scrollbar-thin">
           {viewMode === "table" ? (
             <TableView
               tasks={tasks as Task[]}
