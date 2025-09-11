@@ -152,8 +152,8 @@
 
 /* Thin scrollbar styles (used in KanbanColumn and other components) - Tron-themed */
 .scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: hsl(var(--blue-accent) / 0.40) transparent;
+  scrollbar-width: thin !important;
+  scrollbar-color: hsl(var(--blue-accent) / 0.40) transparent !important;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
