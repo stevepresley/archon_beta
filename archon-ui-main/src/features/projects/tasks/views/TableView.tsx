@@ -348,7 +348,7 @@ export const TableView = ({
   const statusOrder: Task["status"][] = ["todo", "doing", "review", "done"];
 
   return (
-    <div className="overflow-x-auto scrollbar-mac-h">
+    <div className="overflow-x-auto custom-scrollbar">
       <table className="w-full">
         <thead>
           <tr className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-b-2 border-gray-200 dark:border-gray-700">
